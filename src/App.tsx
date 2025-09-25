@@ -1,15 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
 
- */
 
 import React from 'react';
 // import type {PropsWithChildren} from 'react';
 import {enableLatestRenderer} from 'react-native-maps';
 import AppNav from './navigation/AppNav';
+ 
 
 import { AuthProvider } from './context/AuthContext';
 import { ObservationProvider } from './context/ObservationContext';

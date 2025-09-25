@@ -208,7 +208,7 @@ const [precipitationType, setPrecipitationType] = useState();
 
 //Activity type:
 const snowIntensityOptions = [
-    {label: '>1'},
+    {label: '<1'},
     {label: '1-5'},
     {label: '5-10'},
     {label: '>10'},
@@ -241,7 +241,7 @@ const windSpeedOptions = [
     {label: 'Suave (1-25km/h)'},
     {label: 'Moderado (26-40km/h)'},
     {label: 'Fuerte (41-60km/h)'},
-    {label: 'Extrem (>60km/h)'},
+    {label: 'Extremo (>60km/h)'},
 ]
 
 const [windSpeed, setWindSpeed] = useState();

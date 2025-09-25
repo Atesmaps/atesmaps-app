@@ -12,9 +12,10 @@ import {
   Button,
    } from 'react-native';
 
-import moment from 'moment';
+// import moment from 'moment';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 
 import { AuthContext } from '../context/AuthContext';
 import { ObservationContext } from '../context/ObservationContext';
@@ -28,6 +29,7 @@ export default function ObservationDetail({ navigation }) {
     const {currentLocation, getOneTimeLocation} = useContext(LocationContext);
     const {isLoading, lastIndex, observations, historicObservations, newObservation, currentPage, setCurrentPage, setLastPage, lastPage, getData} = useContext(ObservationContext);
     const {userDetails} = useContext(AuthContext);
+    const { t } = useTranslation();
 
     //const [user, setUser] = useState(userDetails);
     const [drafts, setDrafts] = useState(observations);
@@ -255,7 +257,7 @@ export default function ObservationDetail({ navigation }) {
             keyExtractor={(item,index) => index}
             /> */}
             <View style={styles.formContainer}>
-              <Text style={styles.sectionTitle}>Borradores</Text>
+              <Text style={styles.sectionTitle}>{t('borradores')}</Text>
               <View style={styles.spacer}/>
             </View>
             {draftList}

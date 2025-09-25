@@ -168,16 +168,15 @@ export const AuthProvider = ({children}) => {
         setIsLoading(false);
     }
 
-  
-
     const googleLogin = async () => {
         try {
+            console.log('Logging Google Sign in')
             setIsLoading(true);
             const result = await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-            console.log('result:');
-            console.log(result);
+            //console.log('result:');
+            //console.log(result);
             const userInfo = await GoogleSignin.signIn();
-            console.log(userInfo);
+            //console.log(userInfo);
             let response = await axios.post(`${BASE_URL}/auth/google-signin`,{'tokenId': userInfo.idToken, platform:Platform.OS});
     
             let user = response.data.user;
