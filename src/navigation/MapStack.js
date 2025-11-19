@@ -11,6 +11,7 @@ import {
     Text,
   } from 'react-native';
 
+import { useTranslation } from 'react-i18next';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../context/AuthContext';
 import { ObservationContext } from '../context/ObservationContext';
@@ -22,17 +23,21 @@ import ShowObservation from '../screens/ShowObservation';
 const Stack = createNativeStackNavigator();
 
 const ProfileStack: () => Node = ({ navigation, route }) => {
-
+  const {t} = useTranslation();
   const {logout} = useContext(AuthContext);
   const {setCurrentPage} = useContext(ObservationContext);
 
 return(
     <Stack.Navigator> 
       <Stack.Group>
-        <Stack.Screen name="Observaciones" component={ObservationsMap} />
+        <Stack.Screen name="Observaciones" component={ObservationsMap} options={{
+            title: t('misObs'),
+        }}  />
       </Stack.Group>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="ObservationModal" component={ShowObservation} />
+        <Stack.Screen name="ObservationModal" component={ShowObservation} options={{
+            title: t('observationTitle'),
+        }}  />
       </Stack.Group>
     </Stack.Navigator>
 )};

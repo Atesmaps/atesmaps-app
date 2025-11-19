@@ -1,6 +1,7 @@
 import React, { useState, useEffect,useContext } from 'react';
 
 import type {Node} from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
     StyleSheet,
@@ -22,7 +23,7 @@ import Profile from '../screens/Profile';
 const Stack = createNativeStackNavigator();
 
 const ProfileStack: () => Node = ({ navigation, route }) => {
-
+  const { t } = useTranslation();
   const {logout} = useContext(AuthContext);
   const {setCurrentPage} = useContext(ObservationContext);
 
@@ -33,6 +34,7 @@ return(
         component={Profile} 
         options={{
           headerShown: true ,
+          title: t('perfilUser'),
         //headerTitle: () => <Text>Title...</Text>,
           // headerLeft: () => (
           //   <Button

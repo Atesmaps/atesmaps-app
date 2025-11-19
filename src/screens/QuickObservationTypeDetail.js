@@ -13,6 +13,7 @@ import {
     Text,
     TextInput
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import CustomRadioButton from "../components/CustomRadioButton";
 import CustomButton from "../components/CustomButton";
@@ -27,7 +28,7 @@ import { useForm, Controller } from "react-hook-form";
 import { ObservationContext } from '../context/ObservationContext';
 
 const QuickObservationTypeDetail: () => Node = ({ route, navigation }) => {
-
+const {t} = useTranslation();
 const { editingObservation, selectedIndex, setEditingObservation, updateObservations  } = useContext(ObservationContext);
 const [ quickValues, setQuickValues ] = useState(editingObservation.observationTypes?.quick ? editingObservation.observationTypes?.quick : {status: false, values: {}});
 const [inputError, setInputError ] = useState(false);
@@ -80,7 +81,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue, reset
 
 useEffect(()=>{
     if (errors && Object.keys(errors).length != 0) {
-        let errorsText = 'Revisa los siguientes campos: \n';
+        let errorsText = t('errorTitle');
         for (const key in errors) {
             errorsText += `${key}: ${errors[key]['message']} \n`
             // console.log(`${key}: ${errors[key]}`);
@@ -118,7 +119,7 @@ useLayoutEffect(() => {
            
             // navigation.navigate('Observación', {index, update:true})
           }}
-          title="Guardar"
+          title={t('guardar')}
         />
       )
     });
@@ -134,7 +135,7 @@ const updateData = () => {
     if( values.activityType == 7 && (values.customActivityType === null || values.customActivityType == "")){
         setInputError(true);
         Snackbar.show({
-            text: 'Por favor, escribe el tipo de actividad.',
+            text: t('quickObsSnackBarText'),
             duration: Snackbar.LENGTH_SHORT,
             numberOfLines: 2,
             textColor: "#fff",
@@ -201,7 +202,7 @@ const updateData = () => {
         setEditingObservation({...editingObservation, observationTypes: observation.observationTypes['quick']});
         updateObservations(observation);
         Snackbar.show({
-            text: 'Tu observación rápida se ha guardado.',
+            text: t('snackbarObservationText4'),
             duration: Snackbar.LENGTH_SHORT,
             numberOfLines: 2,
             textColor: "#fff",
@@ -224,7 +225,7 @@ const removeData = () => {
     // console.log(observation);
     // console.log('---------------------------');
     Snackbar.show({
-        text: 'Tu observación rápida se ha eliminado.',
+        text: t('quickObsSnackBarText2'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -235,23 +236,23 @@ const removeData = () => {
 
 //Riding conditions:
 const data = [
-    {label: 'Muy buenas condiciones'},
-    {label: 'Buenas condiciones'},
-    {label: 'Condiciones aceptables'},
-    {label: 'Malas condiciones'},
+    {label: t('muyBuenas')},
+    {label: t('buenas')},
+    {label: t('aceptables')},
+    {label: t('malas')},
 ];
 
 const [ridingQuality, setRidingQuality] = useState(quickValues.values?.ridingQuality);
 
 //Activity type:
 const activityData = [
-    {label: 'Esqui de montaña / Splitboard'},
-    {label: 'Raquetas de nieve'},
-    {label: 'Alpinismo'},
-    {label: 'Esquí/Snowboard (Pista)'},
-    {label: 'Esquí de fondo'},
-    {label: 'Sin actividad'},
-    {label: 'Otra'}
+    {label: t('skimo')},
+    {label: t('raquetas')},
+    {label: t('alpinismo')},
+    {label: t('pista')},
+    {label: t('fondo')},
+    {label: t('sinActividad')},
+    {label: t('otra')}
 ]
 
 const [activityType, setActivityType] = useState();
@@ -262,17 +263,15 @@ return(
         <ScrollView >
             <View style={styles.container}>
                 <View style={styles.introContainer} >
-                    <Text style={styles.intro}>Realiza un breve análisis de tu actividad y las condiciones observadas. 
-                    Cualquier informacion puede ser útil a otros usuarios o profesionales. Solo la primera pregunta es obligada, 
-                    no respondas aquellas de las que no estés seguro/a. Puedes añadir más detalles en los apartados Avalancha, Manto y Accidente.</Text> 
-                    <Text style={styles.introSubtext}> * campos obligatorios</Text>
+                    <Text style={styles.intro}>{t('breveAnalisisi')}</Text> 
+                    <Text style={styles.introSubtext}>{t('campos')}</Text>
                 </View>
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="activityType"
-                        title="Actividad*:"
+                        title={t('actividad')}
                         control={control}
                         data={activityData}
                         rules={{required: 'Campo obligatorio'}}
@@ -282,7 +281,7 @@ return(
                     />
                     <CustomInput
                             name="customActivityType"
-                            placeholder="Otro tipo de actividad"
+                            placeholder={t('otroTipo')}
                             control={control}
                             customError={inputError}
                             customStyles={{width:"100%"}}
@@ -295,7 +294,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="ridingQuality"
-                        title="Evaluación general de la actividad:"
+                        title={t('evalGenAct')}
                         control={control}
                         data={data}
                         // rules={{required: 'Campo obligatorio'}}
@@ -319,16 +318,16 @@ return(
                     > */}
 
                     
-                    <Text>Condiciones de nieve:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('condicionesNieve')}</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="deepPowder"
-                                        title="Polvo" 
+                                        title={t('polvo')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="wet" 
-                                        title="Húmeda"
+                                        title={t('humeda')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -336,12 +335,12 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="crusty"
-                                        title="Costra que se rompe" 
+                                        title={t('costra')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="hard" 
-                                        title="Dura/Hielo"
+                                        title={t('dura')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -353,7 +352,7 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         /> */}
                         <CustomCheckbox name="windAffected" 
-                                        title="Venteada"
+                                        title={t('venteada')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -376,21 +375,21 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>Tipo de terreno:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('tipoTerreno')}</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="rodeMellow"
-                                        title="Suave" 
+                                        title={t('suave')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rodeSteep" 
-                                        title="Empinado"
+                                        title={t('empinado')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rodeAlpine" 
-                                        title="Alpino"
+                                        title={t('alpino')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -398,29 +397,29 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="rodeDense"
-                                        title="Bosque denso" 
+                                        title={t('bosqueDenso')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rodeClear" 
-                                        title="Bosque Abierto"
+                                        title={t('bosqueAbierto')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rodeOpen" 
-                                        title="Terreno Abierto"
+                                        title={t('terrenoAbierto')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="rodeShade"
-                                        title="Umbrío" 
+                                        title={t('umbrio')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rodeSunny" 
-                                        title="Soleado"
+                                        title={t('soleado')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -446,16 +445,16 @@ return(
                     > */}
 
                     
-                    <Text>El tiempo:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('tiempoMeteo')}</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="warmDay"
-                                        title="Caluroso" 
+                                        title={t('calurodos')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="coldDay" 
-                                        title="Frio"
+                                        title={t('frio')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -463,24 +462,24 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="cloudyDay"
-                                        title="Nublado" 
+                                        title={t('nublado')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="sunnyDay" 
-                                        title="Soleado"
+                                        title={t('soleado')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="windyDay"
-                                        title="Venteado" 
+                                        title={t('venteado')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="foggyDay" 
-                                        title="Niebla"
+                                        title={t('niebla')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -488,24 +487,24 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="wetDay"
-                                        title="Húmedo" 
+                                        title={t('húmedo')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="rainyDay" 
-                                        title="Lluvia"
+                                        title={t('lluvia')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="weakSnowDay" 
-                                        title="Nevada leve"
+                                        title={t('nevadaLeve')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="intenseSnowDay"
-                                        title="Nevada intensa" 
+                                        title={t('nevadaIntensa')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -529,11 +528,11 @@ return(
                         ]}
                     > */}
 
-                    <Text>Señales de alerta:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('alertas')} </Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="newConditions"
-                                        title="Carga de nieve nueva (más de 30cm en 48h)" 
+                                        title={t('cargaNieve')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -542,7 +541,7 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalanches"
-                                        title="Aludes de placa recientes" 
+                                        title={t('aludesPlaca')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -551,7 +550,7 @@ return(
                   
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="sounds"
-                                        title="Woumfs o fisuras con propagación" 
+                                        title={t('woumpfs')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -559,7 +558,7 @@ return(
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="tempChanges"
-                                        title="Sobrecarga por fusión o lluvia" 
+                                        title={t('fusion')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -567,7 +566,7 @@ return(
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="snowAccumulation"
-                                        title="Acumulaciones recientes por viento" 
+                                        title={t('acumulViento')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -582,7 +581,7 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Otras observaciones:</Text>
+                    <Text>{t('otrasObs')}</Text>
                 
                     <CustomInput
                         name="comments"
@@ -590,13 +589,13 @@ return(
                         multiline={true}
                         numberOfLines={4}
                         customStyles={[styles.inputContainer, {height: '20%'}]}
-                        placeholder="1000 letras max"
+                        placeholder={t('letrasMax')}
                         />
                         <View style={{marginTop: 30}}>
-                            <CustomButton text="Guardar" bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
                         </View>
                         <View>
-                            <CustomButton text="Borrar datos" bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                            <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
                         </View>
                 </View>
 

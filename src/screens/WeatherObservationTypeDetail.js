@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext, useTransition } from 'react';
 import type {Node} from 'react';
 // import RadioButtonRN from 'radio-buttons-react-native';
 
@@ -19,7 +19,7 @@ import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import CustomCheckbox from "../components/CustomCheckbox";
 import Snackbar from "react-native-snackbar";
-
+import { useTranslation } from 'react-i18next';
 
 // import CheckBox from '@react-native-community/checkbox';
 import { useForm, Controller } from "react-hook-form";
@@ -27,7 +27,7 @@ import { useForm, Controller } from "react-hook-form";
 import { ObservationContext } from '../context/ObservationContext';
 
 const WeatherObservationTypeDetail: () => Node = ({ route, navigation }) => {
-
+const {t} = useTranslation();
 const { editingObservation, selectedIndex, setEditingObservation, updateObservations  } = useContext(ObservationContext);
 const [ weatherValues, setWeatherValues ] = useState(editingObservation.observationTypes?.weather ? editingObservation.observationTypes?.weather : {status: false, values: {}});
 
@@ -64,7 +64,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue, reset
 
 useEffect(()=>{
     if (errors && Object.keys(errors).length != 0) {
-        let errorsText = 'Revisa los siguientes campos: \n';
+        let errorsText = t('errorTitle');
         for (const key in errors) {
             errorsText += `${key}: ${errors[key]['message']} \n`
             // console.log(`${key}: ${errors[key]}`);
@@ -76,7 +76,7 @@ useEffect(()=>{
             textColor: "#fff",
             backgroundColor: "#B00020",
             action: {
-                text: 'Cerrar',
+                text: t('close'),
                 textColor: 'white',
                 onPress: () => { /* Do something. */ },
             },
@@ -102,7 +102,7 @@ useLayoutEffect(() => {
            
             // navigation.navigate('Observación', {index, update:true})
           }}
-          title="Guardar"
+          title={t('guardar')}
         />
       )
     });
@@ -153,7 +153,7 @@ const updateData = () => {
     setEditingObservation({...editingObservation, observationTypes: observation.observationTypes['weather']});
     updateObservations(observation);
     Snackbar.show({
-        text: 'Tu observación del tiempo se ha guardado.',
+        text: t('weatherObsSnackBarText2'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -175,7 +175,7 @@ const removeData = () => {
     // console.log(observation);
     // console.log('---------------------------');
     Snackbar.show({
-        text: 'Tu observación del tiempo se ha eliminado.',
+        text: t('weatherObsSnackBarText'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -186,22 +186,22 @@ const removeData = () => {
 
 //Riding conditions:
 const skyConditionOptions = [
-    {label: 'Despejado (0/8)'},
-    {label: 'Pocas nubes (1/8-2/8)'},
-    {label: 'Nubes dispersas (2/8-4/8)'},
-    {label: 'Nubes rotas (5/8-7/8)'},
-    {label: 'Nublado (8/8)'},
-    {label: 'Niebla'},
+    {label: t('despejado')},
+    {label: t('pocasNubes')},
+    {label: t('nubesDispersas')},
+    {label: t('nubesRotas')},
+    {label: t('nublado8')},
+    {label: t('niebla')},
 ];
 
 const [skyCondition, setSkyCondition] = useState(weatherValues.values?.skyCondition);
 
 //Activity type:
 const precipitationTypeOptions = [
-    {label: 'Nieve'},
-    {label: 'Lluvia'},
-    {label: 'Aguanieve'},
-    {label: 'Ninguna'},
+    {label: t('nieve')},
+    {label: t('lluvia')},
+    {label: t('aguanieve')},
+    {label: t('ninguna')},
 ]
 
 const [precipitationType, setPrecipitationType] = useState();
@@ -219,39 +219,39 @@ const [snowIntensity, setSnowIntensity] = useState();
 
 //Activity type:
 const rainIntensityOptions = [
-    {label: 'Llovizna'},
-    {label: 'Chubasco (abrupto)'},
-    {label: 'Lluvia(constante)'},
-    {label: 'Diluvio'},
+    {label: t('llovizna')},
+    {label: t('chubasco')},
+    {label: t('lluviaConst')},
+    {label: t('diluvio')},
 ]
 
 const [rainIntensity, setRainIntensity] = useState();
 
 //Activity type:
 const tempChangeOptions = [
-    {label: 'Cayó'},
-    {label: 'Constante'},
-    {label: 'Subió'},
+    {label: t('cayo')},
+    {label: t('constante')},
+    {label: t('subio')},
 ]
 
 const [tempChange, setTempChange] = useState();
 
 const windSpeedOptions = [
-    {label: 'Calma'},
-    {label: 'Suave (1-25km/h)'},
-    {label: 'Moderado (26-40km/h)'},
-    {label: 'Fuerte (41-60km/h)'},
-    {label: 'Extremo (>60km/h)'},
+    {label: t('calma')},
+    {label: t('suave')},
+    {label: t('moderado')},
+    {label: t('fuerte')},
+    {label: t('extremVel')},
 ]
 
 const [windSpeed, setWindSpeed] = useState();
 
 
 const windCarryOptions = [
-    {label: 'No'},
-    {label: 'Suave'},
-    {label: 'Moderado'},
-    {label: 'Intensa'},
+    {label: t('no')},
+    {label: t('suave')},
+    {label: t('moderado')},
+    {label: t('intensa')},
 ]
 
 const [windCarry, setWindCarry] = useState();
@@ -262,20 +262,18 @@ return(
         <ScrollView >
             <View style={styles.container}>
                 <View style={styles.introContainer} >
-                    <Text style={styles.intro}>Incluye información sobre la precipitación, temperatura y viento;
-                    así como los cambios que hayas percibido en los mismos.Rellena solamente aquellos campos de 
-                    los que tengas informacion precisa</Text> 
-                    <Text style={styles.introSubtext}> * campos obligatorios</Text>
+                    <Text style={styles.intro}>{t('meteoIntro')}</Text> 
+                    <Text style={styles.introSubtext}>{t('campos')}</Text>
                 </View>
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="skyCondition"
-                        title="Estado del cielo*:"
+                        title={`${t('estadoCielo')}*:`}
                         control={control}
                         data={skyConditionOptions}
-                        rules={{required: 'Campo obligatorio'}}
+                        rules={{required: t('requiredField')}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
@@ -286,10 +284,10 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="precipitationType"
-                        title="Tipo de precipitación*:"
+                        title={`${t('tipoPrec')}*:`}
                         control={control}
                         data={precipitationTypeOptions}
-                        rules={{required: 'Campo obligatorio'}}
+                        rules={{required: t('requiredField')}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
@@ -300,7 +298,7 @@ return(
                    
                     <CustomRadioButton 
                         name="snowIntensity"
-                        title="Intensidad precipitacion - Nieve (cm/hora):"
+                        title={t('intensPrecNev')}
                         control={control}
                         data={snowIntensityOptions}
                         box={false}
@@ -314,7 +312,7 @@ return(
                   
                     <CustomRadioButton 
                         name="rainIntensity"
-                        title="Intensidad precipitación - Lluvia:"
+                        title={t('intensPrecLuvia')}
                         control={control}
                         data={rainIntensityOptions}
                         box={false}
@@ -325,7 +323,7 @@ return(
 
                 <View style={styles.formContainer} >
                 <View style={styles.spacer}></View>
-                <Text>Temperatura en el momento de la observación:</Text>
+                <Text>{t('tempObs')}</Text>
                 
                 <View style={styles.inputGroup}>
                 
@@ -339,7 +337,7 @@ return(
                         />
                 
                 </View> 
-                <Text>Temperatura máxima en las últimas 24h:</Text>
+                <Text>{t('tempMax')}</Text>
                 <View style={styles.inputGroup}>
                 
                     <CustomInput
@@ -352,7 +350,7 @@ return(
                         />
                 
                 </View> 
-                <Text>Temperatura mínima en las últimas 24h:</Text>
+                <Text>{t('tempMin')}</Text>
              
                     <View style={styles.inputGroup}>
                     
@@ -371,7 +369,7 @@ return(
 
                     <CustomRadioButton 
                         name="tempChange"
-                        title="Describe como la temperatura cambió en las últimas 3h:"
+                        title={t('tempDescr')}
                         control={control}
                         data={tempChangeOptions}
                         box={false}
@@ -382,7 +380,7 @@ return(
 
                 <View style={styles.formContainer} >
                 <View style={styles.spacer}></View>
-                <Text>Cantidad de nieve en las últimas 24h:</Text>
+                <Text>{t('cantNieve')}</Text>
                 
                     <View style={styles.inputGroup}>
                     
@@ -399,7 +397,7 @@ return(
                 </View>
 
                 <View style={styles.formContainer} >
-                <Text>Combinación de lluvia y nieve total en las últimas 24h:</Text>
+                <Text>{t('combLluviaNieve')}:</Text>
                     <View style={styles.inputGroup}>
                     
                         <CustomInput
@@ -415,7 +413,7 @@ return(
                 </View>
 
                 <View style={styles.formContainer} >
-                <Text>Cantidad de nieve de la nevada más reciente:</Text>
+                <Text>{t('cantNieveReciente')}:</Text>
                     <View style={styles.inputGroup}>
                     
                         <CustomInput
@@ -431,7 +429,7 @@ return(
                 </View>
 
                 <View style={styles.formContainer} >
-                <Text>Fecha del inicio de la tormenta:</Text>
+                <Text>{t('fechaTorm')}:</Text>
                     <View style={styles.inputGroup}>
                     
                         <CustomInput
@@ -450,7 +448,7 @@ return(
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
-                        name="windSpeed"
+                        name={t('velViento')}
                         title="Velocidad del viento:"
                         control={control}
                         data={windSpeedOptions}
@@ -472,8 +470,8 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>Orientación:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('oriOrientación')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
                                         title="N" 
@@ -535,7 +533,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="windCarry"
-                        title="Transporte de nive por viento:"
+                        title={t('transNieveViento')}
                         control={control}
                         data={windCarryOptions}
                         box={false}
@@ -546,7 +544,7 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Otras observaciones:</Text>
+                    <Text>{t('otrasObs')}:</Text>
                 
                     <CustomInput
                         name="comments"
@@ -554,13 +552,13 @@ return(
                         multiline={true}
                         numberOfLines={4}
                         customStyles={[styles.inputContainer, {height: '20%'}]}
-                        placeholder="1000 letras max"
+                        placeholder={t('letrasMax')}
                         />
                         <View style={{marginTop: 30}}>
-                            <CustomButton text="Guardar" bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
                         </View>
                         <View>
-                            <CustomButton text="Borrar datos" bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                            <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
                         </View>
                 </View>
             </View>

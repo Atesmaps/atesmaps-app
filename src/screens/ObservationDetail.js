@@ -15,17 +15,16 @@ import { s3Client } from "../aws/s3";
 
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
-import CustomRadioButton from "../components/CustomRadioButton";
 
 import { ObservationContext } from '../context/ObservationContext';
 import { AuthContext } from '../context/AuthContext';
 import { LocationContext } from '../context/LocationContext';
 import  Snackbar  from "react-native-snackbar";
 // import { UpdateIdentityPoolCommand } from "@aws-sdk/client-cognito-identity";
-
+import { useTranslation } from "react-i18next";
 
 export default function ObservationDetail({ route, navigation }) {
- 
+    const {t} = useTranslation();
     const {editingObservation,setEditingObservation, newObservation, selectedIndex, observations,setCurrentPage, setLastPage, getData, deleteObservation, updateObservations } = useContext(ObservationContext);
     const {userDetails,userToken} = useContext(AuthContext);
     const {currentLocation, LATITUDE_DELTA,LONGITUDE_DELTA,getOneTimeLocation } = useContext(LocationContext)
@@ -62,11 +61,11 @@ export default function ObservationDetail({ route, navigation }) {
     const dateTimeInput = useRef(null);
     // const [whenObsTaken, setWhenObsTaken] = useState(1);
 
-    const obsTakenOptions = [
-      {label: 'Durante la salida (sobre el terreno)'},
-      {label: 'Immediatamente después de la salida (parquing)'},
-      {label: 'Posteriormente (casa/refugio)'},
-  ]
+  //   const obsTakenOptions = [
+  //     {label: 'Durante la salida (sobre el terreno)'},
+  //     {label: 'Immediatamente después de la salida (parquing)'},
+  //     {label: 'Posteriormente (casa/refugio)'},
+  // ]
 
     useEffect(()=>{
       if(Object.keys(editingObservation).length === 0){
@@ -177,7 +176,7 @@ export default function ObservationDetail({ route, navigation }) {
             deleteObservation();
             
             Snackbar.show({
-              text: 'Muchas gracias. Tu Observación se ha enviado a revisar pr el equipo de ATESMAPS.',
+              text: t('snackbarObservationText'),
               duration: Snackbar.LENGTH_SHORT,
               numberOfLines: 2,
               textColor: "#fff",
@@ -193,7 +192,7 @@ export default function ObservationDetail({ route, navigation }) {
     };
     
     const checkLocation = (observation) => {
-      return observation.location_update ? formatLocation(observation.location) : "Selecciona Ubicación"
+      return observation.location_update ? formatLocation(observation.location) : t('ubiSelecciona')
     }
 
     const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
@@ -207,7 +206,7 @@ export default function ObservationDetail({ route, navigation }) {
 
     useEffect(()=>{
       if (errors && Object.keys(errors).length != 0) {         
-          let errorsText = 'Revisa los siguientes campos: \n';
+          let errorsText = t('errorTitle');
           for (const key in errors) {
               errorsText += `${key}: ${errors[key]['message']} \n`
               // console.log(`${key}: ${errors[key]}`);
@@ -280,7 +279,7 @@ export default function ObservationDetail({ route, navigation }) {
       if(!editingObservation.location_update){
         setLocationError(true)
         Snackbar.show({
-          text: 'Antes de subir una Observación, indica su ubicación',
+          text: t('snackbarObservationRequired'),
           duration: Snackbar.LENGTH_SHORT,
           numberOfLines: 2,
           textColor: "#fff",
@@ -307,7 +306,7 @@ export default function ObservationDetail({ route, navigation }) {
   
       }else{
         Snackbar.show({
-          text: 'Antes de subir una Observación, completa por lo menos uno de los típos de observaciones',
+          text: t('snackbarObservationText3'),
           duration: Snackbar.LENGTH_SHORT,
           numberOfLines: 2,
           textColor: "#fff",
@@ -349,7 +348,7 @@ export default function ObservationDetail({ route, navigation }) {
       return (
         <>
           <View style={{display: 'flex',  flexDirection: 'row', marginBottom: 5}}>
-              <CustomButton text="Día"  
+              <CustomButton text={t('obsDayTitle')}  
                             bgColor={"#48a5e9"} 
                             fgColor='white' 
                             customStyle={{width: '33%', marginRight: 15, padding: 11, height:40}}
@@ -358,7 +357,7 @@ export default function ObservationDetail({ route, navigation }) {
                               console.log('photos library to be called');
                               setShowAndroidDatePicker(true);
                             }} />
-              <CustomButton text="Hora"  
+              <CustomButton text={t('obsHourTitle')}  
                             customStyle={{width: '33%', marginRight: 15, padding: 11, height:40}}
                             bgColor={"#48a5e9"} 
                             fgColor='white' 
@@ -426,22 +425,21 @@ export default function ObservationDetail({ route, navigation }) {
       <SafeAreaView style={styles.safeContainer}>
         <ScrollView style={styles.container}>
           <View style={styles.introContainer} >
-            <Text style={styles.intro}>Intrduce la información básica de la salida: Un nombre que la haga reconocible, fecha y geolocalización. 
-            El momento de publicación y alguna foto serán de gran utilidad para toda la comunidad.</Text> 
+            <Text style={styles.intro}>{t('infoBasica')}.</Text> 
           </View>
           <View style={styles.spacer}/>
           <CustomInput
             name="title"
-            placeholder="Lugar de la observación"
+            placeholder={t('lugar')}
             control={control}
-            rules={{required: 'Debes indicar donde fue la Observación'}}
+            rules={{required: t('obsFormLocationValidationText')}}
           />
-          <Text style={[styles.intro,{marginTop:10}]}>Fecha de la salida/observacion:</Text>
+          <Text style={[styles.intro,{marginTop:10}]}>{t('fecha')}</Text>
           <CustomInput
             name="date"
             placeholder={moment().format('MMMM Do YYYY, HH:mm:ss')}
             control={control}
-            rules={{required: 'Debes indicar una fecha'}}
+            rules={{required: t('obsFormDateValidationText')}}
             onPress={showDatepicker}
             blurOnTap={Platform.OS == "android" ? false : true}
             ref={dateTimeInput}
@@ -461,7 +459,7 @@ export default function ObservationDetail({ route, navigation }) {
           />
 
           <CustomButton 
-            text={`Fotos (${editingObservation.images ? editingObservation.images.length : 0})`}
+            text={`${t('foto')} (${editingObservation.images ? editingObservation.images.length : 0})`}
             type="custom"
             order="bottom"
             bgColor={"#fff"}
@@ -497,9 +495,9 @@ export default function ObservationDetail({ route, navigation }) {
 
           <View style={{marginTop: 10}}>
               
-            <Text style={{marginBottom: 5}}>Tipo de observaciones:</Text>
+            <Text style={{marginBottom: 5}}>{t('tipoIObs')}</Text>
             <CustomButton 
-                text="Rápida" 
+                text={t('rapida')}
                 type="custom" 
                 order="top" 
                 // bgColor={"#48a5e9"} 
@@ -510,7 +508,7 @@ export default function ObservationDetail({ route, navigation }) {
                 leftIconImage={require("../../assets/images/icons/buttonIcons/button-quick.png")}
                 onPress={() => navigation.navigate('Rapida')} />
               <CustomButton 
-                text="Meteo" 
+                text={t('meteo')}
                 type="custom" 
                 order="top" 
                 // bgColor={"#48a5e9"} 
@@ -521,7 +519,7 @@ export default function ObservationDetail({ route, navigation }) {
                 leftIconImage={require("../../assets/images/icons/buttonIcons/button-meteo.png")}
                 onPress={() => navigation.navigate('Tiempo')} />
             <CustomButton 
-                text="Avalancha" 
+                text={t('avalancha')}
                 type="custom" 
                 order="middle" 
                 bgColor={"#fff"} 
@@ -530,7 +528,7 @@ export default function ObservationDetail({ route, navigation }) {
                 iconName={observation.observationTypes?.avalanche?.status ?  "arrow-forward-ios" : "add-circle"} 
                 onPress={() => navigation.navigate('Avalancha')} /> 
             <CustomButton 
-                text="Manto de nieve" 
+                text={t('manto')}
                 type="custom" 
                 order="middle" 
                 bgColor={"#fff"}
@@ -539,7 +537,7 @@ export default function ObservationDetail({ route, navigation }) {
                 iconName={observation.observationTypes?.snowpack?.status ?  "arrow-forward-ios" : "add-circle"} 
                 onPress={() => navigation.navigate('Manto de nieve')} />
             <CustomButton 
-                text="Accidente" 
+                text={t('accidente')}
                 type="custom" 
                 order="bottom" 
                 // bgColor={"#B00020"} 
@@ -552,10 +550,10 @@ export default function ObservationDetail({ route, navigation }) {
             <CustomButton text="Incident" type="custom" order="bottom" bgColor={"#e15141"} fgColor='white' iconName={"add-circle"} onPress={()=>{console.log('seting type Incident')}} /> */}
           </View>
           <View style={{marginTop: 40}}>
-            <CustomButton text="Subir a Atesmaps"  bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(onSubmit)} />
+            <CustomButton text={t('subir')}  bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(onSubmit)} />
           </View>
           <View style={{marginBottom: 30}}>
-            <CustomButton text="Eliminar" 
+            <CustomButton text={t('eliminar')}
                 bgColor={"#B00020"} 
                 fgColor='white' 
                

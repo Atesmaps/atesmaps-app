@@ -17,24 +17,19 @@ import { PULIC_BUCKET_URL } from '../config';
 import MapView, {Marker, UrlTile} from 'react-native-maps';
 import Svg from 'react-native-svg';
 import { ObservationContext } from '../context/ObservationContext';
-
+import { useTranslation } from "react-i18next";
+import { useMomentLocale } from "../hooks/useMomentLocale";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 // const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
-moment.locale('es', {
-  months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
-  monthsShort: 'Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.'.split('_'),
-  weekdays: 'Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado'.split('_'),
-  weekdaysShort: 'Dom._Lun._Mar._Mier._Jue._Vier._Sab.'.split('_'),
-  weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
-}
-);
 
 export default function ShowObservation({ route, navigation }) {  
+    const {t} = useTranslation();
+    const momentLocale = useMomentLocale();
   
-    //console.log(navigation)
+
     const [item, setItem] = useState(route.params?.item);
     const [userName, setUserName] = useState('');
     const {getObservationUserDetails} = useContext(ObservationContext);
@@ -43,7 +38,7 @@ export default function ShowObservation({ route, navigation }) {
     useLayoutEffect( () => {
       navigation.setOptions({
         // title: item.title === '' ? 'No title' : item.title,
-        title: 'Observación',
+        title: t('observationTitle'),
         headerLeft: (props) => (
           <HeaderBackButton labelVisible={false} onPress={()=>{
             navigation.goBack();
@@ -80,30 +75,30 @@ export default function ShowObservation({ route, navigation }) {
                 style={styles.rightImage}
                 source={require("../../assets/images/icons/buttonIcons/button-meteo.png")}
               />
-              <Text style={styles.subtitle}>Meteo</Text>
+              <Text style={styles.subtitle}>{t('meteo')}</Text>
             </View>
             <View style={styles.spacer}/> 
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Estado del cielo:</Text>
-              { item.observationTypes.weather.values.skyCondition === 1 && (<Text style={styles.description}>Despejado (0/8)</Text>)}
-              { item.observationTypes.weather.values.skyCondition === 2 && (<Text style={styles.description}>Pocas nubes (1/8-2/8)</Text>)}
-              { item.observationTypes.weather.values.skyCondition === 3 && (<Text style={styles.description}>Nubes dispersas (2/8-4/8)</Text>)}
-              { item.observationTypes.weather.values.skyCondition === 4 && (<Text style={styles.description}>Nubes rotas (5/8-7/8)</Text>)}
-              { item.observationTypes.weather.values.skyCondition === 5 && (<Text style={styles.description}>Nublado (8/8)</Text>)}
-              { item.observationTypes.weather.values.skyCondition === 6 && (<Text style={styles.description}>Niebla</Text>)}
+              <Text style={styles.link}>{t('estadoCielo')}:</Text>
+              { item.observationTypes.weather.values.skyCondition === 1 && (<Text style={styles.description}>{t('despejado')}</Text>)}
+              { item.observationTypes.weather.values.skyCondition === 2 && (<Text style={styles.description}>{t('pocasNubes')}</Text>)}
+              { item.observationTypes.weather.values.skyCondition === 3 && (<Text style={styles.description}>{t('nubesDispersas')}</Text>)}
+              { item.observationTypes.weather.values.skyCondition === 4 && (<Text style={styles.description}>{t('nubesRotas')}</Text>)}
+              { item.observationTypes.weather.values.skyCondition === 5 && (<Text style={styles.description}>{t('nublado8')}</Text>)}
+              { item.observationTypes.weather.values.skyCondition === 6 && (<Text style={styles.description}>{t('niebla')}</Text>)}
             </View>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Tipo de precipitación:</Text>
-              { item.observationTypes.weather.values.precipitationType === 1 && (<Text style={styles.description}>Nieve</Text>)}
-              { item.observationTypes.weather.values.precipitationType === 2 && (<Text style={styles.description}>Lluvia</Text>)}
-              { item.observationTypes.weather.values.precipitationType === 3 && (<Text style={styles.description}>Aguanieve</Text>)}
-              { item.observationTypes.weather.values.precipitationType === 4 && (<Text style={styles.description}>Ninguna</Text>)}
+              <Text style={styles.link}>{t('tipoPrec')}:</Text>
+              { item.observationTypes.weather.values.precipitationType === 1 && (<Text style={styles.description}>{t('nieve')}</Text>)}
+              { item.observationTypes.weather.values.precipitationType === 2 && (<Text style={styles.description}>{t('lluvia')}</Text>)}
+              { item.observationTypes.weather.values.precipitationType === 3 && (<Text style={styles.description}>{t('aguanieve')}</Text>)}
+              { item.observationTypes.weather.values.precipitationType === 4 && (<Text style={styles.description}>{t('ninguna')}</Text>)}
             </View>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Intensidad precipitacion - Nieve (cm/hora):</Text>
+              <Text style={styles.link}>{t('intensPrecNev')}:</Text>
               { item.observationTypes.weather.values.snowIntensity === 1 && (<Text style={styles.description}>>1</Text>)}
               { item.observationTypes.weather.values.snowIntensity === 2 && (<Text style={styles.description}>1-5</Text>)}
               { item.observationTypes.weather.values.snowIntensity === 3 && (<Text style={styles.description}>5-10</Text>)}
@@ -112,59 +107,59 @@ export default function ShowObservation({ route, navigation }) {
             
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Intensidad precipitación - Lluvia:</Text>
-              { item.observationTypes.weather.values.rainIntensity === 1 && (<Text style={styles.description}>Llovizna</Text>)}
-              { item.observationTypes.weather.values.rainIntensity === 2 && (<Text style={styles.description}>Chubasco (abrupto)</Text>)}
-              { item.observationTypes.weather.values.rainIntensity === 3 && (<Text style={styles.description}>Lluvia(constante)</Text>)}
-              { item.observationTypes.weather.values.rainIntensity === 4 && (<Text style={styles.description}>Diluvio</Text>)}
+              <Text style={styles.link}>{t('intensPrecLuvia')}:</Text>
+              { item.observationTypes.weather.values.rainIntensity === 1 && (<Text style={styles.description}>{t('llovizna')}</Text>)}
+              { item.observationTypes.weather.values.rainIntensity === 2 && (<Text style={styles.description}>{t('chubasco')}</Text>)}
+              { item.observationTypes.weather.values.rainIntensity === 3 && (<Text style={styles.description}>{t('lluviaConst')}</Text>)}
+              { item.observationTypes.weather.values.rainIntensity === 4 && (<Text style={styles.description}>{t('diluvio')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Temperatura en el momento de la observación:</Text><Text style={styles.description}>{item.observationTypes.weather.values.temp}</Text>
+              <Text style={styles.link}>{t('tempObs')}:</Text><Text style={styles.description}>{item.observationTypes.weather.values.temp}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Temperatura máxima en las últimas 24h:</Text><Text style={styles.description}>{item.observationTypes.weather.values.maxTemp}</Text>
+              <Text style={styles.link}>{t('tempMax')}:</Text><Text style={styles.description}>{item.observationTypes.weather.values.maxTemp}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Temperatura mínima en las últimas 24h:</Text><Text style={styles.description}>{item.observationTypes.weather.values.minTemp}</Text>
+              <Text style={styles.link}>{t('tempMin')}:</Text><Text style={styles.description}>{item.observationTypes.weather.values.minTemp}</Text>
             </View>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Describe como la temperatura cambió en las últimas 3h:</Text>
-              { item.observationTypes.weather.values.tempChange === 1 && (<Text style={styles.description}>Cayó</Text>)}
-              { item.observationTypes.weather.values.tempChange === 2 && (<Text style={styles.description}>Constante</Text>)}
-              { item.observationTypes.weather.values.tempChange === 3 && (<Text style={styles.description}>Subió</Text>)}
+              <Text style={styles.link}>{t('tempDescr')}:</Text>
+              { item.observationTypes.weather.values.tempChange === 1 && (<Text style={styles.description}>{t('cayo')}</Text>)}
+              { item.observationTypes.weather.values.tempChange === 2 && (<Text style={styles.description}>{t('constante')}</Text>)}
+              { item.observationTypes.weather.values.tempChange === 3 && (<Text style={styles.description}>{t('subio')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Cantidad de nieve en las últimas 24h (cm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.snowAccumulation}</Text>
+              <Text style={styles.link}>{t('cantNieve')} (cm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.snowAccumulation}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Combinación de lluvia y nieve total en las últimas 24h (mm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.rainAccumulation24}</Text>
+              <Text style={styles.link}>{t('combLluviaNieve')} (mm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.rainAccumulation24}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Cantidad de nieve de la nevada más reciente (cm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.snowAccumulation24}</Text>
+              <Text style={styles.link}>{t('cantNieveReciente')} (cm):</Text><Text style={styles.description}>{item.observationTypes.weather.values.snowAccumulation24}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Fecha del inicio de la tormenta:</Text><Text style={styles.description}>{item.observationTypes.weather.values.stormDate}</Text>
+              <Text style={styles.link}>{t('fechaTorm')}:</Text><Text style={styles.description}>{item.observationTypes.weather.values.stormDate}</Text>
             </View>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Velocidad del viento:</Text>
-              { item.observationTypes.weather.values.windSpeed === 1 && (<Text style={styles.description}>Calma</Text>)}
-              { item.observationTypes.weather.values.windSpeed === 2 && (<Text style={styles.description}>Suave (1-25km/h)</Text>)}
-              { item.observationTypes.weather.values.windSpeed === 3 && (<Text style={styles.description}>Moderado (26-40km/h)</Text>)}
-              { item.observationTypes.weather.values.windSpeed === 4 && (<Text style={styles.description}>Fuerte (41-60km/h)</Text>)}
-              { item.observationTypes.weather.values.windSpeed === 5 && (<Text style={styles.description}>Extrem (>60km/h)</Text>)}
+              <Text style={styles.link}>{t('velViento')}:</Text>
+              { item.observationTypes.weather.values.windSpeed === 1 && (<Text style={styles.description}>{t('calma')}</Text>)}
+              { item.observationTypes.weather.values.windSpeed === 2 && (<Text style={styles.description}>{t('suave')}</Text>)}
+              { item.observationTypes.weather.values.windSpeed === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
+              { item.observationTypes.weather.values.windSpeed === 4 && (<Text style={styles.description}>{t('fuerte')}</Text>)}
+              { item.observationTypes.weather.values.windSpeed === 5 && (<Text style={styles.description}>{t('extremVel')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Orientación:</Text>
+              <Text style={styles.link}>{t('oriOrientación')}:</Text>
             </View>
             
               { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
@@ -177,11 +172,11 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.weather.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
             
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Transporte de nive por viento:</Text>
-              { item.observationTypes.weather.values.windCarry === 1 && (<Text style={styles.description}>No</Text>)}
-              { item.observationTypes.weather.values.windCarry === 2 && (<Text style={styles.description}>Suave </Text>)}
-              { item.observationTypes.weather.values.windCarry === 3 && (<Text style={styles.description}>Moderado</Text>)}
-              { item.observationTypes.weather.values.windCarry === 4 && (<Text style={styles.description}>Intensa</Text>)}
+              <Text style={styles.link}>{t('transNieveViento')}:</Text>
+              { item.observationTypes.weather.values.windCarry === 1 && (<Text style={styles.description}>{t('no')}</Text>)}
+              { item.observationTypes.weather.values.windCarry === 2 && (<Text style={styles.description}>{t('suave')} </Text>)}
+              { item.observationTypes.weather.values.windCarry === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
+              { item.observationTypes.weather.values.windCarry === 4 && (<Text style={styles.description}>{t('intensa')}</Text>)}
             </View>
           </View>
         )
@@ -197,81 +192,81 @@ export default function ShowObservation({ route, navigation }) {
                 style={styles.rightImage}
                 source={require("../../assets/images/icons/buttonIcons/button-accident.png")}
               />
-              <Text style={styles.subtitle}>Accidente</Text>
+              <Text style={styles.subtitle}>{t('accidente')}</Text>
             </View>
             <View style={styles.spacer}/> 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Actividad:</Text>
-              { item.observationTypes.accident.values.activityType === 1 && (<Text style={styles.description}>Esqui de montaña / Splitboard</Text>)}
-              { item.observationTypes.accident.values.activityType === 2 && (<Text style={styles.description}>Raquetas de nieve</Text>)}
-              { item.observationTypes.accident.values.activityType === 3 && (<Text style={styles.description}>Escalada/Alpinismo</Text>)}
-              { item.observationTypes.accident.values.activityType === 4 && (<Text style={styles.description}>Esqui/Snowboard (Pista)</Text>)}
-              { item.observationTypes.accident.values.activityType === 5 && (<Text style={styles.description}>Trekking</Text>)}
+              <Text style={styles.link}>{t('actividad')}:</Text>
+              { item.observationTypes.accident.values.activityType === 1 && (<Text style={styles.description}>{t('skimo')}</Text>)}
+              { item.observationTypes.accident.values.activityType === 2 && (<Text style={styles.description}>{t('raquetasNieve')}</Text>)}
+              { item.observationTypes.accident.values.activityType === 3 && (<Text style={styles.description}>{t('escaladaApli')}</Text>)}
+              { item.observationTypes.accident.values.activityType === 4 && (<Text style={styles.description}>{t('pista')}</Text>)}
+              { item.observationTypes.accident.values.activityType === 5 && (<Text style={styles.description}>{t('trek')}</Text>)}
               { item.observationTypes.accident.values.activityType === 6 && (<Text style={styles.description}>{item.observationTypes.accident.values.customActivityType}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Desencadenante:</Text>
-              { item.observationTypes.accident.values.accidentOrigin === 1 && (<Text style={styles.description}>Natural</Text>)}
-              { item.observationTypes.accident.values.accidentOrigin === 2 && (<Text style={styles.description}>Accidental</Text>)}
+              <Text style={styles.link}>{t('desencadenamiento')}:</Text>
+              { item.observationTypes.accident.values.accidentOrigin === 1 && (<Text style={styles.description}>{t('natural')}</Text>)}
+              { item.observationTypes.accident.values.accidentOrigin === 2 && (<Text style={styles.description}>{t('accidental')}</Text>)}
             </View>
 
           
             {/* <View style={styles.spacer}/> */}
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Personas en el grupo:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfPeople}</Text>
+              <Text style={styles.link}>{t('persGrupo')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfPeople}</Text>
             </View>
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Personas parcialmente enterradas:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfPartiallyBuried}</Text>
+              <Text style={styles.link}>{t('persEnteParc')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfPartiallyBuried}</Text>
               </View>
               <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Personas totalmente enterradas:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfBuried}</Text>
+              <Text style={styles.link}>{t('persEnteTot')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfBuried}</Text>
               </View>
               <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Personas con lesiones leves:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfInjured}</Text>
+              <Text style={styles.link}>{t('persLesLeve')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfInjured}</Text>
               </View>
               <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Personas con lesiones graves:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfSeverlyInjured}</Text>
+              <Text style={styles.link}>{t('persLesGrav')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfSeverlyInjured}</Text>
               </View>
               <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Num. de fallecidos:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfDead}</Text>
+              <Text style={styles.link}>{t('fallecidos')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.numOfDead}</Text>
               </View>
             
             {/* <View style={styles.spacer}/> */}
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Profundida de la cicatriz:</Text><Text style={styles.description}>{item.observationTypes.accident.values.crackDepth}</Text>
+              <Text style={styles.link}>{t('profCicatriz')}:</Text><Text style={styles.description}>{item.observationTypes.accident.values.crackDepth}</Text>
             </View>
             
            
             
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Tamaño del alud:</Text>
+              <Text style={styles.link}>{t('tamAva')}:</Text>
             </View>
             
-              { item.observationTypes.accident.values.avalancheSize?.size_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>1-Peligro de enterramiento mínimo (peligro de caida)</Text></View>)}
-              { item.observationTypes.accident.values.avalancheSize?.size_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>2-Puede enterrar, herir o matar a una persona</Text></View>)}
-              { item.observationTypes.accident.values.avalancheSize?.size_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>3-Puede enterrar o destruir un coche</Text></View>)}
-              { item.observationTypes.accident.values.avalancheSize?.size_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>4-Puede enterrar o destruir un vagon de tren</Text></View>)}
-              { item.observationTypes.accident.values.avalancheSize?.size_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>55-Puede modificar el paisaje, posibilidad de daños desastrosos</Text></View>)}
+              { item.observationTypes.accident.values.avalancheSize?.size_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('enteMin1')}</Text></View>)}
+              { item.observationTypes.accident.values.avalancheSize?.size_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('entePers2')}</Text></View>)}
+              { item.observationTypes.accident.values.avalancheSize?.size_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('enteCoche3')}</Text></View>)}
+              { item.observationTypes.accident.values.avalancheSize?.size_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('enteTren4')}</Text></View>)}
+              { item.observationTypes.accident.values.avalancheSize?.size_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('paisaje5')}</Text></View>)}
             
          
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Trampas del terreno:</Text>
-              {!item.observationTypes.accident.values.terrainTraps === 1 && (<Text style={styles.description}>Sin apariencia</Text>)}
-              { item.observationTypes.accident.values.terrainTraps === 2 && (<Text style={styles.description}>Corto/zanja</Text>)}
-              { item.observationTypes.accident.values.terrainTraps === 3 && (<Text style={styles.description}>Desnivel/Cambio de pendiente</Text>)}
-              { item.observationTypes.accident.values.terrainTraps === 4 && (<Text style={styles.description}>Árboles</Text>)}
-              { item.observationTypes.accident.values.terrainTraps === 5 && (<Text style={styles.description}>Barranco</Text>)}
+              <Text style={styles.link}>{t('trampas')}:</Text>
+              {!item.observationTypes.accident.values.terrainTraps === 1 && (<Text style={styles.description}>{t('sinAp')}</Text>)}
+              { item.observationTypes.accident.values.terrainTraps === 2 && (<Text style={styles.description}>{t('cortadoZanja')}</Text>)}
+              { item.observationTypes.accident.values.terrainTraps === 3 && (<Text style={styles.description}>{t('desnPend')}</Text>)}
+              { item.observationTypes.accident.values.terrainTraps === 4 && (<Text style={styles.description}>{t('arbol')}</Text>)}
+              { item.observationTypes.accident.values.terrainTraps === 5 && (<Text style={styles.description}>{t('barranco')}</Text>)}
             </View>
 
          
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Quieres ser contactado?</Text><Text style={styles.description}>{item.observationTypes.accident.values.contactMe ? 'Sí' : 'No'}</Text>
+              <Text style={styles.link}>{t('contacto2')}</Text><Text style={styles.description}>{item.observationTypes.accident.values.contactMe ? 'Sí' : 'No'}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Otras observaciones:</Text>
+              <Text style={styles.link}>{t('otrasObs')}:</Text>
             </View>
             <View style={styles.linkContainer}>
               <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>
@@ -294,30 +289,30 @@ export default function ShowObservation({ route, navigation }) {
             </View>
             <View style={styles.spacer}/> 
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Observación singular o síntesis de la salida:</Text>
-              { item.observationTypes.avalanche.values.obsType === 1 && (<Text style={styles.description}>Singular</Text>)}
-              { item.observationTypes.avalanche.values.obsType === 2 && (<Text style={styles.description}>Síntesis</Text>)}
+              <Text style={styles.link}>{t('obsSing')}:</Text>
+              { item.observationTypes.avalanche.values.obsType === 1 && (<Text style={styles.description}>{t('singular')}</Text>)}
+              { item.observationTypes.avalanche.values.obsType === 2 && (<Text style={styles.description}>{t('sintesis')}</Text>)}
             </View>
           
             <View style={[styles.linkContainer,{marginTop:5}]}>
-            <Text style={[styles.link,{maxWidth: 150}]}>La geolocalización de la observación es precisa?</Text>
-              { item.observationTypes.avalanche.values.geoAccuracy === 1 && (<Text style={styles.description}>Exacta (20-50m)</Text>)}
-              { item.observationTypes.avalanche.values.geoAccuracy === 2 && (<Text style={styles.description}>Bastante precisa (50-500m)</Text>)}
-              { item.observationTypes.avalanche.values.geoAccuracy === 3 && (<Text style={styles.description}>Poco precisa (+500m)</Text>)}
+            <Text style={[styles.link,{maxWidth: 150}]}>{t('geoloc')}?</Text>
+              { item.observationTypes.avalanche.values.geoAccuracy === 1 && (<Text style={styles.description}>{t('exacta')}</Text>)}
+              { item.observationTypes.avalanche.values.geoAccuracy === 2 && (<Text style={styles.description}>{t('bastantePrecisa')}</Text>)}
+              { item.observationTypes.avalanche.values.geoAccuracy === 3 && (<Text style={styles.description}>{t('pocoPrecia')}</Text>)}
              
             </View>
           
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>La actividad de avalancha fue:</Text>
-              { item.observationTypes.avalanche.values.when === 1 && (<Text style={styles.description}>Del mismo día</Text>)}
-              { item.observationTypes.avalanche.values.when === 2 && (<Text style={styles.description}>Del día anterior</Text>)}
-              { item.observationTypes.avalanche.values.when === 3 && (<Text style={styles.description}>Mas de dos días</Text>)}
+              <Text style={styles.link}>{t('actiAva')}:</Text>
+              { item.observationTypes.avalanche.values.when === 1 && (<Text style={styles.description}>{t('dia')}</Text>)}
+              { item.observationTypes.avalanche.values.when === 2 && (<Text style={styles.description}>{t('diaAnte')}</Text>)}
+              { item.observationTypes.avalanche.values.when === 3 && (<Text style={styles.description}>{t('dosDias')}</Text>)}
              
             </View>
       
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Núm. de avalanchas:</Text>
+              <Text style={styles.link}>{t('numAva')}:</Text>
               { item.observationTypes.avalanche.values.amount === 1 && (<Text style={styles.description}>1</Text>)}
               { item.observationTypes.avalanche.values.amount === 2 && (<Text style={styles.description}>2-5</Text>)}
               { item.observationTypes.avalanche.values.amount === 3 && (<Text style={styles.description}>6-10</Text>)}
@@ -326,55 +321,55 @@ export default function ShowObservation({ route, navigation }) {
            
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Medida:</Text>
+              <Text style={styles.link}>{t('medida')}:</Text>
             </View>
             
-              { item.observationTypes.avalanche.values.dangerLevel?.level_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>1-Peligro de enterramiento mínimo (peligro de caída)</Text></View>)}
-              { item.observationTypes.avalanche.values.dangerLevel?.level_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>2-Puede enterrar, herir o matar a una persona</Text></View>)}
-              { item.observationTypes.avalanche.values.dangerLevel?.level_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>3-Puede enterrar o destruir un choche</Text></View>)}
-              { item.observationTypes.avalanche.values.dangerLevel?.level_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>4-Puede enterrar o destruir un vagón de tren</Text></View>)}
-              { item.observationTypes.avalanche.values.dangerLevel?.level_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>5-Puede modificar el paisaje, posibilidad de daños desastrosos.</Text></View>)}
+              { item.observationTypes.avalanche.values.dangerLevel?.level_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('enteMin1')}</Text></View>)}
+              { item.observationTypes.avalanche.values.dangerLevel?.level_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('entePers2')}</Text></View>)}
+              { item.observationTypes.avalanche.values.dangerLevel?.level_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('enteCoche3')}</Text></View>)}
+              { item.observationTypes.avalanche.values.dangerLevel?.level_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('enteTren4')}</Text></View>)}
+              { item.observationTypes.avalanche.values.dangerLevel?.level_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('paisaje5')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Tipología de alud:</Text>
+              <Text style={styles.link}>{t('tipoAlud')}:</Text>
             </View>
             
-              { item.observationTypes.avalanche.values.avalancheType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Placa de nieve reciente</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Placa de viento</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Capa débil persistente</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Placa húmeda</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Cornisa</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_6 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Cornisa y placa</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_7 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Puntual húmeda</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_8 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Puntual seca</Text></View>)}
-              { item.observationTypes.avalanche.values.avalancheType?.type_9 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Deslizamiento basal</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('placaReciente')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('placaViento')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('debilCapa')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('placaHumeda')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('cornisa')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_6 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('cornisaPlaca')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_7 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('caracteristicaAva')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_8 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('puntualSeca')}</Text></View>)}
+              { item.observationTypes.avalanche.values.avalancheType?.type_9 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('desli')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5, marginBottom: 5}]}>
-              <Text style={styles.link}>Caracteristicas de la avalancha</Text>
+              <Text style={styles.link}>{t('caracteristicaAva')}</Text>
               
             </View>
             <View style={[styles.linkContainer,{marginLeft: 15}]}>
-              <Text style={styles.link}>Profundidad de la fractura (en avalanchas de placa):</Text>
+              <Text style={styles.link}>{t('profundidadFract')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.depth} cm</Text>
             </View>
             <View style={[styles.linkContainer,{marginLeft: 15}]}>
-              <Text style={styles.link}>Ancho (en avalanchas de placa):</Text>
+              <Text style={styles.link}>{t('anchoAva')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.width} m</Text>
             </View>
             <View style={[styles.linkContainer,{marginLeft: 15}]}>
-              <Text style={styles.link}>Largo (en avalanchas de placa y puntuales):</Text>
+              <Text style={styles.link}>{t('largoAval')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.length} m</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Desencadenamiento:</Text>
-              { item.observationTypes.avalanche.values.trigger === 1 && (<Text style={styles.description}>Accidental</Text>)}
-              { item.observationTypes.avalanche.values.trigger === 2 && (<Text style={styles.description}>Natural</Text>)}
-              { item.observationTypes.avalanche.values.trigger === 3 && (<Text style={styles.description}>Artificial</Text>)}
+              <Text style={styles.link}>{t('desencadenamiento')}:</Text>
+              { item.observationTypes.avalanche.values.trigger === 1 && (<Text style={styles.description}>{t('accidental')}</Text>)}
+              { item.observationTypes.avalanche.values.trigger === 2 && (<Text style={styles.description}>{t('natural')}</Text>)}
+              { item.observationTypes.avalanche.values.trigger === 3 && (<Text style={styles.description}>{t('artificial')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Franja altitudinal:</Text>
+              <Text style={styles.link}>{t('franjaAlti')}:</Text>
             </View>
             
               { item.observationTypes.avalanche.values.heightRange?.range_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>-2.000m</Text></View>)}
@@ -382,17 +377,17 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.avalanche.values.heightRange?.range_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>+2.300m</Text></View>)}
             
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Cota altimerica zona de salida (m):</Text>
+              <Text style={styles.link}>{t('cotaZonaSalida')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.height}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Inclinación zona de salida (m):</Text>
+              <Text style={styles.link}>{t('inclinaciónZona')} (m):</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.inclination}º</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Orientación:</Text>
+              <Text style={styles.link}>{t('oriOrientación')}:</Text>
             </View>
             
               { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
@@ -405,20 +400,20 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.avalanche.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
             
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Grano de la capa débil:</Text>
+              <Text style={styles.link}>{t('granoCapaDebil')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.snowType}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Exposición:</Text>
-              { item.observationTypes.avalanche.values.windExposure === 1 && (<Text style={styles.description}>Sotavento</Text>)}
-              { item.observationTypes.avalanche.values.windExposure === 2 && (<Text style={styles.description}>Carga cruzada</Text>)}
-              { item.observationTypes.avalanche.values.windExposure === 3 && (<Text style={styles.description}>Otras situaciones</Text>)}
-              { item.observationTypes.avalanche.values.windExposure === 4 && (<Text style={styles.description}>Sin exposición al viento</Text>)}
+              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              { item.observationTypes.avalanche.values.windExposure === 1 && (<Text style={styles.description}>{t('sotavento')}Sotavento</Text>)}
+              { item.observationTypes.avalanche.values.windExposure === 2 && (<Text style={styles.description}>{t('cargaHumeda')}Carga cruzada</Text>)}
+              { item.observationTypes.avalanche.values.windExposure === 3 && (<Text style={styles.description}>{t('otrasHumeda')}Otras situaciones</Text>)}
+              { item.observationTypes.avalanche.values.windExposure === 4 && (<Text style={styles.description}>{t('sinExpoViento')}Sin exposición al viento</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Otras observaciones:</Text>
+              <Text style={styles.link}>{t('otrasObs')}:</Text>
             </View>
             <View style={styles.linkContainer}>
               <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.avalanche.values.comments}</Text>
@@ -437,23 +432,23 @@ export default function ShowObservation({ route, navigation }) {
                 style={styles.rightImage}
                 source={require("../../assets/images/icons/buttonIcons/button-snow.png")}
               />
-              <Text style={styles.subtitle}>Manto de nieve</Text>
+              <Text style={styles.subtitle}>{t('observationSnowTitle')}</Text>
             </View>
             <View style={styles.spacer}/> 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={[styles.link,{maxWidth: 150}]}>La geolocalización de la observación es precisa?</Text>
-              { item.observationTypes.snowpack.values.geoAccuracy === 1 && (<Text style={styles.description}>Exacta (20-50m)</Text>)}
-              { item.observationTypes.snowpack.values.geoAccuracy === 2 && (<Text style={styles.description}>Bastante precisa (50-500m)</Text>)}
-              { item.observationTypes.snowpack.values.geoAccuracy === 3 && (<Text style={styles.description}>Poco precisa (+500m)</Text>)}
+              <Text style={[styles.link,{maxWidth: 150}]}>{t('geoloc')}?</Text>
+              { item.observationTypes.snowpack.values.geoAccuracy === 1 && (<Text style={styles.description}>{t('exacta')}</Text>)}
+              { item.observationTypes.snowpack.values.geoAccuracy === 2 && (<Text style={styles.description}>{t('bastantePrecisa')}</Text>)}
+              { item.observationTypes.snowpack.values.geoAccuracy === 3 && (<Text style={styles.description}>{t('pocoPrecia')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Franja altitudinal del test (m):</Text>
+              <Text style={styles.link}>{t('franjaAltiTest')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.altitude}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Orientación:</Text>
+              <Text style={styles.link}>{t('oriOrientación')}:</Text>
             </View>
             
               { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
@@ -466,137 +461,137 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.snowpack.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
             
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Profundidad del manto:</Text>
+              <Text style={styles.link}>{t('profManti')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.depth} cm</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Has escuchado/sentido woumpfs?</Text>
-              { item.observationTypes.snowpack.values.woumpfs === 1 && (<Text style={styles.description}>Sí</Text>)}
-              { item.observationTypes.snowpack.values.woumpfs === 2 && (<Text style={styles.description}>No</Text>)}
+              <Text style={styles.link}>{t('woumps')}</Text>
+              { item.observationTypes.snowpack.values.woumpfs === 1 && (<Text style={styles.description}>{t('si')}</Text>)}
+              { item.observationTypes.snowpack.values.woumpfs === 2 && (<Text style={styles.description}>{t('no')}</Text>)}
             </View>
             
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Has observado fisurascon propagación?</Text>
-              { item.observationTypes.snowpack.values.cracks === 1 && (<Text style={styles.description}>Sí</Text>)}
-              { item.observationTypes.snowpack.values.cracks === 2 && (<Text style={styles.description}>No</Text>)}
+              <Text style={styles.link}>{t('obsPropa')}</Text>
+              { item.observationTypes.snowpack.values.cracks === 1 && (<Text style={styles.description}>{t('si')}</Text>)}
+              { item.observationTypes.snowpack.values.cracks === 2 && (<Text style={styles.description}>{t('no')}</Text>)}
             </View>
              
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Nive en superfície:</Text>
+              <Text style={styles.link}>{t('nieveSup')}:</Text>
             </View>
             
-              { item.observationTypes.snowpack.values.layerSnowType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Nueva</Text></View>)}
-              { item.observationTypes.snowpack.values.layerSnowType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Crosta</Text></View>)}
-              { item.observationTypes.snowpack.values.layerSnowType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Escarcha de superfície</Text></View>)}
-              { item.observationTypes.snowpack.values.layerSnowType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Facetas</Text></View>)}
-              { item.observationTypes.snowpack.values.layerSnowType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Grano fino</Text></View>)}
-              { item.observationTypes.snowpack.values.layerSnowType?.type_6 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Variable</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nueva')}</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('crosta')}</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('escarcha')}</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('facetas')}</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('granoFino')}</Text></View>)}
+              { item.observationTypes.snowpack.values.layerSnowType?.type_6 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('variable')}</Text></View>)}
 
            
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Penetración pie:</Text>
+              <Text style={styles.link}>{t('penetracionPie')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.footPenetration}cm</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Penetración esquí:</Text>
+              <Text style={styles.link}>{t('penetracionEsqui')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.skiPenetration}cm</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Test cizalla de mano:</Text>
-              { item.observationTypes.snowpack.values.handTest === 1 && (<Text style={styles.description}>Muy fácil</Text>)}
-              { item.observationTypes.snowpack.values.handTest === 2 && (<Text style={styles.description}>Fácil</Text>)}
-              { item.observationTypes.snowpack.values.handTest === 3 && (<Text style={styles.description}>Moderado</Text>)}
-              { item.observationTypes.snowpack.values.handTest === 4 && (<Text style={styles.description}>Difícil</Text>)}
-              { item.observationTypes.snowpack.values.handTest === 5 && (<Text style={styles.description}>No concluyente</Text>)}
+              <Text style={styles.link}>{t('testCizalla')}:</Text>
+              { item.observationTypes.snowpack.values.handTest === 1 && (<Text style={styles.description}>{t('muyFacil')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 2 && (<Text style={styles.description}>{t('facil')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 4 && (<Text style={styles.description}>{t('dificil')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 5 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Test de compresión:</Text>
-              { item.observationTypes.snowpack.values.compresionTest === 1 && (<Text style={styles.description}>1 a 10 golpes</Text>)}
-              { item.observationTypes.snowpack.values.compresionTest === 2 && (<Text style={styles.description}>11 a 20 golpes</Text>)}
-              { item.observationTypes.snowpack.values.compresionTest === 3 && (<Text style={styles.description}>21 a 30 golpes</Text>)}
-              { item.observationTypes.snowpack.values.compresionTest === 4 && (<Text style={styles.description}>No concluyente</Text>)}
+              <Text style={styles.link}>{t('cTTest')}:</Text>
+              { item.observationTypes.snowpack.values.compresionTest === 1 && (<Text style={styles.description}>{t('hits1')}</Text>)}
+              { item.observationTypes.snowpack.values.compresionTest === 2 && (<Text style={styles.description}>{t('hits2')}</Text>)}
+              { item.observationTypes.snowpack.values.compresionTest === 3 && (<Text style={styles.description}>{t('hits3')}</Text>)}
+              { item.observationTypes.snowpack.values.compresionTest === 4 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Tipo de fractura:</Text>
+              <Text style={styles.link}>{t('tipoFracturaCT')}:</Text>
             </View>
             
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Colapso súbito</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Planar súbito</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Planar resistente</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Colapso progresivo</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Rotura (break)</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarResistente')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoProgresivo')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('roturaBreak')}</Text></View>)}
              
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Profundida de la fractura:</Text>
+              <Text style={styles.link}>{t('profFractCT')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.fractureDepthCt}cm</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Test columna extendida (ECT):</Text>
-              { item.observationTypes.snowpack.values.extensionTest === 1 && (<Text style={styles.description}>Propagación</Text>)}
-              { item.observationTypes.snowpack.values.extensionTest === 2 && (<Text style={styles.description}>Sin propagación</Text>)}
-              { item.observationTypes.snowpack.values.extensionTest === 3 && (<Text style={styles.description}>No concluyente</Text>)}
+              <Text style={styles.link}>{t('eCTTest')}:</Text>
+              { item.observationTypes.snowpack.values.extensionTest === 1 && (<Text style={styles.description}>{t('propagación')}</Text>)}
+              { item.observationTypes.snowpack.values.extensionTest === 2 && (<Text style={styles.description}>{t('sinPropagación')}</Text>)}
+              { item.observationTypes.snowpack.values.extensionTest === 3 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Tipo de fractura:</Text>
+              <Text style={styles.link}>{t('tipoFracturaECT')}:</Text>
             </View>
             
-              { item.observationTypes.snowpack.values.fractureType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Colapso súbito</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Planar súbito</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Planar resistente</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Colapso progresivo</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>Rotura (break)</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarResistente')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoProgresivo')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('roturaBreak')}</Text></View>)}
              
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Profundida de la fractura:</Text>
+              <Text style={styles.link}>{t('profFractECT')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.fractureDepth}cm</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Dureza de la placa (sobre la capa débil):</Text>
-              { item.observationTypes.snowpack.values.layerHardness === 1 && (<Text style={styles.description}>1-(P) Puño</Text>)}
-              { item.observationTypes.snowpack.values.layerHardness === 2 && (<Text style={styles.description}>2-(4d) 4 Dedos</Text>)}
-              { item.observationTypes.snowpack.values.layerHardness === 3 && (<Text style={styles.description}>3-(1d) 1 Dedo</Text>)}
-              { item.observationTypes.snowpack.values.layerHardness === 4 && (<Text style={styles.description}>4-(L) Lápiz</Text>)}
-              { item.observationTypes.snowpack.values.layerHardness === 5 && (<Text style={styles.description}>5-(C) Cuchillo</Text>)}
-              { item.observationTypes.snowpack.values.layerHardness === 6 && (<Text style={styles.description}>6-(H) Hielo</Text>)}
+              <Text style={styles.link}>{t('durezaPlaca')}:</Text>
+              { item.observationTypes.snowpack.values.layerHardness === 1 && (<Text style={styles.description}>{t('hardnessTest1')}</Text>)}
+              { item.observationTypes.snowpack.values.layerHardness === 2 && (<Text style={styles.description}>{t('hardnessTest2')}</Text>)}
+              { item.observationTypes.snowpack.values.layerHardness === 3 && (<Text style={styles.description}>{t('hardnessTest3')}</Text>)}
+              { item.observationTypes.snowpack.values.layerHardness === 4 && (<Text style={styles.description}>{t('hardnessTest4')}</Text>)}
+              { item.observationTypes.snowpack.values.layerHardness === 5 && (<Text style={styles.description}>{t('hardnessTest5')}</Text>)}
+              { item.observationTypes.snowpack.values.layerHardness === 6 && (<Text style={styles.description}>{t('hardnessTest6')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Dureza de la capa débil:</Text>
-              { item.observationTypes.snowpack.values.weakLayerHardness === 1 && (<Text style={styles.description}>1-(P) Puño</Text>)}
-              { item.observationTypes.snowpack.values.weakLayerHardness === 2 && (<Text style={styles.description}>2-(4d) 4 Dedos</Text>)}
-              { item.observationTypes.snowpack.values.weakLayerHardness === 3 && (<Text style={styles.description}>3-(1d) 1 Dedo</Text>)}
-              { item.observationTypes.snowpack.values.weakLayerHardness === 4 && (<Text style={styles.description}>4-(L) Lápiz</Text>)}
-              { item.observationTypes.snowpack.values.weakLayerHardness === 5 && (<Text style={styles.description}>5-(C) Cuchillo</Text>)}
-              { item.observationTypes.snowpack.values.weakLayerHardness === 6 && (<Text style={styles.description}>6-(H) Hielo</Text>)}
+              <Text style={styles.link}>{t('durezaPlacaDebil')}:</Text>
+              { item.observationTypes.snowpack.values.weakLayerHardness === 1 && (<Text style={styles.description}>{t('hardnessTest1')}</Text>)}
+              { item.observationTypes.snowpack.values.weakLayerHardness === 2 && (<Text style={styles.description}>{t('hardnessTest2')}</Text>)}
+              { item.observationTypes.snowpack.values.weakLayerHardness === 3 && (<Text style={styles.description}>{t('hardnessTest3')}</Text>)}
+              { item.observationTypes.snowpack.values.weakLayerHardness === 4 && (<Text style={styles.description}>{t('hardnessTest4')}</Text>)}
+              { item.observationTypes.snowpack.values.weakLayerHardness === 5 && (<Text style={styles.description}>{t('hardnessTest5')}</Text>)}
+              { item.observationTypes.snowpack.values.weakLayerHardness === 6 && (<Text style={styles.description}>{t('hardnessTest6')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Humedad de la capa:</Text>
-              { item.observationTypes.snowpack.values.snowHumidity === 1 && (<Text style={styles.description}>1-Seca-Bola imposible</Text>)}
-              { item.observationTypes.snowpack.values.snowHumidity === 2 && (<Text style={styles.description}>2-Húmeda-Bola fácil</Text>)}
-              { item.observationTypes.snowpack.values.snowHumidity === 3 && (<Text style={styles.description}>3-Mojada-Guante no se moja</Text>)}
-              { item.observationTypes.snowpack.values.snowHumidity === 4 && (<Text style={styles.description}>4-Muy mojada-Guante se moja</Text>)}
-              { item.observationTypes.snowpack.values.snowHumidity === 5 && (<Text style={styles.description}>5-Slush-Sin aire en los poros</Text>)}
+              <Text style={styles.link}>{t('humedadCapa')}:</Text>
+              { item.observationTypes.snowpack.values.snowHumidity === 1 && (<Text style={styles.description}>{t('secaBola')}</Text>)}
+              { item.observationTypes.snowpack.values.snowHumidity === 2 && (<Text style={styles.description}>{t('humedaBola')}</Text>)}
+              { item.observationTypes.snowpack.values.snowHumidity === 3 && (<Text style={styles.description}>{t('mojadaGuanteNo')}</Text>)}
+              { item.observationTypes.snowpack.values.snowHumidity === 4 && (<Text style={styles.description}>{t('mojadaGuante')}</Text>)}
+              { item.observationTypes.snowpack.values.snowHumidity === 5 && (<Text style={styles.description}>{t('slush')}</Text>)}
               
             </View>
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
-              <Text style={styles.link}>Tipo de grano de la capa débil:</Text>
+              <Text style={styles.link}>{t('tipoGranoCapaDebil')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.snowType}</Text>
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Otras observaciones:</Text>
+              <Text style={styles.link}>{t('otrasObs')}:</Text>
             </View>
             <View style={styles.linkContainer}>
               <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.snowpack.values.comments}</Text>
@@ -615,19 +610,19 @@ export default function ShowObservation({ route, navigation }) {
                 style={styles.rightImage}
                 source={require("../../assets/images/icons/buttonIcons/button-quick.png")}
               />
-              <Text style={styles.subtitle}>Rápida</Text>
+              <Text style={styles.subtitle}>{t('observationQuickTitle')}</Text>
               
             </View>
             <View style={styles.spacer}/> 
            
             <View style={styles.linkContainer}>
-              <Text style={styles.link}>Actividad:</Text>
-              { item.observationTypes.quick.values.activityType === 1 && (<Text style={styles.description}>Esqui de montaña / Splitboard</Text>)}
-              { item.observationTypes.quick.values.activityType === 2 && (<Text style={styles.description}>Raquetas de nieve</Text>)}
-              { item.observationTypes.quick.values.activityType === 3 && (<Text style={styles.description}>Alpinismo</Text>)}
-              { item.observationTypes.quick.values.activityType === 4 && (<Text style={styles.description}>Esquí/Snowboard (Pista)</Text>)}
-              { item.observationTypes.quick.values.activityType === 5 && (<Text style={styles.description}>Esquí de fondo</Text>)}
-              { item.observationTypes.quick.values.activityType === 6 && (<Text style={styles.description}>Sin Actividad</Text>)}
+              <Text style={styles.link}>{t('acti')}:</Text>
+              { item.observationTypes.quick.values.activityType === 1 && (<Text style={styles.description}>{t('skimo')}</Text>)}
+              { item.observationTypes.quick.values.activityType === 2 && (<Text style={styles.description}>{t('raquetasNieve')}</Text>)}
+              { item.observationTypes.quick.values.activityType === 3 && (<Text style={styles.description}>{t('alpinismo')}</Text>)}
+              { item.observationTypes.quick.values.activityType === 4 && (<Text style={styles.description}>{t('pista')}</Text>)}
+              { item.observationTypes.quick.values.activityType === 5 && (<Text style={styles.description}>{t('fondo')}</Text>)}
+              { item.observationTypes.quick.values.activityType === 6 && (<Text style={styles.description}>{t('sinActividad')}</Text>)}
               { item.observationTypes.quick.values.activityType === 7 && (<Text style={styles.description}>{item.observationTypes.quick.values.customActivityType}</Text>)}
             </View>
         
@@ -637,63 +632,63 @@ export default function ShowObservation({ route, navigation }) {
             </View>
             <View style={styles.linkContainer}>
               <Text style={styles.link}></Text>
-              { item.observationTypes.quick.values.ridingQuality === 1 && (<Text style={styles.description}>Muy buenas condiciones</Text>)}
-              { item.observationTypes.quick.values.ridingQuality === 2 && (<Text style={styles.description}>Buenas condiciones</Text>)}
-              { item.observationTypes.quick.values.ridingQuality === 3 && (<Text style={styles.description}>Condiciones aceptables</Text>)}
-              { item.observationTypes.quick.values.ridingQuality === 4 && (<Text style={styles.description}>Malas condiciones</Text>)}
+              { item.observationTypes.quick.values.ridingQuality === 1 && (<Text style={styles.description}>{t('muyBuenas')}</Text>)}
+              { item.observationTypes.quick.values.ridingQuality === 2 && (<Text style={styles.description}>{t('buenas')}</Text>)}
+              { item.observationTypes.quick.values.ridingQuality === 3 && (<Text style={styles.description}>{t('aceptables')}</Text>)}
+              { item.observationTypes.quick.values.ridingQuality === 4 && (<Text style={styles.description}>{t('malas')}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Condiciones de la nieve:</Text>
+              <Text style={styles.link}>{t('condicionesNieve')}:</Text>
             </View>
             
-              { item.observationTypes.quick.values.snowConditions.crusty  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Crosta</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.crusty  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('crosta')}</Text></View>)}
               {/* { item.observationTypes.quick.values.snowConditions.deepPowder && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text>Polvo</Text></View>)} */}
-              { item.observationTypes.quick.values.snowConditions.hard && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Dura</Text></View>)}
-              { item.observationTypes.quick.values.snowConditions.heavy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Pesad</Text></View>)}
-              { item.observationTypes.quick.values.snowConditions.powder && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Polvo</Text></View>)}
-              { item.observationTypes.quick.values.snowConditions.wet && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Húmeda</Text></View>)}
-              { item.observationTypes.quick.values.snowConditions.windyAffected && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Ventada</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.hard && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('dura')}</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.heavy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('heavy')}</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.powder && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('polvo')}</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.wet && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('humeda')}</Text></View>)}
+              { item.observationTypes.quick.values.snowConditions.windyAffected && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('venteada')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Tipo de terreno:</Text>
+              <Text style={styles.link}>{t('tipoTerreno')}:</Text>
             </View>
             
-              { item.observationTypes.quick.values.rodeSlopeTypes?.mellow  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Suave</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.alpine && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Alpino</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.steep && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Empinado</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.clear && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Terreno abierto</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.dense && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Bosque denso</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.openTrees && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Bosque abierto</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.shade && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Unbrío</Text></View>)}
-              { item.observationTypes.quick.values.rodeSlopeTypes?.sunny && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Soleado</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.mellow  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('suave')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.alpine && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('alpino')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.steep && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('empinado')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.clear && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('terrenoAbierto')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.dense && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('bosqueDenso')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.openTrees && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('bosqueAbierto')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.shade && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('umbrio')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.sunny && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('soleado')}</Text></View>)}
             
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>El tiempo:</Text>
+              <Text style={styles.link}>{t('tiempoMeteo')}:</Text>
             </View>
             
-              { item.observationTypes.quick.values.dayType?.cloudy  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Nublado</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.cold && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Frio</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.foggy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Niebla</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.stormy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Lluvia</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.sunny && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Soleado</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.warm && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Caluroso</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.weakSnow && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Nevada leve</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.wet && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Húmedo</Text></View>)}
-              { item.observationTypes.quick.values.dayType?.windy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Venteado</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.cloudy  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('nublado')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.cold && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('frio')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.foggy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('niebla')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.stormy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('lluvia')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.sunny && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('soleado')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.warm && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('calurodos')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.weakSnow && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('nevadaLeve')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.wet && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('húmedo')}</Text></View>)}
+              { item.observationTypes.quick.values.dayType?.windy && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('venteado')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Señales de alerta:</Text>
+              <Text style={styles.link}>{t('alertas')}:</Text>
             </View>
             
-              { item.observationTypes.quick.values.avalancheConditions?.newConditions  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Carga de nieve nueva (más de 30cm en 48h)</Text></View>)}
-              { item.observationTypes.quick.values.avalancheConditions?.slabs && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Aludes de placa recientes</Text></View>)}
-              { item.observationTypes.quick.values.avalancheConditions?.snowAccumulation && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Acumulaciones recientes por viento</Text></View>)}
-              { item.observationTypes.quick.values.avalancheConditions?.sounds && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Woumfs o fisuras con propagación</Text></View>)}
-              { item.observationTypes.quick.values.avalancheConditions?.tempChanges && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>Sobrecarga por fusión o lluvia</Text></View>)}
+              { item.observationTypes.quick.values.avalancheConditions?.newConditions  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('cargaNieve')}</Text></View>)}
+              { item.observationTypes.quick.values.avalancheConditions?.slabs && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('aludesPlaca')}</Text></View>)}
+              { item.observationTypes.quick.values.avalancheConditions?.snowAccumulation && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('acumulViento')}</Text></View>)}
+              { item.observationTypes.quick.values.avalancheConditions?.sounds && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('woumpfs')}</Text></View>)}
+              { item.observationTypes.quick.values.avalancheConditions?.tempChanges && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('fusion')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>Otras observaciones:</Text>
+              <Text style={styles.link}>{t('otrasObs')}:</Text>
             </View>
             <View style={styles.linkContainer}>
               <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.quick.values.comments}</Text>
@@ -733,11 +728,11 @@ export default function ShowObservation({ route, navigation }) {
       return (
       <View style={styles.obsHeader}>
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={{fontSize: 12}}>{moment(item.date).format('Do MMMM YY - HH:mm')}</Text>
+        <Text style={{fontSize: 12}}>{moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}</Text>
          {/*{ item.status === 0 && (<Text style={{fontSize: 12}}>Tomada: Durante la salida (sobre el terreno)</Text>)}
         { item.status === 1 && (<Text style={{fontSize: 12}}>Tomada: Immediatamente después de la salida (parquing)</Text>)}
         { item.status === 2 && (<Text style={{fontSize: 12}}>Tomada: Posteriormente (casa/refugio)</Text>)} */}
-        <Text style={{fontSize: 12}}>Usuario: {userName}</Text> 
+        <Text style={{fontSize: 12}}>{t('userTitle')}: {userName}</Text> 
       </View>
       )
     }

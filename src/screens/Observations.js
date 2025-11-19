@@ -143,7 +143,6 @@ export default function ObservationDetail({ navigation }) {
           style={{marginBottom: 20}}/>
         <Text>Por favor, antes de realizar observaciones,</Text>
         <Text>complete su perfil de usuario.</Text>
-       
         <Text>Gracias.</Text>
         
         <Button style={styles.button} title="Volver al perfil"  onPress={async () => {
@@ -263,7 +262,7 @@ export default function ObservationDetail({ navigation }) {
             {draftList}
             <View style={[styles.formContainer,{ marginTop: 15}]}>
               <View style={{flexDirection: 'row',justifyContent: 'space-between'}}>
-              <Text style={[styles.sectionTitle,{ justifyContent: 'flex-start'}]}>Observaciones realizadas</Text>
+              <Text style={[styles.sectionTitle,{ justifyContent: 'flex-start'}]}>{t('obsRel')}</Text>
               <Pressable
                   style={{ justifyContent: 'flex-end'}}
                   onPress={()  => {

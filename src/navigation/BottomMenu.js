@@ -2,13 +2,14 @@ import * as React from 'react';
 import { Text, View, Image, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import { useTranslation } from 'react-i18next';
 
 import bottomMenuData from './bottomMenuData';
 
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabs() {
+  const {t} = useTranslation();
   return (
     <Tab.Navigator screenOptions={{tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 90}}}>
       {bottomMenuData.map((item, idx) => (
@@ -19,6 +20,7 @@ export default function BottomTabs() {
           
           options={{
           headerShown: false, 
+          title: t(item.title), 
           tabBarIcon: ({ focused }) => (
             <View style={styles.tabBarItemContainer}>
               <MaterialCommunityIcons size={25} 
@@ -31,7 +33,7 @@ export default function BottomTabs() {
               /> */}
             </View>
           ),
-          tabBarLabel: ({ focused }) => <Text style={{marginBottom: (Platform.OS === 'ios' ? 0 : 5),fontSize: 12, color: focused ? '#307df6' : '#5f5f5f' }}>{item.name}</Text>,
+          tabBarLabel: ({ focused }) => <Text style={{marginBottom: (Platform.OS === 'ios' ? 0 : 5),fontSize: 12, color: focused ? '#307df6' : '#5f5f5f' }}>{t(item.title)}</Text>,
         }}
         />        
       ))}

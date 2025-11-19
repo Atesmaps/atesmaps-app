@@ -2,7 +2,7 @@
 #import <UIKit/UIKit.h>
 #import <GoogleMaps/GoogleMaps.h>
 
-@interface AppDelegate : RCTAppDelegate
 
+@interface AppDelegate : RCTAppDelegate
 
 @end

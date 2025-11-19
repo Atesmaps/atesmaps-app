@@ -2,6 +2,7 @@ import React, {useContext} from "react";
 import { StyleSheet, Text, View, Image, Linking, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
+import { useTranslation } from "react-i18next";
 
 import {ObservationContext } from '../context/ObservationContext';
 
@@ -15,6 +16,7 @@ import {ObservationContext } from '../context/ObservationContext';
 // );
 
 export default function Item({ item, index,  navigation  }) {
+    const { t } = useTranslation();
     const {setSelectedIndex, updateSelectedIndex} = useContext(ObservationContext);
     // console.log(item);
 
@@ -22,14 +24,14 @@ export default function Item({ item, index,  navigation  }) {
       if (item.status == 0) {
         return (
           <View style={styles.itemStatus}>
-            <Text style={{fontSize:10, textAlign: 'center', color: 'white'}}>{'Borrador'}</Text>
+            <Text style={{fontSize:10, textAlign: 'center', color: 'white'}}>{t('borrador')}</Text>
           </View>
         )
       }
       if (item.status == 1) {
         return (
           <View style={[styles.itemStatus,{backgroundColor:"#62a256"}]}>
-            <Text style={{fontSize:10, textAlign: 'center', color: 'white'}}>{ 'Enviadas'}</Text>
+            <Text style={{fontSize:10, textAlign: 'center', color: 'white'}}>{ t('env')}</Text>
           </View>
         )
       }
@@ -60,7 +62,7 @@ export default function Item({ item, index,  navigation  }) {
 
     const title = (title) => {
       if (title === ''){
-        return <Text style={{color:"gray"}}>( Sin titulo )</Text>
+        return <Text style={{color:"gray"}}>{t('noTitle')}</Text>
       }else{
        return  <Text style={{fontWeight:"bold"}}>{item.title}</Text>
       }
@@ -68,7 +70,7 @@ export default function Item({ item, index,  navigation  }) {
 
     return (
       <>
-      {item.status < 0 && (
+      {/* {item.status < 0 && (
         <View style={styles.bannerItem}>
           <TouchableOpacity 
             style={[{width:'100%', flex:1}, styles.bannerItem]}
@@ -79,7 +81,7 @@ export default function Item({ item, index,  navigation  }) {
           <Image source={require('../../assets/images/banners/vertic_320x50px.gif')} style={styles.bannerItem} /> 
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
       {item.status >= 0 && (
         <>
         <View style={styles.listItem}>

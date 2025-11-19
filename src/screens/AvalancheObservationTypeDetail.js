@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import type {Node} from 'react';
-import RadioButtonRN from 'radio-buttons-react-native';
+// import RadioButtonRN from 'radio-buttons-react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
     SafeAreaView,
@@ -27,6 +28,7 @@ import CustomInput from "../components/CustomInput";
 
 const AvalancheObservationTypeDetail: () => Node = ({ route, navigation }) => {
 const { editingObservation, selectedIndex, updateObservations, setEditingObservation  } = useContext(ObservationContext);
+const {t} = useTranslation();
 
 const [avalancheValues, setAvalancheValues] = useState(editingObservation.observationTypes?.avalanche ? editingObservation.observationTypes?.avalanche : {status: false, values: {}});
 const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
@@ -76,7 +78,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue } = us
 });
 useEffect(()=>{
     if (errors && Object.keys(errors).length != 0) {
-        let errorsText = 'Revisa los siguientes campos: \n';
+        let errorsText = t('errorTitle');
         for (const key in errors) {
             errorsText += `${key}: ${errors[key]['message']} \n`
             // console.log(`${key}: ${errors[key]}`);
@@ -88,7 +90,7 @@ useEffect(()=>{
             textColor: "#fff",
             backgroundColor: "#B00020",
             action: {
-                text: 'Cerrar',
+                text: t('close'),
                 textColor: 'white',
                 onPress: () => { /* Do something. */ },
             },
@@ -113,7 +115,7 @@ useLayoutEffect(() => {
           
             // navigation.navigate('Observación', {index, update:true})
           }}
-          title="Guardar"
+          title={t('guardar')}
         />
       )
     });
@@ -137,7 +139,7 @@ useLayoutEffect(() => {
     
     navigation.navigate('Observación',{selectedIndex});
     Snackbar.show({
-        text: 'Tu observación sobre avalanchas se ha eliminado.',
+        text: t('avalancheObsSnackBarText'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -217,7 +219,7 @@ const updateData = () => {
     // console.log('---------------------------');
     navigation.navigate('Observación',{selectedIndex});
     Snackbar.show({
-        text: 'Tu observación sobre avalanchas se ha guardado.',
+        text: t('avalancheObsSnackBarText2'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -238,20 +240,20 @@ useEffect(()=>{
 
 
 const obsTypeOptions = [
-    {label: 'Singular'},
-    {label: 'Síntesis'},
+    {label: t('singular')},
+    {label: t('sintesis')},
 ];
 
 const whenOptions = [
-        {label: 'Del mismo dia'},
-        {label: 'Del dia anterior'},
-        {label: 'Mas de dos días'},
+        {label: t('dia')},
+        {label: t('diaAnte')},
+        {label: t('dosDias')},
     ];
 
 const accuracyOptions = [
-    {label: 'Exacta (20-50m)'},
-    {label: 'Bastante precisa (50-500m)'},
-    {label: 'Poco precisa (>500m)'},
+    {label: t('exacta')},
+    {label: t('bastantePrecisa')},
+    {label: t('pocoPrecia')},
 ];
 
 const amountOptions = [
@@ -262,16 +264,16 @@ const amountOptions = [
     ];
 
 const triggerOptions = [
-        {label: 'Accidental'},
-        {label: 'Natural'},
-        {label: 'Artificial'},
+        {label: t('accidental')},
+        {label: t('natural')},
+        {label: t('artificial')},
     ];
 
 const windExposureOptions = [
-        {label: 'Sotavento'},
-        {label: 'Carga cruzada'},
-        {label: 'Otras situaciones'},
-        {label: 'Sin exposicion al viento'},
+        {label: t('sotavento')},
+        {label: t('cargaHumeda')},
+        {label: t('otrasHumeda')},
+        {label: t('sinExpoViento')},
     ];
 
 return(
@@ -279,18 +281,17 @@ return(
         <ScrollView >
             <View style={styles.container}>
                 <View style={styles.introContainer} >
-                    <Text style={styles.intro}>Si tienes información sobre una avalancha o una situación de condiciones generalizada, 
-                    aquí puedes detallar información al respecto. Rellena solamente aquellos campos de los que tengas información precisa. </Text> 
-                    <Text style={styles.introSubtext}> * campos obligatorios</Text>
+                    <Text style={styles.intro}>{t('infoAva')} </Text> 
+                    <Text style={styles.introSubtext}> {t('campos')}</Text>
                 </View>
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="obsType"
-                        title="Observación singular o síntesis del lugar de observación:*"
+                        title={`${t('obsSing')}:*`}
                         control={control}
                         data={obsTypeOptions}
-                        rules={{required: 'Campo obligatorio'}}
+                        rules={{required: t('requiredField')}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
@@ -300,7 +301,7 @@ return(
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="geoAccuracy"
-                        title="La geolocalización de la observación es precisa?"
+                        title={t('geoloc')}
                         control={control}
                         data={accuracyOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -315,7 +316,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="when"
-                        title="La actividad de avalancha fue:"
+                        title={`${t('actiAva')}:`}
                         control={control}
                         data={whenOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -329,7 +330,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="amount"
-                        title="Número de avalanchas:"
+                        title={`${t('numAva')}:`}
                         control={control}
                         data={amountOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -353,18 +354,18 @@ return(
                     > */}
 
                     
-                    <Text>Medida:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>        
+                    <Text>{t('medida')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>        
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="dangerLevel1"
-                                        title="1-Peligro de enterramiento mínimo (peligro de caída)" 
+                                        title={t('enteMin1')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="dangerLevel2" 
-                                        title="2-Puede enterrar, herir o matar a una persona."
+                                        title={t('entePers2')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -372,21 +373,21 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="dangerLevel3"
-                                        title="3-Puede enterrar o destruir un coche." 
+                                        title={t('enteCoche3')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="dangerLevel4" 
-                                        title="4-Puede enterrar o destruir un vagon de tren."
+                                        title={t('enteTren4')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="dangerLevel5"
-                                        title="5-Puede modificar el paisaje, possibilidad de daños desastrosos." 
+                                        title={t('paisaje5')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -412,16 +413,16 @@ return(
                     > */}
 
                     
-                    <Text>Tipología de alud:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>            
+                    <Text>{t('tipoAlud')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>            
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheType1"
-                                        title="Placa nieve reciente." 
+                                        title={t('placaReciente')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="avalancheType2" 
-                                        title="Placa de viento."
+                                        title={t('placaViento')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -429,43 +430,43 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheType3"
-                                        title="Capa debil persistente" 
+                                        title={t('debilCapa')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="avalancheType4" 
-                                        title="Placa húmeda."
+                                        title={t('puntual')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheType5"
-                                        title="Cornisa." 
+                                        title={t('cornisa')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="avalancheType6" 
-                                        title="Cornisa y placa."
+                                        title={t('cornisaPlaca')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheType7"
-                                        title="Puntual húmeda." 
+                                        title={t('puntual')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="avalancheType8" 
-                                        title="Puntual seca."
+                                        title={t('puntualSeca')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheType9"
-                                        title="Deslizamiento basal." 
+                                        title={t('desli')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -483,7 +484,7 @@ return(
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
 
-                    <Text>Características de la avalancha:</Text>
+                    <Text>{t('avalancheCharacteristicsTitle')}:</Text>
                     {/* <Text style={{fontSize:12, color: 'gray', padding:5}}>Si dudas entre dos tipos, puedes marcar las dos</Text>         */}
                     
                     <View style={styles.inputGroup}>
@@ -491,7 +492,7 @@ return(
                        
                         <CustomInput
                             name="depth"
-                            placeholder=" Profundidad de la fractura (en avalanchas de placa)(cm)"
+                            placeholder={t('profundidadFract')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -502,7 +503,7 @@ return(
                         
                             <CustomInput
                                 name="width"
-                                placeholder=" Ancho (en avalanchas de placa)(m)"
+                                placeholder={t('anchoAva')}
                                 control={control}
                                 customStyles={{width:"100%"}}
                                 //   rules={{required: 'Email is required'}}
@@ -512,7 +513,7 @@ return(
                
                             <CustomInput
                                 name="length"
-                                placeholder=" Largo (en avalanchas de placa y puntuales)(m)"
+                                placeholder={t('largoAval')}
                                 control={control}
                                 customStyles={{width:"100%"}}
                                 //   rules={{required: 'Email is required'}}
@@ -527,7 +528,7 @@ return(
                     <View style={styles.spacer}></View>
                     <CustomRadioButton 
                         name="trigger"
-                        title="Desencadenamiento:"
+                        title={t('desencadenamiento')}
                         control={control}
                         data={triggerOptions}
                         box={false}
@@ -551,8 +552,8 @@ return(
                     > */}
 
                     
-                    <Text>Franja altitudinal:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('franjaAlti')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="heightRange1"
                                         title="<2.000 m" 
@@ -593,7 +594,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="height"
-                            placeholder="Cota altimetrica zona de salida (m)"
+                            placeholder={t('cotaZonaSalida')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -611,7 +612,7 @@ return(
                          
                     <CustomInput
                             name="inclination"
-                            placeholder="Inclinación zona de salida (º)"
+                            placeholder={t('inclinaciónZona')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -633,7 +634,7 @@ return(
                         ]}
                     > */}
                     <Text>Orientación:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
                                         title="N" 
@@ -695,13 +696,13 @@ return(
                 )} 
                 </View>*/}
                 <View style={styles.formContainer} >
-                <Text>Grano de la capa:</Text>
+                <Text>{t('granocapa')}:</Text>
                 <View style={styles.spacer}></View>
                     <View style={styles.inputGroup}>
                     
                         <CustomInput
                             name="snowType"
-                            placeholder="Grano de la capa debil"
+                            placeholder={t('granoCapaDebil')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -714,7 +715,7 @@ return(
                  <View style={styles.spacer}></View>
                  <CustomRadioButton 
                         name="windExposure"
-                        title="Exposición:"
+                        title={t('exposicion')}
                         control={control}
                         data={windExposureOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -727,7 +728,7 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Otras observaciones:</Text>
+                    <Text>{t('otrasObs')}:</Text>
                 
                     <CustomInput
                         name="comments"
@@ -735,13 +736,13 @@ return(
                         multiline={true}
                         numberOfLines={4}
                         customStyles={[styles.inputContainer, {height: '20%'}]}
-                        placeholder="1000 letras max"
+                        placeholder={t('letrasMax')}
                         />
                         <View style={{marginTop: 30}}>
-                            <CustomButton text="Guardar" bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
                         </View>
                         <View>
-                            <CustomButton text="Borrar datos" bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                            <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
                         </View>
                 </View>
                 

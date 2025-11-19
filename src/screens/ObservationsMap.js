@@ -13,11 +13,13 @@ import {
 } from 'react-native';
 
 import { SelectList } from 'react-native-dropdown-select-list'
+import { useTranslation } from 'react-i18next';
 
 
 import MapView, {Marker, UrlTile} from 'react-native-maps';
 // import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
+
 // import Svg from 'react-native-svg';
 import Loading from '../components/Loading';
 
@@ -27,7 +29,8 @@ import { LocationContext } from '../context/LocationContext';
 import { ObservationContext } from '../context/ObservationContext';
 
 import CustomButton from "../components/CustomButton";
-import {locationsData, locationsNames, filterNames, filterData} from './data/MapFilterData';
+// import {locationsData, locationsNames, filterNames, filterData} from './data/MapFilterData';
+import { useMapFilterData } from '../hooks/useMapFilterData';
 
 const bluePin = require('../../assets/images/pins/atesmaps-blue.png');
 const redPin = require('../../assets/images/pins/atesmaps-red.png')
@@ -41,7 +44,7 @@ const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 const ObservationsMap: () => Node = ({ navigation  }) => {
     const {LATITUDE_DELTA,LONGITUDE_DELTA, currentLocation} = useContext(LocationContext);
     const {isLoading, getAllObservations, allObservations,} = useContext(ObservationContext);
-
+    const { t, i18n } = useTranslation();
     const [newDelta, setNewDelta]=useState({longitudeDelta: 0.7470, latitudeDelta: 0.7470})
     const [newRegion, setNewRegion]=useState({ 
       latitude: currentLocation.latitude, 
@@ -51,7 +54,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     // const [locationIsLoading, setLocationIsLoading] = useState(false);
     const [flying, setFlying] = useState(false);
     const [mapIndex, setMapIndex] = useState(0);
-
+    const {locationsData, locationsNames, filterNames, filterData} = useMapFilterData();
     const [dayFilter, setDayFilter] = useState(3);
     const [locationFilter, setLocationFilter] = useState(currentLocation)
     const [selectedLocation, setSelectedLocation] = useState(0);
@@ -60,6 +63,21 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     const [scrollWidth, setScrollWidth] = useState(0);
 
   
+    const mapI18nToMomentLocale = (i18nCode) => {
+        switch (i18nCode) {
+            case 'cat':
+                return 'ca'; // Catalan
+            case 'en':
+                return 'en'; // English
+            case 'fr':
+                return 'fr'; // French
+            case 'es':
+                return 'es'; // Spanish
+            default:
+                return 'en'; // Fallback to English
+        }
+    };
+
     //NOTE: This is React Native integrated animated library:
     let mapAnimation = new Animated.Value(0);
     //TODO: use React Reanimated library instead.
@@ -362,7 +380,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                         setSelectedLocation(val)
                       }}
                       data={locationsNames} 
-                      placeholder="Cerca de mi"
+                      placeholder={t('cerca')}
                       save="key"
                     // defaultOption={{ key:'0', value:'Cerca de mi' }}
                       search={false}
@@ -376,7 +394,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                         setSelectedDay(val)
                       }} 
                       data={filterNames} 
-                      placeholder="3 días"
+                      placeholder={"3 "+t("dias")}
                       search={false}
                       //defaultOption={{ key:'0', value:'3 días' }}
                       save="key"
@@ -527,10 +545,10 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                         <View style={[styles.obsIcons, {justifyContent: 'space-between'}]}>
 
                           <Text numberOfLines={2} style={styles.cardtitle}>{(marker.title.length > 30 ? marker.title.substring(0, 30)+'...' : marker.title)} </Text>
-                          <Text style={styles.cardDescription}>{moment(marker.date).format('Do MMMM YY')}</Text>
+                          <Text style={styles.cardDescription}>{moment(marker.date).locale(mapI18nToMomentLocale(i18n.language)).format('Do MMMM YY')}</Text>
                         </View> 
                         <View style={styles.obsIcons}>
-                        <Text numberOfLines={1} style={styles.cardDescription}>Tipo de observaciones:</Text>
+                        <Text numberOfLines={1} style={styles.cardDescription}>{t('tipoIObs')}:</Text>
                         {marker.observationTypes.quick.status == true && (
                           <Image source={require("../../assets/images/icons/buttonIcons/button-quick.png")}
                                 style={styles.obsIcon}
@@ -563,7 +581,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                         )}                                                                                          
                         </View>
                        
-                        <CustomButton text="Ver"  
+                        <CustomButton text={t('view')}  
                             bgColor={"#48a5e9"} 
                             fgColor='white' 
                             customStyle={{width: '100%', padding: 6, height: 30}}

@@ -15,6 +15,7 @@ import {
 
 // import fs from "react-native-fs";
 const Base64Binary = require('base64-arraybuffer');
+import { useTranslation } from 'react-i18next';
 
 import { ObservationContext } from '../context/ObservationContext';
 
@@ -59,7 +60,7 @@ const HEIGHT = 320;
 const OVERDRAG = 20;
 
 const ObservationImagesList: () => Node = ({ route, params, navigation }) => {
-
+const {t} = useTranslation();
 const { editingObservation,setEditingObservation,observations, selectedIndex, updateObservations  } = useContext(ObservationContext);
 const [images, setImages] = useState(editingObservation.images ? editingObservation.images : []);
 const [isOpen, setOpen] = useState(false);
@@ -105,7 +106,7 @@ useLayoutEffect(() => {
     headerRight:() => (
             <Pressable
               onPress={async ()  => {
-                console.log('mostrar imagepicker....');
+                //console.log('mostrar imagepicker....');
                 //sheetRef.current.snapTo(0); 
                 setOpen(true);
                 }}
@@ -127,7 +128,7 @@ useLayoutEffect(() => {
               //navigation.navigate('Observación', {selectedIndex, update:true})
               navigation.goBack();
             }}
-            title="Guardar"
+            title={t('guardar')}
           />
     )
   });
@@ -184,23 +185,23 @@ const renderContent =
     }}
   >
     <View style={{alignItems: 'center'}}>
-      <Text style={styles.panelTitle}>Cargar Foto</Text>
-      <Text style={styles.panelSubtitle}>Sube imagenes de la observación</Text>
+      <Text style={styles.panelTitle}>{t('cargaFoto')}</Text>
+      <Text style={styles.panelSubtitle}>{t('subeImage')}</Text>
     </View>
     <CustomButton 
-          text="Take Photo" 
+          text={t('imagePickerTakePhotoText')}
           type="tertiary"
           onPress={takePhotoFromCamera}
           iconName = {null}
         />
     <CustomButton 
-        text="Choose From Library" 
+        text={t('imagePickerChoosePhotoText')} 
         type="tertiary"
         iconName = {null}
         onPress={choosePhotoFromLibrary} 
       />
     <CustomButton 
-        text="Cancel" 
+        text={t('cancelar')}
         type="tertiary"
         iconName = {null}
         onPress={() => {
@@ -270,11 +271,11 @@ return(
             size={50} 
             color={'gray'}
             style={{marginBottom: 20}}/>
-        <Text>No se ha subido ninguna imagen.</Text>
+        <Text>{t('noImage')}</Text>
         <Button style={styles.button} 
-          title="Añadir imagen" 
+          title={t('imageAñadir')}
           onPress={() => {
-            console.log('mostrar imagepicker....');
+            // console.log('mostrar imagepicker....');
             //sheetRef.current.snapTo(0); 
             toggleSheet();
           }} />

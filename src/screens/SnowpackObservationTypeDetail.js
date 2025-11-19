@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import type {Node} from 'react';
-import RadioButtonRN from 'radio-buttons-react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
     SafeAreaView,
@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import  Snackbar  from "react-native-snackbar";
-import CheckBox from '@react-native-community/checkbox';
+
 import CustomInput from "../components/CustomInput";
 import CustomRadioButton from "../components/CustomRadioButton";
 import CustomButton from "../components/CustomButton";
@@ -27,6 +27,9 @@ import { useForm, Controller } from "react-hook-form";
 import { ObservationContext } from '../context/ObservationContext';
 
 const SnowpackObservationTypeDetail: () => Node = ({ route, navigation }) => {
+   
+    const {t} = useTranslation();
+
     useLayoutEffect(() => {
         navigation.setOptions({
           // title: value === '' ? 'No title' : value,
@@ -40,13 +43,14 @@ const SnowpackObservationTypeDetail: () => Node = ({ route, navigation }) => {
               
                 // navigation.navigate('Observación', {index, update:true})
               }}
-              title="Guardar"
+              title={t('guardar')}
             />
           )
         });
         //TODO: Here we can dynamically change the header of the screen....
         //check documentation here: https://reactnavigation.org/docs/navigation-prop/#setparams
       }, [navigation]);
+
 const { editingObservation, selectedIndex, setEditingObservation,updateObservations  } = useContext(ObservationContext);
 const [snowpackValues, setSnowpackValues] = useState(editingObservation.observationTypes?.snowpack ? editingObservation.observationTypes?.snowpack : {status: false, values: {}});
 
@@ -110,7 +114,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue } = us
 
 useEffect(()=>{
     if (errors && Object.keys(errors).length != 0) {
-        let errorsText = 'Revisa los siguientes campos: \n';
+        let errorsText = t('errorTitle')
         for (const key in errors) {
             errorsText += `${key}: ${errors[key]['message']} \n`
             // console.log(`${key}: ${errors[key]}`);
@@ -122,7 +126,7 @@ useEffect(()=>{
             textColor: "#fff",
             backgroundColor: "#B00020",
             action: {
-                text: 'Cerrar',
+                text: t('close'),
                 textColor: 'white',
                 onPress: () => { /* Do something. */ },
             },
@@ -144,7 +148,7 @@ const removeData = () => {
     // console.log(observation);
     // console.log('---------------------------');
     Snackbar.show({
-        text: 'Tu observación sobre el manto de nieve se ha eliminado.',
+        text: t('snowObsSnackBarText'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -241,7 +245,7 @@ const updateData = () => {
     // console.log('---------------------------');
     navigation.navigate('Observación',{selectedIndex});
     Snackbar.show({
-        text: 'Tu observación sobre el manto de nieve se ha guardado.',
+        text: t('snowObsSnackBarText2'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -251,9 +255,9 @@ const updateData = () => {
 }
 
 const accuracyOptions = [
-        {label: 'Exacta (20-50m)'},
-        {label: 'Bastante precisa (50-500m)'},
-        {label: 'Poco precisa (>500m)'},
+        {label: t('exacta')},
+        {label: t('bastantePrecisa')},
+        {label: t('pocoPrecia')},
     ];
 
 // const triggerOptions = [
@@ -263,44 +267,44 @@ const accuracyOptions = [
 //     ];
 
 const booleanOptions = [
-        {label: 'Si'},
-        {label: 'No'},
+        {label: t('si')},
+        {label: t('no')},
     ];
 
 const windExposureOptions = [
-        {label: 'Sotavento'},
-        {label: 'Sobrevento'},
-        {label: 'Carga cruzada'},
-        {label: 'Sin exposicion al viento'},
+        {label: t('sotavento')},
+        {label: t('sobrevento')},
+        {label: t('cargaHumeda')},
+        {label: t('sinExpoViento')},
     ];
 
 const cmtOptions = [
-        {label: 'Muy facil'},
-        {label: 'Facil'},
-        {label: 'Moderado'},
-        {label: 'Difícil'},
-        {label: 'No concluyente'},
+        {label:  t('muyFacil')},
+        {label:  t('facil')},
+        {label:  t('moderado')},
+        {label:  t('dificil')},
+        {label:  t('noConcluyente')},
     ];
 
 const  snowTypeOptions= [
-        {label: 'Nueva'},
-        {label: 'Crosta'},
-        {label: 'Facetas'},
-        {label: 'Grano fino'},
-        {label: 'Variable'},
+        {label: t('nueva')},
+        {label: t('crosta')},
+        {label: t('facetas')},
+        {label: t('granoFino')},
+        {label: t('variable')},
     ];
 
 const ctOptions = [
-        {label: '1 a 10 Golpes'},
-        {label: '11 a 20 Golpes'},
-        {label: '21 a 30 Golpes'},
-        {label: 'No concluyente'},
+        {label: t('hits1')},
+        {label: t('hits2')},
+        {label: t('hits3')},
+        {label: t('noConcluyente')},
     ];
 
 const ectOptions = [
-        {label: 'Propagación'},
-        {label: 'Sin propagarción'},
-        {label: 'No concluyente'},
+        {label: t('propagación')},
+        {label: t('sinPropagación')},
+        {label: t('noConcluyente')},
     ];
 
 // const fractureOptions = [
@@ -312,26 +316,26 @@ const ectOptions = [
 //     ];
 
 const hardnessOptions = [
-        {label: '1 - (P) Puño'},
-        {label: '2 - (4d) 4 dedos'},
-        {label: '3 - (1d) 1 dedo'},
-        {label: '4 - (L) Lápiz'},
-        {label: '5 - (C) Cuchillo'},
-        {label: '6 - (H) Hielo'},
+        {label: t('hardnessTest1')},
+        {label: t('hardnessTest2')},
+        {label: t('hardnessTest3')},
+        {label: t('hardnessTest4')},
+        {label: t('hardnessTest5')},
+        {label: t('hardnessTest6')}
     ]
 
 const humidityOptions = [
-        {label: '1-Seca-Bola imposible'},
-        {label: '2-Húmeda-Bola fácil'},
-        {label: '3-Mojada-Guante no se moja'},
-        {label: '4-Muy mojada-Guante se moja'},
-        {label: '5-Slush-Sin aire en los poros'},
+        {label: t('secaBola')},
+        {label: t('humedaBola')},
+        {label: t('mojadaGuanteNo')},
+        {label: t('mojadaGuante')},
+        {label: t('slush')},
      
     ]
 
 const obsTypeOptions = [
-        {label: 'Singular'},
-        {label: 'Síntesis'},
+        {label: t('singular')},
+        {label: t('sintesis')},
     ];
     
 
@@ -341,9 +345,8 @@ return(
         <ScrollView >
             <View style={styles.container}>
                 <View style={styles.introContainer} >
-                    <Text style={styles.intro}>Has evaluado la estabilidad del manto durante tu salida? 
-                    Rellena solamente aquellos campos de los que tengas informacion precisa </Text> 
-                    <Text style={styles.introSubtext}>* campos obligatorios</Text>
+                    <Text style={styles.intro}>{t('estabManto')} </Text> 
+                    <Text style={styles.introSubtext}>{t('campos')}</Text>
                 </View>
                 {/* <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
@@ -362,7 +365,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="geoAccuracy"
-                        title="La geolocalización de la observación es precisa?"
+                        title={t('geoloc')}
                         control={control}
                         data={accuracyOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -385,7 +388,7 @@ return(
                         }
                         ]}
                     > */}
-                     <Text>Franja altitudinal:</Text>
+                     <Text>{t('franjaAlti')}:</Text>
                     {/*<View style={styles.formGroup}>
                         <CustomCheckbox name="altitudeRange1"
                                         title="< 2.000m" 
@@ -415,7 +418,7 @@ return(
                     </View>   */}
                     <CustomInput
                         name="altitude"
-                        placeholder="Cota altimetrica donde se ha realizado el test (si la sabes)"
+                        placeholder={t('cotaAlti')}
                         control={control}
                         // rules={{required: 'Title is required'}}
                     />      
@@ -438,7 +441,7 @@ return(
                         ]}
                     > */}
                     <Text>Orientación:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
                                         title="N" 
@@ -498,7 +501,7 @@ return(
 
                 <View style={styles.formContainer} >
                 <View style={styles.spacer}></View>
-                    <Text>Profundidad del manto:</Text>
+                    <Text>{t('profManti')}:</Text>
                     <CustomInput
                         name="depth"
                         placeholder="(cm)"
@@ -512,7 +515,7 @@ return(
                    
                     <CustomRadioButton 
                         name="woumpfs"
-                        title="Has escuchado/sentido woumpfs?"
+                        title={t('woumps')}
                         control={control}
                         data={booleanOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -528,7 +531,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="cracks"
-                        title="Has observado fisuras con propagación?"
+                        title={t('obsPropa')}
                         control={control}
                         data={booleanOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -551,40 +554,40 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     /> */}
-                    <Text>Nieve en superfície:</Text>
+                    <Text>{t('nieveSup')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="layerSnowType1"
-                                        title="Nueva" 
+                                        title={t('nueva')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="layerSnowType2" 
-                                        title="Crosta"
+                                        title={t('crosta')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="layerSnowType3"
-                                        title="Escarcha de superfície" 
+                                        title={t('escarcha')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="layerSnowType4" 
-                                        title="Facetas"
+                                        title={t('facetas')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="layerSnowType5"
-                                        title="Grano fino" 
+                                        title={t('granoFino')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="layerSnowType6" 
-                                        title="Variable"
+                                        title={t('variable')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -593,7 +596,7 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Penetración pie:</Text>
+                    <Text>{t('penetracionPie')}:</Text>
                     <CustomInput
                         name="footPenetration"
                         placeholder="(cm)"
@@ -604,7 +607,7 @@ return(
             
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Penetración esqui:</Text>
+                    <Text>{t('penetracionEsqui')}:</Text>
                     <CustomInput
                         name="skiPenetration"
                         placeholder="(cm)"
@@ -619,7 +622,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="handTest"
-                        title="Test Cizalla de mano"
+                        title={t('testCizalla')}
                         control={control}
                         data={cmtOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -643,7 +646,7 @@ return(
                 <View style={styles.formContainer} >
                     <CustomRadioButton 
                         name="compresionTest"
-                        title="Test Compresión (CT)"
+                        title={t('cTTest')}
                         control={control}
                         data={ctOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -664,35 +667,35 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     /> */}
-                    <Text>Tipo de fractura (CT):</Text>
+                    <Text>{t('tipoFracturaCT')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType1Ct"
-                                        title="Colapso subito" 
+                                        title={t('colapsoSubito')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="fractureType2Ct" 
-                                        title="Planar subito"
+                                        title={t('planarSubito')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType3Ct"
-                                        title="Planar resistente" 
+                                        title={t('planarResistente')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="fractureType4Ct" 
-                                        title="Colapso progresivo"
+                                        title={t('colapsoProgresivo')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType5Ct"
-                                        title="Rotura (Break)" 
+                                        title={t('roturaBreak')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -700,10 +703,10 @@ return(
                 </View>
                 <View style={styles.formContainer} >
                
-                    <Text>Profundidad de fractura (CT):</Text>
+                    <Text>{t('profFractCT')}:</Text>
                     <CustomInput
                         name="fractureDepthCt"
-                        placeholder="cm desde la superfície"
+                        placeholder={t('profFractPlaceholder')}
                         control={control}
                         // rules={{required: 'Title is required'}}
                     />   
@@ -714,7 +717,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="extensionTest"
-                        title="Test Columna Extendida (ECT)"
+                        title={t('eCTTest')}
                         control={control}
                         data={ectOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -736,35 +739,35 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     /> */}
-                    <Text>Tipo de fractura (ECT):</Text>
+                    <Text>{t('tipoFracturaECT')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType1"
-                                        title="Colapso subito" 
+                                        title={t('colapsoSubito')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="fractureType2" 
-                                        title="Planar subito"
+                                        title={t('planarSubito')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType3"
-                                        title="Planar resistente" 
+                                        title={t('planarResistente')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="fractureType4" 
-                                        title="Colapso progresivo"
+                                        title={t('colapsoProgresivo')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType5"
-                                        title="Rotura (Break)" 
+                                        title={t('roturaBreak')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -773,10 +776,10 @@ return(
 
                 <View style={styles.formContainer} >
               
-                    <Text>Profundidad de fractura (ECT):</Text>
+                    <Text>{t('profFractECT')}:</Text>
                     <CustomInput
                         name="fractureDepth"
-                        placeholder="cm desde la superfície"
+                        placeholder={t('profFractPlaceholder')}
                         control={control}
                         // rules={{required: 'Title is required'}}
                     />   
@@ -787,7 +790,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="layerHardness"
-                        title="Dureza de la placa (sobre la capa debil)"
+                        title={t('durezaPlaca')}
                         control={control}
                         data={hardnessOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -801,7 +804,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="weakLayerHardness"
-                        title="Dureza de la capa debil"
+                        title={t('durezaPlacaDebil')}
                         control={control}
                         data={hardnessOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -815,7 +818,7 @@ return(
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
                         name="snowHumidity"
-                        title="Humedad de la capa"
+                        title={t('humedadCapa')}
                         control={control}
                         data={humidityOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -828,10 +831,10 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Tipo de grano de la capa debil:</Text>
+                    <Text>{t('tipoGranoCapaDebil')}:</Text>
                     <CustomInput
                         name="snowType"
-                        placeholder="Describe el tipo de copo"
+                        placeholder={t('tipoCopo')}
                         control={control}
                         // rules={{required: 'Title is required'}}
                     />  
@@ -839,7 +842,7 @@ return(
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
-                    <Text>Otras observaciones:</Text>
+                    <Text>{t('otrasObs')}:</Text>
                 
                     <CustomInput
                         name="comments"
@@ -847,13 +850,13 @@ return(
                         multiline={true}
                         numberOfLines={4}
                         customStyles={[styles.inputContainer, {height: '20%'}]}
-                        placeholder="1000 letras max"
+                        placeholder={t('letrasMax')}
                         />
                     <View style={{marginTop: 30}}>
-                            <CustomButton text="Guardar" bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
                         </View>
                     <View>
-                        <CustomButton text="Borrar datos" bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                        <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
                     </View>
                 </View>
                 

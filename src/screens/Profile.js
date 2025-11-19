@@ -2,7 +2,6 @@ import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import type {Node} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 import {
     StyleSheet,
     View,
@@ -15,6 +14,7 @@ import {
     ActivityIndicator
   } from 'react-native';
 
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { BASE_URL } from '../config';
 
@@ -36,7 +36,7 @@ const Profile: () => Node = () => {
 
 const {logout, userDetails, setUserDetails,updateUser, userToken} = useContext(AuthContext);
 const {setCurrentPage} = useContext(ObservationContext);
-
+const {t} = useTranslation();
 const [user, setUser] = useState(userDetails);
 const [isLoading, setIsLoading] = useState(false);
 const [modalVisible, setModalVisible] = useState(false);
@@ -144,12 +144,12 @@ return userDetails ? (
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Estas seguro que quieres cancelar la cuenta? </Text>
+            <Text style={styles.modalText}>{t('deleteAccountPopMessage')}</Text>
             <View>
-              <CustomButton text="Eliminar" bgColor={"#B00020"} fColor='#fff' iconName={null} onPress={handleDelete} />
+              <CustomButton text={t('deleteAccountPopDeleteButton')} bgColor={"#B00020"} fColor='#fff' iconName={null} onPress={handleDelete} />
             </View>
             <View>
-            <CustomButton text="Volver" bgColor={"#48a5e9"} fColor='#fff' iconName={null}  onPress={() => setModalVisible(!modalVisible)} />
+            <CustomButton text={t('deleteAccountPopBackButton')} bgColor={"#48a5e9"} fColor='#fff' iconName={null}  onPress={() => setModalVisible(!modalVisible)} />
             </View>
            
           </View>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 // import type {Node} from 'react';
 import  Snackbar  from "react-native-snackbar";
+import { useTranslation } from 'react-i18next';
 
 import {
     StatusBar,
@@ -24,7 +25,7 @@ import { useForm, Controller } from "react-hook-form";
 
 const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
     // const [user, setUser] = useState(null);
-
+    const { t } = useTranslation();
     const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
       //defaultValues: preloadedValues
       
@@ -51,7 +52,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
     useEffect(()=>{
         if (errors && Object.keys(errors).length != 0) {
-            let errorsText = 'Revisa los siguientes campos: \n';
+            let errorsText = t('errorTitle');
             for (const key in errors) {
                 errorsText += `${key}: ${errors[key]['message']} \n`
                 // console.log(`${key}: ${errors[key]}`);
@@ -73,10 +74,10 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
     //Activity type:
     const genderOptions = [
-        {label: 'Mujer'},
-        {label: 'Hombre'},
-        {label: 'No binario'},
-        {label: 'Prefiero no decirlo'}
+        {label: t('mujer')},
+        {label: t('hombre')},
+        {label: t('binario')},
+        {label: t('prefiero')}
     ]
     const [gender, setGender] = useState(false);
 
@@ -88,65 +89,65 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
     ]
      //Activity type:
      const carreerOptions = [
-        {label: 'No relacionada con el terreno de aludes'},
-        {label: 'Relacionada con el terreno de aludes (trabajador/a estacion esqui, guarda refugio...)'},
-        {label: 'Especificamente relacionada con el terreno de aludes (observador/a, predictor/a, guia, consultor/a, pister/a avalanchas)'},
+        {label: t('noTA')},
+        {label: t('siTA')},
+        {label: t('relTA')},
     ]
     const [carreer, setCarreer] = useState(false);
 
      //Activity type:
      const educationOptions = [
-        {label: 'Sin formación específica'},
-        {label: 'Curso/formación recreativo nivel 1'},
-        {label: 'Curso/formación recreativo nivel 2'},
-        {label: 'Curso profesional (ACNA.CAG, CAP o CAS, CAA ITP, AAA PRO, equivalente)'},
+        {label: t('noformacion')},
+        {label: t('nivel1')},
+        {label: t('nivel2')},
+        {label: t('nivelProf')},
     ]
     const [education, setEducation] = useState(false);
 
 
      //Activity type:
      const terrainExpirienceOptions = [
-        {label: 'Novel/principiante/inexperto: 1-2 años'},
-        {label: 'Aprendiente: 3-5 años'},
-        {label: 'Experto: más de 5 años'},
+        {label: t('novel')},
+        {label: t('aprendiente')},
+        {label: t('experto')},
     ]
     const [terrainExpirience, setTerrainExpirience] = useState(false);
 
      //Activity type:
      const terrainFrequencyOptions = [
-        {label: 'Baja: 1-2 actividades-días/mes'},
-        {label: 'Mediana: 1-2 actividades-días/semana'},
-        {label: 'Alta: 3-7 actividades-días/semana'},
+        {label: t('baja')},
+        {label: t('mediana')},
+        {label: t('alta')},
     ]
     const [terrainFrequency, setTerrainFrequency] = useState(false);
 
      //Activity type:
      const terrainTypeOptions = [
-        {label: 'Simple (Exposición a pendientes poco derechos y terreno forestal. Algunas claros de bosque pueden implicar zonas de llegada de aludes poco frecuentes. Muchas opciones para reducir o eliminar la exposición.)'},
-        {label: 'Exigente (Exposición a zonas de trayecto de aludes bien definidos, a zonas de salida o en trampas. Hay opciones para reducir o eliminar la exposición encontrando rutas cuidadosamente.)'},
-        {label: 'Complejo (Exposición a zonas de trayecto de aludes múltiples y superpuestas o en grandes extensiones de terreno abierto y derecho. Zonas de inicio de aludes múltiples y con trampas debajo. Mínimas opciones de reducir la exposición.)'},
+        {label: t('simple')},
+        {label: t('exigente')},
+        {label: t('complejo')},
     ]
     const [terrainType, setTerrainType] = useState(false);
 
      //Activity type:
      const conditionsOptions = [
-        {label: 'Sólo con grado de peligro 1-Débil o 2-Moderado'},
-        {label: 'Incluso con grado de peligro 3-Marcado pero escojo terreno menos complejo y expuesto.'},
-        {label: 'Incluso con grado de pelirgo 4-Fuerte, pero escojo terreno menos complejo y expuesto.'},
+        {label: t('grado1')},
+        {label: t('grado3')},
+        {label: t('grado4')},
     ]
     const [condition, setCondition] = useState(false);
 
     return(
        <>
-            <Text style={styles.sectionTitle}>Datos de Usuario</Text>
+            <Text style={styles.sectionTitle}>{t('datosUser')}</Text>
             <View style={styles.spacer}/>
             <View style={{marginTop: 10}}>
                 
                 <CustomInput
                   name="username"
-                  placeholder= "Nombre de usuario"
+                  placeholder= {t("namePlacehodler")}
                   control={control}
-                  rules={{required: 'El Nombre de usuario es obligatorio.'}}
+                  rules={{required: t('userFormNameRule')}}
                   // onPress={showDatepicker}
                 />
 
@@ -158,7 +159,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
                   name="email"
                   placeholder="Email"
                   control={control}
-                  rules={{required: 'Email is required'}}
+                  rules={{required: t('userFormEmailRule')}}
                   secureTextEntry={preloadedValues?.email.includes('privaterelay.appleid.com')}
                   selectTextOnFocus={false}
                   editable={false}
@@ -184,15 +185,15 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
                   // onPress={showDatepicker}
                 /> */}
               </View>
-              <Text style={[styles.sectionTitle,{marginTop: 30}]}>Datos personales</Text>
+              <Text style={[styles.sectionTitle,{marginTop: 30}]}>{t('datosPerson')}</Text>
               <View style={styles.spacer}/>
               <View style={{marginTop: 10}}>
-                <Text>Nombre*</Text>
+                <Text>{t('nombre')}*</Text>
                 <CustomInput
                     name="name"
-                    placeholder="Nombre"
+                    placeholder={t('nombre')}
                     control={control}
-                    rules={{required: 'Name is required'}}
+                    rules={{required: t('userFormNameRule')}}
                    
                     // onPress={showDatepicker}
                 />
@@ -200,15 +201,15 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
                 <Text>Apellidos*</Text>
                 <CustomInput
                     name="lastName"
-                    placeholder="Apellidos"
+                    placeholder={t('apellidos')}
                     control={control}
-                    rules={{required: 'lastName is required'}}
+                    rules={{required:t('userFormSurnameRule')}}
                     // onPress={showDatepicker}
                 />
 
                 <CustomRadioButton 
                     name="gender"
-                    title="Género:  (opcional)"
+                    title={t('genero')}
                     control={control}
                     data={genderOptions}
                     // rules={{required: 'Genero is required'}}
@@ -220,7 +221,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
                 <CustomRadioButton 
                     name="age"
-                    title="Franja de edad: (opcional)"
+                    title={t('franjaEdad')}
                     control={control}
                     data={ageOptions}
                     // rules={{required: 'Genero is required'}}
@@ -230,28 +231,28 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
                     
                 />
 
-                <Text style={{marginTop: 15}}>Instagram (opcional)</Text>
+                <Text style={{marginTop: 15}}>{t('userFormInstaTitle')}</Text>
                 <CustomInput
                     name="instagraProfile"
-                    placeholder="@Nombre_cuenta"
+                    placeholder={t('userFormInstaTitlePlacehodler')}
                     control={control}
                 />
 
-                <Text>Twitter (opcional)</Text>
+                <Text>{t('userFormXTitle')}</Text>
                 <CustomInput
                     name="twitterProfile"
-                    placeholder="@Nombre_cuenta"
+                    placeholder={t('userFormXTitlePlacehodler')}
                     control={control}
                 />
                 
-                <Text style={[styles.sectionTitle,{marginTop: 30}]}>Experiencia en terreno de aludes (TA)</Text>
+                <Text style={[styles.sectionTitle,{marginTop: 30}]}>{t('tAExperiencia')}</Text>
                 <View style={styles.spacer}/>
                 <CustomRadioButton 
                     name="professionalOrientation"
-                    title="Profesión:"
+                    title={t('profesion')}
                     control={control}
                     data={carreerOptions}
-                    rules={{required: 'Profesión is required'}}
+                    rules={{required: t('userFormProfession')}}
                     box={false}
                     textColor={'black'}
                     circleSize={14}
@@ -260,7 +261,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
                 <CustomRadioButton 
                     name="snowEducationLevel"
-                    title="Formació en terreno de aludes:"
+                    title={t('formacionTA')}
                     control={control}
                     data={educationOptions}
                    //rules={{required: 'Profesión is required'}}
@@ -272,7 +273,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
                 <CustomRadioButton 
                     name="snowExperienceLevel"
-                    title="Experiencia en terreno de aludes:"
+                    title={t('expTA')}
                     control={control}
                     data={terrainExpirienceOptions}
                    //rules={{required: 'Profesión is required'}}
@@ -284,7 +285,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
                 <CustomRadioButton 
                     name="avalanchExposure"
-                    title="Frecuencia en terreno de aludes:"
+                    title={t('frecTA')}
                     control={control}
                     data={terrainFrequencyOptions}
                    //rules={{required: 'Profesión is required'}}
@@ -294,11 +295,11 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
                     containerStyle={{marginTop: 30}}
                 />
 
-                <Text style={[styles.sectionTitle,{marginTop: 30}]}>Exposición al riesgo de aludes (RA)</Text>
+                <Text style={[styles.sectionTitle,{marginTop: 30}]}>{t('expRA')}</Text>
                 <View style={styles.spacer}/>
                 <CustomRadioButton 
                     name="terrainType"
-                    title="Tipo de terreno que escojo para hacer actividad siempre que sea posible por condiciones:"
+                    title={t('tipoTerrenoAtes')}
                     control={control}
                     data={terrainTypeOptions}
                    //rules={{required: 'Profesión is required'}}
@@ -310,7 +311,7 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
 
                 <CustomRadioButton 
                     name="conditionsType"
-                    title="Condiciones de aludes que escojo para hacer actividad:"
+                    title={t('conidicionesAludes')}
                     control={control}
                     data={conditionsOptions}
                    //rules={{required: 'Profesión is required'}}
@@ -323,10 +324,10 @@ const UserForm = ({preloadedValues, onSubmit, onDelete}) => {
               
             </View>
             <View style={{marginTop: 30}}>
-                <CustomButton text="Guardar" bgColor={"#62a256"} fColor='white' iconName={null} onPress={handleSubmit(onSubmit)} />
+                <CustomButton text={t('guardar')} bgColor={"#62a256"} fColor='white' iconName={null} onPress={handleSubmit(onSubmit)} />
             </View>
             <View style={{marginTop: 10}}>
-                <CustomButton text="Cancelar Cuenta" bgColor={"#B00020"} fColor='white' iconName={null} onPress={onDelete} />
+                <CustomButton text={t('cancelar')} bgColor={"#B00020"} fColor='white' iconName={null} onPress={onDelete} />
             </View>
             </>
     )};

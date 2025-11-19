@@ -13,6 +13,7 @@ import {
   } from 'react-native';
 
 import Svg from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 
 // import { HeaderBackButton } from '@react-navigation/elements';
 //import { HeaderBackButton } from '@react-navigation/stack';
@@ -20,7 +21,6 @@ import  Snackbar  from "react-native-snackbar";
 import MapView, {Marker, UrlTile} from 'react-native-maps';
 
 import Geolocation from 'react-native-geolocation-service';
-
 import Loading from '../components/Loading';
 
 
@@ -28,7 +28,7 @@ import { ObservationContext } from '../context/ObservationContext';
 import { LocationContext } from '../context/LocationContext';
 
 const LocationPicker: () => Node = ({ route, navigation }) => {
-
+    const {t} = useTranslation();
     const {LATITUDE_DELTA,LONGITUDE_DELTA} = useContext(LocationContext)
     const {editingObservation, setEditingObservation,updateObservations} = useContext(ObservationContext);
     const [pickedLocation, setPickedLocation]= useState({
@@ -68,14 +68,14 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
               navigation.navigate('Observación', {index, update:true})
 
               Snackbar.show({
-                text: 'Tu ubicación se ha guardado.',
+                text: t('obsLocationSnackbarSuccessText'),
                 duration: Snackbar.LENGTH_SHORT,
                 numberOfLines: 2,
                 textColor: "#fff",
                 backgroundColor: "#62a256",
             });
             }}
-            title="Guardar"
+            title={t('guardar')}
           />
         )
         // headerRight: (props) => (
@@ -224,7 +224,7 @@ return(
               });
             }}
             style={styles.bubble}>
-            <Text>Borra selección</Text>
+            <Text>{t('selectborraSelección')}</Text>
           </TouchableOpacity>
         </View>
       </View>

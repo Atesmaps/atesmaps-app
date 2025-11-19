@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import type {Node} from 'react';
 // import RadioButtonRN from 'radio-buttons-react-native';
+import { useTranslation } from 'react-i18next';
 
 import {
     SafeAreaView,
@@ -27,7 +28,7 @@ import { useForm, Controller } from "react-hook-form";
 import { ObservationContext } from '../context/ObservationContext';
 
 const AccidentObservationTypeDetail: () => Node = ({ route, navigation }) => {
-
+const {t} = useTranslation();
 const { editingObservation, selectedIndex, setEditingObservation, updateObservations  } = useContext(ObservationContext);
 const [ accidentValues, setAccidentValues ] = useState(editingObservation.observationTypes?.accident ? editingObservation.observationTypes?.accident : {status: false, values: {}});
 const [inputError, setInputError ] = useState(false);
@@ -59,7 +60,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue, reset
 
 useEffect(()=>{
     if (errors && Object.keys(errors).length != 0) {
-        let errorsText = 'Revisa los siguientes campos: \n';
+        let errorsText = t('errorTitle');
         for (const key in errors) {
             errorsText += `${key}: ${errors[key]['message']} \n`
             // console.log(`${key}: ${errors[key]}`);
@@ -71,7 +72,7 @@ useEffect(()=>{
             textColor: "#fff",
             backgroundColor: "#B00020",
             action: {
-                text: 'Cerrar',
+                text: t('close'),
                 textColor: 'white',
                 onPress: () => { /* Do something. */ },
             },
@@ -95,7 +96,7 @@ useLayoutEffect(() => {
            
             // navigation.navigate('Observación', {index, update:true})
           }}
-          title="Guardar"
+          title={t('guardar')}
         />
       )
     });
@@ -112,7 +113,7 @@ const updateData = () => {
     if( values.activityType == 6 && (values.customActivityType === null || values.customActivityType == "")){
         setInputError(true);
         Snackbar.show({
-            text: 'Por favor, escribe el tipo de actividad.',
+            text: t('quickObsSnackBarText'),
             duration: Snackbar.LENGTH_SHORT,
             numberOfLines: 2,
             textColor: "#fff",
@@ -156,7 +157,7 @@ const updateData = () => {
         setEditingObservation({...editingObservation, observationTypes: observation.observationTypes['quick']});
         updateObservations(observation);
         Snackbar.show({
-            text: 'Tu observación del accidente se ha guardado.',
+            text: t('accidentObsSnackBarText2'),
             duration: Snackbar.LENGTH_SHORT,
             numberOfLines: 2,
             textColor: "#fff",
@@ -173,7 +174,7 @@ const removeData = () => {
     updateObservations(observation);
     
     Snackbar.show({
-        text: 'Tu observación de accidente se ha eliminado.',
+        text: t('accidentObsSnackBarText'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -185,33 +186,33 @@ const removeData = () => {
 
 //Activity options:
 const activityData = [
-    {label: 'Esquí de montaña/splitboard'},
-    {label: 'Freeride'},
-    {label: 'Escalada/alpinismo'},
-    {label: 'Raquetas de nieve'},
-    {label: 'Trekking'},
-    {label: 'Otra'},
+    {label: t('skimo')},
+    {label: t('freeride')},
+    {label: t('escaladaApli')},
+    {label: t('raquetasNieve')},
+    {label: t('trek')},
+    {label: t('otra')},
 ];
 
 // Terrain options
-const terrainOptionsData = [
-    {label: 'Convexo: un puente'},
-    {label: 'Cóncavo: forma de cuenco'},
-    {label: 'Planar: liso sin convexidades o concavidades significativas'},
-    {label: 'Sin apoyo: una pendiente que cae abruptamente en la parte inferior'},
-];
+// const terrainOptionsData = [
+//     {label: 'Convexo: un puente'},
+//     {label: 'Cóncavo: forma de cuenco'},
+//     {label: 'Planar: liso sin convexidades o concavidades significativas'},
+//     {label: 'Sin apoyo: una pendiente que cae abruptamente en la parte inferior'},
+// ];
 
 const terrainTrapOptions = [
-    {label: 'Sin apariencia'},
-    {label: 'Cortado/zanja'},
-    {label: 'Desnivel/cambio de pendiente'},
-    {label: 'Árboles'},
-    {label: 'Barranco'},
+    {label: t('sinAp')},
+    {label: t('cortadoZanja')},
+    {label: t('desnPend')},
+    {label: t('arbol')},
+    {label: t('barranco')},
 ]
 
 const accidentOriginOptions = [
-    {label: 'Natural'},
-    {label: 'Accidental'},
+    {label: t('natural')},
+    {label: t('accidental')},
 ]
 
 
@@ -220,28 +221,25 @@ return(
         <ScrollView >
             <View style={styles.container}>
                 <View style={styles.introContainer} >
-                    <Text style={styles.intro}>Has provocado o presenciado un accidente de alud? Aqui puedes dar algunos datos al respecto. 
-                    La informacion que introduzcas se guardará en la base de datos de Atesmaps,
-                     así como en la de ACNA (Asociació pel Coneixement de la Neu i les Allaus), 
-                     la del ICGC (Cataluña), el CENMA (Andorra) y el CLA (Val d’Aran).</Text> 
-                    <Text style={styles.introSubtext}>* campos obligatorios</Text>
+                    <Text style={styles.intro}>{t('obsAccid')}</Text> 
+                    <Text style={styles.introSubtext}>{t('campos')}</Text>
                 </View>
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="activityType"
-                        title="Actividad*:"
+                        title={`${t('acti')}*:`}
                         control={control}
                         data={activityData}
-                        rules={{required: 'Campo obligatorio'}}
+                        rules={{required: t('requiredField')}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
                     />
                     <CustomInput
                             name="customActivityType"
-                            placeholder="Otro tipo de actividad"
+                            placeholder={t('otroTipo')}
                             control={control}
                             customError={inputError}
                             customStyles={{width:"100%"}}
@@ -253,10 +251,10 @@ return(
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="accidentOrigin"
-                        title="Desencadenamiento*:"
+                        title={`${t('desencadenamiento')}*:`}
                         control={control}
                         data={accidentOriginOptions}
-                        rules={{required: 'Campo obligatorio'}}
+                        rules={{required: t('requiredField')}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
@@ -264,12 +262,12 @@ return(
                    
                 </View>
                 <View style={styles.formContainer} >
-                <Text>Información sobre el grupo y los afectados:</Text>
+                <Text>{t('infoGrupo')}:</Text>
                 <View style={styles.spacer}></View>
                     <View style={[styles.inputGroup, {flexDirection:'row'}]}>
                         <CustomInput
                             name="numOfPeople"
-                            placeholder="Num. personas en el grupo"
+                            placeholder={t('persGrupo')}
                             control={control}
                             customStyles={{width:"100%",marginRight: 15}}
                             //   rules={{required: 'Email is required'}}
@@ -279,7 +277,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="numOfPartiallyBuried"
-                            placeholder="Num. personas parcialmente enterradas"
+                            placeholder={t('persEnteParc')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -289,7 +287,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="numOfBuried"
-                            placeholder="Num. personas totalmente enterradas"
+                            placeholder={t('persEnteTot')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -299,7 +297,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="numOfInjured"
-                            placeholder="Num. personas con lesiones leves"
+                            placeholder={t('persLesLeve')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -309,7 +307,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="numOfSeverlyInjured"
-                            placeholder="Num. personas con lesiones graves"
+                            placeholder={t('persLesGrav')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -319,7 +317,7 @@ return(
                     <View style={styles.inputGroup}>
                         <CustomInput
                             name="numOfDead"
-                            placeholder="Num. de fallecidos"
+                            placeholder={t('fallecidos')}
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -329,7 +327,7 @@ return(
                 </View>
 
                 <View style={styles.formContainer} >
-                <Text>Profundidad de la cicatriz:</Text>
+                <Text>{t('profCicatriz')}:</Text>
                 <View style={styles.spacer}></View>
                 <CustomInput
                     name="crackDepth"
@@ -368,18 +366,18 @@ return(
                     > */}
 
                     
-                    <Text>Tamaño alud:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text>{t('tamAva')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheSize1"
-                                        title="1-Peligro de enterramiento mínimo (peligro de caída)" 
+                                        title={t('enteMin1')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheSize2" 
-                                        title="2-Puede enterrar, herir o matar a una persona"
+                                        title={t('entePers2')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -387,21 +385,21 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheSize3"
-                                        title="3-Puede enterrar o destruir un coche" 
+                                        title={t('enteCoche3')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View>
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheSize4" 
-                                        title="4-Puede enterrar o destruir un vagon de tren"
+                                        title={t('enteTren4')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="avalancheSize5"
-                                        title="5-Puede modificar el paisaje, possibilidad de daños desastrosos" 
+                                        title={t('paisaje5')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -417,7 +415,7 @@ return(
                     <View style={styles.spacer}/>
                      <CustomRadioButton 
                         name="terrainTraps"
-                        title="Trampas del terreno:"
+                        title={`${t('trampas')}:`}
                         control={control}
                         data={terrainTrapOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -431,7 +429,7 @@ return(
                 
                 <View style={styles.formContainer} >
                     
-                    <Text>Otras observaciones:</Text>
+                    <Text>{t('otrasObs')}:</Text>
                 
                     <CustomInput
                         name="comments"
@@ -439,23 +437,23 @@ return(
                         multiline={true}
                         numberOfLines={4}
                         customStyles={[styles.inputContainer, {height: '20%'}]}
-                        placeholder="1000 letras max"
+                        placeholder={t('letrasMax')}
                         />
                        <View style={{width:'100%',flexDirection: 'row'}}>
                             <CustomCheckbox name="contactMe" 
-                                            title="Marcar si quieres ser contactado para aportar más información sobre el accidente. Añade un método de contacto en observaciones."
+                                            title={t('contacto')}
                                             control={control}  
                                             // customStyles={styles.inputContainer}
                                             // rules={{required: 'Campo obligatorio'}}
                             />
                       </View> 
-                      <Text>Los datos de contacto se tratarán con confidencialidad y solo con la finalidad de contactar con los/las implicados/as para el registro y estudio posterior de los aludes. </Text>
+                      <Text>{t('datosContacto')}</Text>
 
                         <View style={{marginTop: 30}}>
-                            <CustomButton text="Guardar" bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
                         </View>
                         <View>
-                            <CustomButton text="Borrar datos" bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                            <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
                         </View>
                 </View>
             </View>

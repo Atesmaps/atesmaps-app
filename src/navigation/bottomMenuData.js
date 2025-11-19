@@ -7,6 +7,7 @@ import MapStack from './MapStack';
 const bottomMenuData = [
   {
     name: 'Mis Observaciones',
+    title: 'misObs',
     component: ObservationStack,
     icon: 'eye',
   },
@@ -17,11 +18,13 @@ const bottomMenuData = [
   // },
   {
     name: 'Mapa',
+    title: 'map',
     component: MapStack,
     icon: 'map',
   },
   {
     name: 'Perfil',
+    title: 'perfil',
     component: ProfileStack,
     icon: 'account',
   },

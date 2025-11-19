@@ -2,10 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>700806496723-fti4em8r028sfmq83uma9invbijh1iri.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDObEPTUwxykjj0oah0NDI1Baz6fFFcIVk</string>
 	<key>BUNDLE_ID</key>
 	<string>org.atesmaps.pyrscope</string>
 	<key>CLIENT_ID</key>
 	<string>700806496723-icb53pqd5n0nanhpmkaqklcpi0f8jcag.apps.googleusercontent.com</string>
+	<key>GCM_SENDER_ID</key>
+	<string>700806496723</string>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:700806496723:ios:77862818862805afdbaf26</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -15,7 +33,11 @@
 	</dict>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
+	<key>PROJECT_ID</key>
+	<string>atesmaps-floc-1706229343199</string>
 	<key>REVERSED_CLIENT_ID</key>
 	<string>com.googleusercontent.apps.700806496723-icb53pqd5n0nanhpmkaqklcpi0f8jcag</string>
+	<key>STORAGE_BUCKET</key>
+	<string>atesmaps-floc-1706229343199.firebasestorage.app</string>
 </dict>
 </plist>

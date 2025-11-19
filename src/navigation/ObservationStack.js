@@ -24,38 +24,53 @@ import ObservationImageList from '../screens/ObservationImageList';
 import LocationPicker from '../screens/LocationPicker';
 import ShowObservation from '../screens/ShowObservation';
 
-
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-
 import {ObservationContext } from '../context/ObservationContext';
-import {LocationContext } from '../context/LocationContext';
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
 const ObservationStack: () => Node = ({ navigation, route }) => {
-
+const {t} = useTranslation();
 const {lastIndex, selectedIndex} = useContext(ObservationContext);
 // let index = observations.length > 0 ? observations.length-1 : 0;
 
 return(
     <Stack.Navigator> 
       <Stack.Group>
-        <Stack.Screen name="Observaciones" component={Observations} />
+        <Stack.Screen name="Observaciones" component={Observations} options={{
+            title: t('observacionesTitle')
+        }} />
         <Stack.Screen 
           name="Observación" 
           component={ObservationDetail}
           options={{
+            title: t('observationTitle'),
             headerShown: true,
         }} />
-        <Stack.Screen name="Detalles" component={ShowObservation} />
-        <Stack.Screen name="Imagenes" component={ObservationImageList} />
-        <Stack.Screen name="Ubicación" component={LocationPicker} />
-        <Stack.Screen name="Rapida" component={QuickObservationTypeDetail} />
-        <Stack.Screen name="Avalancha" component={AvalancheObservationTypeDetail} />
-        <Stack.Screen name="Manto de nieve" component={SnowpackObservationTypeDetail} />
-        <Stack.Screen name="Accidente" component={AccidentObservationTypeDetail} />
-        <Stack.Screen name="Tiempo" component={WeatherObservationTypeDetail} />
+        <Stack.Screen name="Detalles" component={ShowObservation} options={{
+            title: t('observationDetailsTitle')
+        }} />
+        <Stack.Screen name="Imagenes" component={ObservationImageList} options={{
+            title: t('observationImagesTitle')
+        }} />
+        <Stack.Screen name="Ubicación" component={LocationPicker} options={{
+            title: t('observationLocationTitle')
+        }} />
+        <Stack.Screen name="Rapida" component={QuickObservationTypeDetail} options={{
+            title: t('observationQuickTitle')
+        }} />
+        <Stack.Screen name="Avalancha" component={AvalancheObservationTypeDetail} options={{
+            title: t('observationAvalancheTitle')
+        }} />
+        <Stack.Screen name="Manto de nieve" component={SnowpackObservationTypeDetail} options={{
+            title: t('observationSnowTitle')
+        }} />
+        <Stack.Screen name="Accidente" component={AccidentObservationTypeDetail} options={{
+            title: t('observationAccidentTitle')
+        }} />
+        <Stack.Screen name="Tiempo" component={WeatherObservationTypeDetail} options={{
+            title: t('observationWeatherTitle')
+        }} />
         
       </Stack.Group>
       
