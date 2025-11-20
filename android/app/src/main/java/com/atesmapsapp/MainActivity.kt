@@ -4,6 +4,8 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
+
 //import android.os.Bundle
 
 class MainActivity : ReactActivity() {
@@ -14,6 +16,7 @@ class MainActivity : ReactActivity() {
    */
    
   override fun getMainComponentName(): String = "atesmapsApp"
+  
 
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
@@ -21,4 +24,10 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+  //react-native-screens override
+   override fun onCreate(savedInstanceState: Bundle?) {
+      supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+      super.onCreate(savedInstanceState);
+   }
 }

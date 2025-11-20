@@ -8,18 +8,6 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-pre_install do |installer|
-  installer.pod_targets.each do |pod|
-    if pod.name == 'RNWorklets'
-      puts "Removing obsolete pod: #{pod.name}"
-      pod.implied_targets.each do |target|
-        target.user_targets.each do |user_target|
-          user_target.send(:remove_target_dependency, pod.name)
-        end
-      end
-    end
-  end
-end
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
