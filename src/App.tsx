@@ -2,7 +2,7 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './localization/i18n'; // Your i18n configuration
 // import type {PropsWithChildren} from 'react';
-import {enableLatestRenderer} from 'react-native-maps';
+// import {enableLatestRenderer} from 'react-native-maps';
 import AppNav from './navigation/AppNav';
 import moment from 'moment';
 
@@ -25,7 +25,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ObservationProvider } from './context/ObservationContext';
 import { LocationProvider } from './context/LocationContext';
 
-enableLatestRenderer();
+// enableLatestRenderer();
 
 function App(): React.JSX.Element {
   return (

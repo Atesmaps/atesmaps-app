@@ -56,6 +56,8 @@
 	<string>Utilizamos tu geolaclización para poder marcar la posición de tus observaciones</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Da acceso a la libreria para subir fotos de tus observaciones</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto-Regular.ttf</string>

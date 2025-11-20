@@ -15,7 +15,10 @@
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="${usesCleartextTraffic}"
+      android:supportsRtl="true">
+      
       <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyDjc5LqCFtdMBxEmDPtMNmK9g1SB1e4pRA"/>
 
       <activity

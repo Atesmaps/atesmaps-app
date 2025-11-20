@@ -11,7 +11,8 @@ import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-sign
 import { appleAuth, appleAuthAndroid } from '@invertase/react-native-apple-authentication';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
-import { v4 as uuid } from 'uuid';
+import uuid from 'react-native-uuid';
+// import { v4 as uuid } from 'uuid';
 import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
 
@@ -98,8 +99,10 @@ export const AuthProvider = ({children}) => {
               }
             }else{
                 // Generate secure, random values for state and nonce
-                const rawNonce = uuid();
-                const state = uuid();
+                // const rawNonce = uuid();
+                // const state = uuid();
+                const rawNonce = uuid.v4();
+                const state = uuid.v4();
 
                 // Configure the request
                 appleAuthAndroid.configure({
