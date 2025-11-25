@@ -42,10 +42,13 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
     // const [ observation, setObservation ] = useState(observations[route.params?.index]);
     
     //const [marker, setMarker] = useState(null)
-
+    const mapRef = useRef(null);
 
     const [marker, setMarker] = useState({
-      coordinate: {latitude:Number(editingObservation.location?.latitude),longitude:Number(editingObservation.location?.longitude)},
+      coordinate: {
+        latitude:Number(editingObservation.location?.latitude ?? location.latitude),
+        longitude:Number(editingObservation.location?.longitude ?? location.longitude)
+      },
       key: 1,
       color: '#ff0000'
     });
@@ -110,9 +113,12 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
             setIsLoading(false);
           },
           {
-            enableHighAccuracy: false,
-            timeout: 3000,
-            maximumAge: 1000
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            distanceFilter: 0,        
+            forceRequestLocation: true, // Android specific: Force a fresh location if cache is empty
+            showLocationDialog: true,
           },
         );
     },[])
@@ -129,7 +135,8 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
     };
 
     const onMapPress = (e) => {
-        // console.log(e.nativeEvent)
+      console.log('map pressed!')
+        console.log(e.nativeEvent)
         setMarker({
             coordinate: e.nativeEvent.coordinate,
             key: 1,
@@ -149,23 +156,28 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
 return(
     <View style={styles.container}>
         <MapView
+          ref={mapRef}
           // provider={this.props.provider}
           provider={Platform.OS == "android" ?  "google" : undefined}
+          // mapType={Platform.OS === "android" ? "none" : "standard"}
+          
+          //region={getMapRegion()}
+          maptype={'none'}
           style={styles.map}
           showsUserLocation = {true}
           // mapType= {Platform.OS == "android" ? "terrain" : "satellite"}
-          // initialRegion={{
-          //   latitude: pickedLocation.latitude ? pickedLocation.latitude : location.latitude,
-          //   longitude: pickedLocation.longitude ? pickedLocation.longitude : location.longitude,
-          //   latitudeDelta: delta.latitude,//pickedLocation.latitudeDelta ? pickedLocation.latitudeDelta : location.latitudeDelta,
-          //   longitudeDelta: delta.longitude//</View>pickedLocation.longitudeDelta ? pickedLocation.longitudeDelta : location.longitudeDelta,
-          // }}
+          initialRegion={{
+            latitude: Number(editingObservation.location?.latitude ?? location.latitude),
+            longitude: Number(editingObservation.location?.longitude ?? location.longitude),
+            latitudeDelta: location.latitudeDelta,
+            longitudeDelta: location.longitudeDelta,
+          }}
           onPress={onMapPress}
           onRegionChangeComplete={(region) => {
             setNewDelta({latitude: (region.latitudeDelta < 0.0170 ? 0.0170 : region.latitudeDelta),longitude:(region.longitudeDelta < 0.0200 ? 0.0200 : region.longitudeDelta) })
             setNewRegion({latitude: region.latitude,longitude:region.longitude })}
           }
-          region={getMapRegion()}>
+         >
             <UrlTile
               /**
                * The url template of the tile server. The patterns {x} {y} {z} will be replaced at runtime
@@ -192,12 +204,16 @@ return(
               coordinate={marker.coordinate}
              
             >
-              <Svg style={styles.pin} >
-                <Image style={styles.pin}
-                     source={require('../../assets/images/pins/atesmaps-blue.png')}/> 
-              </Svg>
-              {/* <Image style={styles.pin}
-                     source={require('../../assets/images/pins/atesmaps-blue.png')}/> */}
+              {Platform.OS == "android" && (
+                <Image style={styles.pin} source={require('../../assets/images/pins/atesmaps-blue.png')}/>
+              )}
+              
+              {Platform.OS == "ios" && (    
+                <Svg style={styles.pin} >
+                  <Image style={styles.pin}
+                      source={require('../../assets/images/pins/atesmaps-blue.png')}/> 
+                </Svg>
+              )}
             </Marker>
             : null
           }
@@ -222,6 +238,12 @@ return(
                 key: 1,
                 color: '#ff0000'
               });
+              mapRef.current?.animateToRegion({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.0170,
+                longitudeDelta: 0.0200,
+              }, 1000);
             }}
             style={styles.bubble}>
             <Text>{t('selectborraSelección')}</Text>

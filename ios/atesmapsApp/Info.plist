@@ -47,13 +47,15 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Da accesso camara para que puedas hacer fotos de las observaciones.</string>
+	<string>Da acceso a la camara para subir fotos de tus observaciones</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Utilizamos tu geolaclización para poder marcar la posición de tus observaciones</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Utilizamos tu geolaclización para poder marcar la posición de tus observaciones</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Utilizamos tu geolaclización para poder marcar la posición de tus observaciones</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Da acceso a la libreria para subir fotos de tus observaciones</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Da acceso a la libreria para subir fotos de tus observaciones</string>
 	<key>RCTNewArchEnabled</key>

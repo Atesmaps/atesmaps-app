@@ -81,6 +81,10 @@ export default function ObservationDetail({ navigation }) {
     //   // setUser(userDetails);
     // },[userDetails])
 
+    useEffect(() =>{
+        console.log(uploaded)
+    }, [])
+
     useEffect(()=>{
       setDrafts(observations);
     },[observations])
@@ -121,7 +125,9 @@ export default function ObservationDetail({ navigation }) {
       }
     }
 
+    
     if( isLoading &&  uploaded.length < 1 ) {
+     
       return(
           <Loading />
           // <View style={{flex:1, justifyContent: 'center', alignItems:'center'}}>
@@ -141,11 +147,11 @@ export default function ObservationDetail({ navigation }) {
           size={50} 
           color={'gray'}
           style={{marginBottom: 20}}/>
-        <Text>Por favor, antes de realizar observaciones,</Text>
-        <Text>complete su perfil de usuario.</Text>
-        <Text>Gracias.</Text>
+        <Text>{t('completeProfile1')}</Text>
+        <Text>{t('completeProfile2')}</Text>
+        <Text>{t('completeProfile3')}</Text>
         
-        <Button style={styles.button} title="Volver al perfil"  onPress={async () => {
+        <Button style={styles.button} title={t('backProfileButton')} onPress={async () => {
                 navigation.navigate('Perfil')
                 }} />
       </View>
@@ -162,8 +168,8 @@ export default function ObservationDetail({ navigation }) {
             size={50} 
             color={'gray'}
             style={{marginBottom: 20}}/>
-          <Text>No se ha creado ninguna observación.</Text>
-          <Button style={styles.button} title="Añadir observación"  onPress={async () => {
+          <Text>{t('noObsCreated')}</Text>
+          <Button style={styles.button} title={t('addObs')}  onPress={async () => {
                   // await newObservation({
                   //   title: 'New observation',
                   //   date: Date.now(),
@@ -193,7 +199,7 @@ export default function ObservationDetail({ navigation }) {
             size={50} 
             color={'gray'}
             style={{marginBottom: 20}}/>
-          <Text>No hay ningún borrador de observaciones.</Text>
+          <Text>{t('noDrafts')}</Text>
         </View>
     }else{ 
       draftList = <FlatList
@@ -213,7 +219,7 @@ export default function ObservationDetail({ navigation }) {
             size={50} 
             color={'gray'}
             style={{marginBottom: 20}}/>
-          <Text>No se envió ninguna observación.</Text>
+          <Text>{t('noObs')}</Text>
         </View>
     }else{
       uploadedList = <FlatList

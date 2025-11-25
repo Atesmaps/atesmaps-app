@@ -15,14 +15,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    
+    //GMSServices.provideAPIKey("AIzaSyDjc5LqCFtdMBxEmDPtMNmK9g1SB1e4pRA")
+
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
 
+    //[GMSServices provideAPIKey:@"AIzaSyDjc5LqCFtdMBxEmDPtMNmK9g1SB1e4pRA"]; 
+
     reactNativeDelegate = delegate
     reactNativeFactory = factory
-
-    GMSServices.provideAPIKey("AIzaSyDjc5LqCFtdMBxEmDPtMNmK9g1SB1e4pRA")
 
     window = UIWindow(frame: UIScreen.main.bounds)
 

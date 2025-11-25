@@ -63,14 +63,16 @@ export const AuthProvider = ({children}) => {
     }
 
     const appleLogin = async () => {
+        console.log('Apple loggin trigger..')
         try {
             setIsLoading(true);
             if(Platform.OS === 'ios'){
-            const appleAuthRequestResponse = await appleAuth.performRequest({
-                requestedOperation: appleAuth.Operation.LOGIN,
-                // Note: it appears putting FULL_NAME first is important, see issue #293
-                requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+              const appleAuthRequestResponse = await appleAuth.performRequest({
+                  requestedOperation: appleAuth.Operation.LOGIN,
+                  // Note: it appears putting FULL_NAME first is important, see issue #293
+                  requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
               });
+              console.log('no error at this point...')
             
               // get current authentication state for user
               // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
@@ -78,9 +80,8 @@ export const AuthProvider = ({children}) => {
               
               // use credentialState response to ensure the user is authenticated
               if (credentialState === appleAuth.State.AUTHORIZED) {
-               
-                //console.log(credentialState); 
-                //console.log(appleAuthRequestResponse);
+                console.log(credentialState); 
+                console.log(appleAuthRequestResponse);
                 const {email, fullName} = appleAuthRequestResponse;
                 //const {} = jwtDecode(appleAuthRequestResponse.identityToken);
               
@@ -88,10 +89,10 @@ export const AuthProvider = ({children}) => {
 
                 let user = response.data.user;
 
-               // console.log(user)
-                // console.log('This is after logging:')
-                // console.log(user);
-                // console.log('------------------------')
+                console.log(user)
+                console.log('This is after logging:')
+                console.log(user);
+                console.log('------------------------')
                 await AsyncStorage.setItem('userToken', response.data.accessToken);
                 await AsyncStorage.setItem('userDetails', JSON.stringify(user));
                 setUserToken(response.data.accessToken);
@@ -148,6 +149,8 @@ export const AuthProvider = ({children}) => {
                 // Send the authorization code to your backend for verification
             }
         } catch (error) {
+
+            console.log(error);
             // E_SIGNIN_CANCELLED_ERROR
             if(error.message === 'E_SIGNIN_CANCELLED_ERROR'){
                 Snackbar.show({

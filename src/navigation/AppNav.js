@@ -47,7 +47,7 @@ const AppNav: () => Node = () => {
             return response.data.version
         } catch (error) {
           console.error('Error checking for updates:', error.message);
-          //console.log(error);
+          console.log(error);
         } 
     }
 

@@ -5,6 +5,7 @@ import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
 import {ObservationContext } from '../context/ObservationContext';
+import { useMomentLocale } from "../hooks/useMomentLocale";
 
 // moment.locale('es', {
 //   months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
@@ -17,6 +18,7 @@ import {ObservationContext } from '../context/ObservationContext';
 
 export default function Item({ item, index,  navigation  }) {
     const { t } = useTranslation();
+    const momentLocale = useMomentLocale();
     const {setSelectedIndex, updateSelectedIndex} = useContext(ObservationContext);
     // console.log(item);
 
@@ -88,7 +90,8 @@ export default function Item({ item, index,  navigation  }) {
           <View style={{marginTop:5,marginBottom: (item.status > 0 ? 5 : 0), alignItems:"flex-start",flex:1}}>
             {/* <Text style={{fontWeight:"bold"}}>{item.title}</Text> */}
             {title(item.title)}
-            <Text style={{ marginTop: (item.status > 0 ? 5 : 0)}}>{moment(item.date).format('Do MMMM YYYY')}</Text>
+            <Text style={{ marginTop: (item.status > 0 ? 5 : 0)}}>{moment(item.date).locale(momentLocale).format('Do MMMM YYYY')}</Text>
+            
           </View>
           {button()}
         </View>

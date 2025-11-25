@@ -16,7 +16,9 @@ export const ObservationProvider = ({children}) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [observations, setObservations] = useState([]);
-    const [historicObservations, setHistoricObservations] = useState([{"_id":"-1", "status": -1}]);
+   
+    //const [historicObservations, setHistoricObservations] = useState([{"_id":"-1", "status": -1}]);  //uncomment to add banner on the list
+    const [historicObservations, setHistoricObservations] = useState([]); // comment to add baner
     const [allObservations, setAllObservations] = useState([]);
     
     const [editingObservation, setEditingObservation] = useState({});
@@ -117,7 +119,8 @@ export const ObservationProvider = ({children}) => {
                 }
             } else if (response && response.data) {
                 if(page === 1){
-                    let aux = [{"_id":"-1", "status": -1}];
+                    //let aux = [{"_id":"-1", "status": -1}];  // uncomment to enable banner
+                    let aux = []; // comment to add baner
                     aux = aux.concat(response.data)
                     setHistoricObservations(aux);
                     setCurrentPage(2);

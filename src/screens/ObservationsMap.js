@@ -95,7 +95,6 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
 
   useEffect(()=>{
     // console.log('calling getObservations');
-    let location;
     if (selectedLocation == 0){
       location = currentLocation
     }else{
@@ -103,6 +102,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     }
     const days = filterData[selectedDay];
     getAllObservations({days: days,location: location});
+    
   },[selectedLocation,selectedDay]);
 
   useEffect(()=>{
@@ -115,6 +115,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     //console.log(location)
 
     if(allObservations.length > 0){
+ 
       // console.log('setting location to first obs...')
       setMapIndex(0);
       const { coordinates } = allObservations[0].location;
@@ -473,8 +474,11 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                     }
                     if (index !== mapIndex) {
                       // console.log('setting new index and location.')
-                      
+                     
+                
+                      if (index > 0){                        
                         const { coordinates } = allObservations[index].location;
+
                         _map.current.animateToRegion(
                           {
                             latitude: Number(coordinates[1]),
@@ -492,6 +496,7 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                           longitudeDelta: newDelta.longitudeDelta,
                         })
                         setMapIndex(Number(index));
+                      }
                     }
                   //console.log((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH))
                   //console.log(Math.ceil((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH)));

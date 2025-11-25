@@ -126,11 +126,12 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         //targetSdkVersion 31
-        ndkVersion = "22.1.7171670"
-        versionCode 33
-        versionName "3.1.1"
+        //ndkVersion = "22.1.7171670"
+        versionCode 37
+        versionName "3.1.5"
         //react-native-image-crop-picker required config
-            vectorDrawables.useSupportLibrary = true
+        vectorDrawables.useSupportLibrary = true
+        
     }
     // splits {
     //     abi {
@@ -164,6 +165,7 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            //matchingFallbacks = ['release', 'debug']
             // if (nativeArchitectures) {
             //     ndk {
             //         abiFilters nativeArchitectures.split(',')

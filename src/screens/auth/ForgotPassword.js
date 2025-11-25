@@ -24,13 +24,14 @@ import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
 import Loading from '../../components/Loading';
 import  Snackbar  from "react-native-snackbar";
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
 const ForgotPassword: () => Node = ({navigation}) => {
   const [email, setEmail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { t } = useTranslation();
   
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     //defaultValues: preloadedValues
@@ -46,7 +47,7 @@ const ForgotPassword: () => Node = ({navigation}) => {
       let response = await axios.post(`${BASE_URL}/auth/request-new-password`,{'email': data.email});
       setIsLoading(false);
       Snackbar.show({
-        text: 'Se envió un email a tu cuenta de correo.',
+        text: t('snackBarForgotPassMsg1'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -58,7 +59,7 @@ const ForgotPassword: () => Node = ({navigation}) => {
       setIsLoading(false);
       console.log(err);
       Snackbar.show({
-        text: 'Ooops, algo fue mal.',
+        text: t('snackBarForgotPassMsg2'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -80,7 +81,7 @@ const ForgotPassword: () => Node = ({navigation}) => {
       <SafeAreaView style={{flex: 1, justifyContent: 'center'}}>
         <View style={{paddingHorizontal: 25}}>
          <View>
-              <Text style={{height: 100, fontSize: 14, textAlign: 'center', fontWeight: '200', color: '#333', marginBottom: 25}}>Introduce el email de tu cuenta AtesMaps y se enviará un correo con un link para resetear tu password.</Text>
+              <Text style={{height: 100, fontSize: 14, textAlign: 'center', fontWeight: '200', color: '#333', marginBottom: 25}}>{t('resetPassText')}</Text>
          </View> 
 
          <CustomInput
@@ -89,7 +90,7 @@ const ForgotPassword: () => Node = ({navigation}) => {
             control={control}
             // customStyles={{width:"100%"}}
             keyboardType='email-address'
-            rules={{required: 'Introduce el Email'}}
+            rules={{required: t('userFormEmailRule')}}
 
             // onPress={showDatepicker}
             />
@@ -106,7 +107,7 @@ const ForgotPassword: () => Node = ({navigation}) => {
           </View> */}
 
           <View style={{marginTop: 0}}>
-                <CustomButton text="Enviar" bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(resetPassword)} />
+                <CustomButton text={t('sendButton')} bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(resetPassword)} />
             </View>
           
           {/* <TouchableOpacity style={{backgroundColor: '#3098CF', padding: 20, borderRadius:10, marginBottom: 20}} onPress={() => {

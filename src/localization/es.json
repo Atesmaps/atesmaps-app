@@ -347,5 +347,41 @@
   "deleteAccountPopMessage":"Estas seguro que quieres cancelar la cuenta?",
   "deleteAccountPopBackButton":"Volver",
   "deleteAccountPopDeleteButton":"Eliminar",
-  "noTitle":"( Sin titulo )"
+  "noTitle":"( Sin titulo )",
+
+  "noDrafts":"No hay ningún borrador de observaciones.",
+  "noObs":"No se envió ninguna observación.",
+  "resetPassText":"Introduce el email de tu cuenta AtesMaps y se enviará un correo con un link para resetear tu password.",
+  "completeProfile1":"Por favor, antes de realizar observaciones,",
+  "completeProfile2":"complete su perfil de usuario.",
+  "completeProfile3":"Gracias.",
+  "addObs":"Añadir observación",
+  "noObsCreated":"No se ha creado ninguna observación.",
+  "backProfileButton":"Volver al perfil",
+  "sendButton":"Enviar",
+  "googleLogin":"Login con Google",
+  "appleLogin":"Login con Apple",
+  "forgotPassButton":"Olvidaste el password?",
+  "userFormPassRule":"El password es obligatorio",
+  "createAccountText":"Crear una cuenta:",
+  "createAccountButton":"Registrarse",
+  "loginButton":"Login",
+  "registrationSnackbarError1":"Los passwords no coinciden",
+  "registrationSnackbarError2":"Los emails no coinciden",
+  "registrationSnackbarError3":"El formato del email es incorrecto",
+  "requiredFieldPasswordText":"Introduce el password",
+  "requiredPasswordConfirmationText":"Confirma el password",
+  "requiredEmailConfirmationText":"Confirma el email",
+  "passwordConfirmationPlaceholder":"Confirmación de password",
+  "emailConfirmationPlaceholder":"Confirmación del email",
+  "requiredEmail":"Introduce el Email",
+  "userNamePlacehoder":"Nombre de usuario",
+  "requiredFieldUsernameText":"Introduce el nombre de usuario, no usar characteres especiales.",
+  "snackBarForgotPassMsg1":"Se envió un email a tu cuenta de correo.",
+  "snackBarForgotPassMsg2":"Ooops, algo fue mal.",
+  "snackbarObservationRequired": "Por favor, determina la ubicación de la observación."
+
+
+
+
 }

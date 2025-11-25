@@ -25,7 +25,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import CustomButton from "../components/CustomButton";
 import Item from '../components/ImageItem';
 
-// import BottomSheet from 'reanimated-bottom-sheet';
+
 
 import Animated, 
 { useAnimatedStyle, 
@@ -70,13 +70,13 @@ const [isLoading, setIsLoading] = useState(false);
 // console.log(editingObservation);
 
 const sheetRef = useRef();
-//const fall = new Animated.Value(1);
 const offset = useSharedValue(0);
 
 
 const toggleSheet = () => {
-  setOpen(!isOpen);
   offset.value = 0;
+  setOpen(!isOpen);
+  
 }
 
 const translateY = useAnimatedStyle(() => ({
@@ -92,9 +92,11 @@ const pan = Gesture.Pan().onChange((event)=>{
   if (offset.value < HEIGHT / 3){
     offset.value = withSpring(0);
   }else{
+    
     offset.value = withTiming(HEIGHT, {}, () => {
       runOnJS(toggleSheet)();
     });
+    
   }
 })
 
@@ -116,20 +118,42 @@ useLayoutEffect(() => {
                                     name="camera-plus"/>
             </Pressable>),
     headerLeft:()=>(
-      <Button
-            onPress={() => {
-              console.log('updating images list for observation')
-              let aux = editingObservation;
-              aux.images = images;
+            <Pressable style={{
+                    // alignItems: 'center',
+                  //  justifyContent: 'center',
+                    paddingVertical: 12,
+                    paddingHorizontal: 12,
+                    //borderRadius: 4,
+                    elevation: 3,
+                
+               
+                  }} onPress={() => {
+                    console.log('updating images list for observation')
+                    let aux = editingObservation;
+                    aux.images = images;
+                
+                    
+                    setEditingObservation({...aux});
+                    updateObservations({...aux});
+                    //navigation.navigate('Observación', {selectedIndex, update:true})
+                    navigation.goBack();
+                  }}>
+                  <MaterialIcons name='arrow-back' size={25}  style={{marginRight: 5}}/>
+                </Pressable>
+      // <Button
+      //       onPress={() => {
+      //         console.log('updating images list for observation')
+      //         let aux = editingObservation;
+      //         aux.images = images;
           
               
-              setEditingObservation({...aux});
-              updateObservations({...aux});
-              //navigation.navigate('Observación', {selectedIndex, update:true})
-              navigation.goBack();
-            }}
-            title={t('guardar')}
-          />
+      //         setEditingObservation({...aux});
+      //         updateObservations({...aux});
+      //         //navigation.navigate('Observación', {selectedIndex, update:true})
+      //         navigation.goBack();
+      //       }}
+      //       title={t('guardar')}
+      //     />
     )
   });
   
@@ -231,7 +255,7 @@ if(images?.length > 0){
           />
     </View>
     {isOpen && (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={styles.sheetContainer}>
       <AnimatedPressable 
         style={styles.backdrop} 
         entering={FadeIn} 
@@ -239,24 +263,15 @@ if(images?.length > 0){
         onPress={toggleSheet} />
       <GestureDetector gesture={pan}>
         <Animated.View style={[styles.sheet, translateY]} 
-          entering={SlideInDown.springify().damping(15)} 
-          exiting={SlideOutDown}
+          entering={SlideInDown.springify().damping(110)} 
+          //exiting={SlideOutDown}
         >
         {renderContent}
         </Animated.View>
       </GestureDetector>
     </GestureHandlerRootView>
     )}
-    {/* <BottomSheet
-          ref={sheetRef}
-          snapPoints={[330, -100]}
-          initialSnap={1}
-          callbackNode={fall}
-          enabledGestureInteration={true}
-          borderRadius={10}
-          renderContent={renderContent}
-          renderHeader={renderHeader}
-        /> */}
+    
  </>
   )
 }
@@ -284,7 +299,7 @@ return(
         </TouchableOpacity> */}
     </View>
     {isOpen && (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={styles.sheetContainer}>
       <AnimatedPressable 
         style={styles.backdrop} 
         entering={FadeIn} 
@@ -292,27 +307,17 @@ return(
         onPress={toggleSheet} 
       />
        <GestureDetector gesture={pan}>
-      <Animated.View style={[styles.sheet, translateY]} 
-        entering={SlideInDown.springify().damping(15)}
-        exiting={SlideOutDown}
-      >
-   
-       {renderContent}
-      </Animated.View>
+        <Animated.View style={[styles.sheet, translateY]} 
+          entering={SlideInDown.springify().damping(110)}
+          //exiting={SlideOutDown}
+        >
+    
+        {renderContent}
+        </Animated.View>
       </GestureDetector>
     </GestureHandlerRootView>
     )}
     
-    {/* <BottomSheet
-          ref={sheetRef}
-          snapPoints={[330, -100]}
-          initialSnap={1}
-          callbackNode={fall}
-          enabledGestureInteration={true}
-          borderRadius={10}
-          renderContent={renderContent}
-          renderHeader={renderHeader}
-        /> */}
  </>
    
 )};
@@ -365,6 +370,11 @@ const styles = StyleSheet.create({
       height: 30,
       marginBottom: 10,
     },
+    sheetContainer: {
+    ...StyleSheet.absoluteFillObject, // This forces the container to cover the whole screen
+    zIndex: 1, // Ensure it sits on top of the list
+    justifyContent: 'flex-end', // Helps position the sheet at the bottom
+  },
     backdrop:{
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0, 0, 0, 0.3)",

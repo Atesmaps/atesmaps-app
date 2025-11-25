@@ -2,35 +2,36 @@ import React, { useState, useEffect, useContext } from 'react';
 import type {Node} from 'react';
 
 import {
-    SafeAreaView,
-    StatusBar,
+    // SafeAreaView,
+    // StatusBar,
     StyleSheet,
-    useColorScheme,
+    // useColorScheme,
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
     View,
     Text,
-    TextInput,
+    // TextInput,
     Image,
     TouchableOpacity,
     Keyboard,
     Platform,
   } from 'react-native';
 
-import {
-    //GoogleSignin,
-    GoogleSigninButton,
-    //statusCodes,
-} from '@react-native-google-signin/google-signin';
-import { appleAuthAndroid, AppleButton } from '@invertase/react-native-apple-authentication';
+// import {
+//     //GoogleSignin,
+//     GoogleSigninButton,
+//     //statusCodes,
+// } from '@react-native-google-signin/google-signin';
+// import { appleAuthAndroid, AppleButton } from '@invertase/react-native-apple-authentication';
+import { useTranslation } from 'react-i18next';
 
 
-
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+// import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useForm, Controller } from "react-hook-form";
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthContext } from '../../context/AuthContext';
+
 
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
@@ -40,6 +41,7 @@ const Stack = createNativeStackNavigator();
 const Login: () => Node = ({navigation}) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const { t } = useTranslation();
 
   const {login, 
          googleLogin, 
@@ -77,7 +79,7 @@ const Login: () => Node = ({navigation}) => {
           </View>
 
           <CustomButton 
-            text="Login con Google" 
+            text={t('googleLogin')} 
             //bgColor={"white"} 
             fColor='black'
             type='custom'
@@ -89,7 +91,7 @@ const Login: () => Node = ({navigation}) => {
           />
           {/* {appleAuthAndroid.isSupported || Platform.OS === 'ios' && ( */}
             <CustomButton 
-              text="Login con Apple" 
+              text={t('appleLogin')} 
               fColor='black'
               type='custom'
               customStyle={{ paddingLeft: '30%', marginVertical: 5,alignItems:'center'}}
@@ -108,7 +110,7 @@ const Login: () => Node = ({navigation}) => {
             control={control}
             // customStyles={{width:"100%"}}
             keyboardType='email-address'
-            rules={{required: 'Introduce el Email'}}
+            rules={{required: t('userFormEmailRule')}}
             />
 
           <CustomInput
@@ -117,22 +119,22 @@ const Login: () => Node = ({navigation}) => {
             control={control}
             // customStyles={{width:"100%"}}
             secureTextEntry={true}
-            rules={{required: 'Introduce el password'}}
+            rules={{required: t('userFormPassRule')}}
             />
           <TouchableOpacity style={{alignItems: 'flex-end', marginBottom: 25}} onPress={() => {navigation.navigate('Forgot');}}>
-                 <Text style={{color: '#3098CF', fontWeight: '700'  }}>Olvidaste el password?</Text>
+                 <Text style={{color: '#3098CF', fontWeight: '700'  }}>{t('forgotPassButton')}</Text>
           </TouchableOpacity>
           <View style={{marginTop: 0}}>
-                <CustomButton text="Login" bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(submit)} />
+                <CustomButton text={t('loginButton')} bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(submit)} />
           </View>
 
           <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom:100}}>
-            <Text> Crear una cuenta:</Text>
+            <Text> {t('createAccountText')}</Text>
             <TouchableOpacity onPress={() => {
               //navigation.popToTop();
               navigation.navigate('Register');
             }}>
-                <Text style={{color: '#3098CF', fontWeight: '700'  }}>  Registrarse</Text>
+                <Text style={{color: '#3098CF', fontWeight: '700'  }}> {t('createAccountButton')} </Text>
             </TouchableOpacity>
           </View>
         </View>

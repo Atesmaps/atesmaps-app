@@ -2,17 +2,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import type {Node} from 'react';
 
 import {
-    SafeAreaView,
-    StatusBar,
+    // SafeAreaView,
+    // StatusBar,
     StyleSheet,
-    useColorScheme,
+    // useColorScheme,
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
     View,
-    Text,
+    // Text,
     Image,
-    TextInput,
-    TouchableOpacity,
+    // TextInput,
+    // TouchableOpacity,
     Keyboard,
   } from 'react-native';
 
@@ -26,6 +26,7 @@ import { AuthContext } from '../../context/AuthContext';
 import  Snackbar  from "react-native-snackbar";
 
 import { useForm, Controller } from "react-hook-form";
+import { useTranslation } from 'react-i18next';
 
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ const Registration: () => Node = () => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [passwordConfirmation, setPasswordConfirmation] = useState(null);
+  const { t } = useTranslation();
 
   const {signUp} = useContext(AuthContext);
 
@@ -56,7 +58,7 @@ const Registration: () => Node = () => {
     if(data.password != data.passwordConfirmation) {
       console.log('password is different...');
       Snackbar.show({
-          text: 'Los passwords no coinciden',
+          text: t('registrationSnackbarError1'),
           duration: Snackbar.LENGTH_SHORT,
           numberOfLines: 2,
           textColor: "#fff",
@@ -67,7 +69,7 @@ const Registration: () => Node = () => {
     if(data.email != data.emailConfirmation) {
       console.log('emails is different...');
       Snackbar.show({
-          text: 'Los emails no coinciden',
+          text: t('registrationSnackbarError2'),
           duration: Snackbar.LENGTH_SHORT,
           numberOfLines: 2,
           textColor: "#fff",
@@ -79,7 +81,7 @@ const Registration: () => Node = () => {
       signUp(data.userName, data.password, data.email);
     }else{
       Snackbar.show({
-        text: 'El formato del email es incorrecto',
+        text: t('registrationSnackbarError3'),
         duration: Snackbar.LENGTH_SHORT,
         numberOfLines: 2,
         textColor: "#fff",
@@ -108,10 +110,10 @@ const Registration: () => Node = () => {
 
           <CustomInput
             name="userName"
-            placeholder="Nombre de usuario"
+            placeholder={t('userNamePlacehoder')}
             control={control}
             // customStyles={{width:"100%"}}
-            rules={{required: 'Introduce el nombre de usuario, no usar characteres especiales.'}}
+            rules={{required: t('requiredFieldUsernameText')}}
             // onPress={showDatepicker}
             />
 
@@ -121,18 +123,18 @@ const Registration: () => Node = () => {
             keyboardType='email-address'
             control={control}
             // customStyles={{width:"100%"}}
-            rules={{required: 'Introduce el Email'}}
+            rules={{required: t('requiredEmail')}}
 
             // onPress={showDatepicker}
             />
 
           <CustomInput
             name="emailConfirmation"
-            placeholder="Confirmación del email"
+            placeholder={t('emailConfirmationPlaceholder')}
             keyboardType='email-address'
             control={control}
             // customStyles={{width:"100%"}}
-            rules={{required: 'Confirma el email'}}
+            rules={{required: t('requiredEmailConfirmationText')}}
 
             // onPress={showDatepicker}
             />
@@ -143,18 +145,18 @@ const Registration: () => Node = () => {
             control={control}
             secureTextEntry={true}
             // customStyles={{width:"100%"}}
-            rules={{required: 'Introduce el password'}}
+            rules={{required: t('requiredFieldPasswordText')}}
 
             // onPress={showDatepicker}
             />
 
           <CustomInput
             name="passwordConfirmation"
-            placeholder="Confirmación de password"
+            placeholder={t('passwordConfirmationPlaceholder')}
             control={control}
             secureTextEntry={true}
             // customStyles={{width:"100%"}}
-            rules={{required: 'Confirma el password'}}
+            rules={{required: t('requiredPasswordConfirmationText')}}
 
             // onPress={showDatepicker}
             />
@@ -172,7 +174,7 @@ const Registration: () => Node = () => {
           
     
           <View style={{marginTop: 0}}>
-                <CustomButton text="Enviar" bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(submit)} />
+                <CustomButton text={t('sendButton')} bgColor={"#3098CF"} fgColor='white' iconName={null} onPress={handleSubmit(submit)} />
             </View>
           {/* <TouchableOpacity style={{backgroundColor: '#3098CF', padding: 20, borderRadius:10, marginBottom: 20}} onPress={() => {signUp(userName, password, email)}}>
               <Text style={{textAlign:'center', color:'#fff', fontWeight: '700', fontSize: 17  }}>Register</Text>
