@@ -763,10 +763,20 @@ export default function ShowObservation({ route, navigation }) {
             key={1}
             coordinate={{latitude:Number(item.location?.coordinates[1]),longitude:Number(item.location?.coordinates[0])}}
           >
-            <Svg style={styles.pin} >
+             {Platform.OS == "android" && (
+                <Image style={styles.pin} source={require('../../assets/images/pins/atesmaps-blue.png')}/>
+              )}
+              
+              {Platform.OS == "ios" && (    
+                <Svg style={styles.pin} >
+                  <Image style={styles.pin}
+                      source={require('../../assets/images/pins/atesmaps-blue.png')}/> 
+                </Svg>
+              )}
+            {/* <Svg style={styles.pin} >
               <Image style={styles.pin}
                     source={require('../../assets/images/pins/atesmaps-blue.png')}/> 
-            </Svg>
+            </Svg> */}
           </Marker>
            
         </MapView>
