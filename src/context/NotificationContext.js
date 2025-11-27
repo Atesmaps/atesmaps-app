@@ -80,7 +80,6 @@ export const NotificationProvider = ({ children }) => {
         setIsPermissionGranted(hasPermission);
       
       
-      
       try {
         // A. Visually clear the red dot on the phone (Native OS)
         await notifee.setBadgeCount(0);
