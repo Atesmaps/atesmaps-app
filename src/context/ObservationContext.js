@@ -1,19 +1,21 @@
 import React, {createContext, useContext, useState, useEffect} from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '../api/axiosConfig';
 
 import  Snackbar  from "react-native-snackbar";
-import { BASE_URL } from '../config';
+// x    
 
 import { AuthContext } from '../context/AuthContext';
-import { GetBucketLoggingOutputFilterSensitiveLog } from '@aws-sdk/client-s3';
+import { useTranslation } from 'react-i18next';
 
 export const ObservationContext = createContext();
 
 export const ObservationProvider = ({children}) => {
     const {userDetails,userToken, logout} = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(false);
+    const { t } = useTranslation();
 
     const [observations, setObservations] = useState([]);
    
@@ -29,21 +31,21 @@ export const ObservationProvider = ({children}) => {
     const [lastPage, setLastPage] = useState(false);
     
 
-    const sentRequest = async (url, method, data) => {
-        try {
-          const response = await axios({
-            method: method,
-            url: `${BASE_URL}${url}`,
-            data: data,
-            //headers: { "Content-Type": "multipart/form-data" },
-            headers: {"Authorization": `Bearer ${userToken}`}
-          });
-          return response;
-        } catch (error) {
-          console.log(error);
-          return error;
-        }
-    };
+    // const sentRequest = async (url, method, data) => {
+    //     try {
+    //       const response = await axios({
+    //         method: method,
+    //         url: `${BASE_URL}${url}`,
+    //         data: data,
+    //         //headers: { "Content-Type": "multipart/form-data" },
+    //         headers: {"Authorization": `Bearer ${userToken}`}
+    //       });
+    //       return response;
+    //     } catch (error) {
+    //       console.log(error);
+    //       return error;
+    //     }
+    // };
 
     const showUpdateAlert = () => {
         Alert.alert(
@@ -66,21 +68,33 @@ export const ObservationProvider = ({children}) => {
         // console.log(`API call to get observations with filter values Days: ${filter.days} and location:`);
         // console.log(filter.location);
         try{
-            let response = null
-            response = await sentRequest(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`, "get", '');
-            if(response && response.status != 200){
-                if (userDetails){ 
-                    showUpdateAlert();
-                }else{
-                    console.log("Error no valid Token");
-                    logout();
-                }
-            } else if (response && response.data) {
+           
+            const response = await api.get(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`);
+            // response = await sentRequest(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`, "get", '');
+            // if(response && response.status != 200){
+            //     if (userDetails){ 
+            //         showUpdateAlert();
+            //     }else{
+            //         console.log("Error no valid Token");
+            //         logout();
+            //     }
+            // } else if (response && response.data) {
+            //     setAllObservations(response.data);
+            // }
+            if (response && response.data) {
                 setAllObservations(response.data);
             }
             setIsLoading(false);
         } catch (err){
             console.log(err);
+            if (err.response && err.response.status !== 200) {
+                 if (userDetails){ 
+                    showUpdateAlert();
+                } else {
+                    console.log("Error no valid Token");
+                    logout();
+                }
+            }
             setIsLoading(false);
         }
     }
@@ -89,8 +103,9 @@ export const ObservationProvider = ({children}) => {
         setIsLoading(true);
         let user = {username: 'Anonymous'};
         try{
-            let response = null
-            response = await sentRequest(`/users/${userId}`, "get", '');
+            const response = await api.get(`/users/${userId}`);
+            //let response = null
+            //response = await sentRequest(`/users/${userId}`, "get", '');
             //console.log(response.data);
             user = response.data;
         }catch (err){
@@ -105,19 +120,12 @@ export const ObservationProvider = ({children}) => {
         try{
             let response = null
             // console.log(page)
-            if (userDetails)  response = await sentRequest(`/observations/user/${userDetails?._id}?page=${page}`, "get", '');
-            //TODO: Sync local data with new data
-            if(response && response.status != 200){
-                if (userDetails){ 
-                    setCurrentPage(1);
-                    showUpdateAlert();
-                    
-                }else{
-                    console.log("Error no valid Token");
-                    setCurrentPage(1);
-                    logout();
-                }
-            } else if (response && response.data) {
+            //if (userDetails)  response = await sentRequest(`/observations/user/${userDetails?._id}?page=${page}`, "get", '');
+            if (userDetails) {
+                 response = await api.get(`/observations/user/${userDetails?._id}?page=${page}`);
+            }
+         
+            if (response && response.data) {
                 if(page === 1){
                     //let aux = [{"_id":"-1", "status": -1}];  // uncomment to enable banner
                     let aux = []; // comment to add baner
@@ -140,6 +148,16 @@ export const ObservationProvider = ({children}) => {
         } catch (err){
             console.log(err);
             setHistoricObservations(historicObservations);
+            if (err.response && err.response.status !== 200) {
+                if (userDetails){ 
+                    setCurrentPage(1);
+                    showUpdateAlert();
+                } else {
+                    console.log("Error no valid Token");
+                    setCurrentPage(1);
+                    logout();
+                }
+            }
         }
         try{
             let list = JSON.parse(await AsyncStorage.getItem('list'));
@@ -165,7 +183,7 @@ export const ObservationProvider = ({children}) => {
             await AsyncStorage.setItem('list', JSON.stringify(aux)); 
             setEditingObservation(observation);
             Snackbar.show({
-                text: 'Tu borrador de observación se ha creado.',
+                text: t('snackbarDraftCreated'),
                 duration: Snackbar.LENGTH_SHORT,
                 numberOfLines: 2,
                 textColor: "#fff",
@@ -217,7 +235,7 @@ export const ObservationProvider = ({children}) => {
             setLastIndex(index);
             setSelectedIndex(null);
             Snackbar.show({
-                text: 'Tu borrador de observación se ha eliminado.',
+                text: t('snackbarDraftDeleted'),
                 duration: Snackbar.LENGTH_SHORT,
                 numberOfLines: 2,
                 textColor: "#fff",
@@ -226,23 +244,17 @@ export const ObservationProvider = ({children}) => {
         }catch(err){
           console.log(err)
         } 
-        setIsLoading(false);
-        // console.log('---');
-        // console.log(observations);
-        // console.log('---END REmoving observation---');
-        // navigation.navigate('Lista de Observaciones');
-       
+        setIsLoading(false);       
     }
 
+    const findObservationIndex = (id) => {
+        if (!allObservations || allObservations.length === 0) return -1;
+        return allObservations.findIndex((obs) => obs._id === id || obs.id === id);
+    };
+
     useEffect(()=>{
-        // console.log('-----Observations updated-----')
-        // console.log(observations);
         let index = observations.length 
-       // console.log(index);
         setLastIndex(index);
-       // setSelectedIndex(index-1);
-      //  console.log('-----------------------------')
-        // setList();
     },[observations]);
 
 
@@ -261,7 +273,8 @@ export const ObservationProvider = ({children}) => {
                 setSelectedIndex,
                 setEditingObservation,
                 updateSelectedIndex,
-                sentRequest,
+                findObservationIndex,
+                // sentRequest,
                 getData,
                 getAllObservations,
                 getObservationUserDetails,

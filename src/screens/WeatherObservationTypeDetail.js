@@ -470,7 +470,7 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>{t('oriOrientación')}:</Text>
+                    <Text>{t('oriOrientacion')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"

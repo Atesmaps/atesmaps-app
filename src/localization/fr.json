@@ -149,7 +149,7 @@
   "moderado": "Modéré",
   "fuerte": "Fort",
   "extremVel": "Extrême (>60km/h)",
-  "oriOrientación": "Orientation",
+  "oriOrientacion": "Orientation",
   "transNieveViento": "Transport de neige par le vent",
   "no": "Non",
   "intensa": "Intense",
@@ -375,5 +375,8 @@
   "requiredFieldUsernameText": "Saisissez le nom d'utilisateur, sans caractères spéciaux.",
   "snackBarForgotPassMsg1": "Un e-mail a été envoyé à votre adresse.",
   "snackBarForgotPassMsg2": "Oups, une erreur est survenue.",
-  "snackbarObservationRequired": "Veuillez définir l'emplacement de l'observation."
+  "snackbarObservationRequired": "Veuillez définir l'emplacement de l'observation.",
+  "snackbarDraftCreated": "Votre brouillon d'observation a été créé.",
+  "snackbarDraftDeleted": "Votre brouillon d'observation a été supprimé.",
+  "viewButton":"Voir"
 }

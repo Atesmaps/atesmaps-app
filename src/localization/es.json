@@ -149,7 +149,7 @@
   "moderado": "Moderado (26-40km/h)",
   "fuerte": "Fuerte (41-60km/h)",
   "extremVel": "extrem (>60km/h)",
-  "oriOrientación": "Orientación",
+  "oriOrientacion": "Orientación",
   "transNieveViento": "Trasnporte de nieve por viento",
   "no": "No", 
   "intensa": "Intensa",
@@ -379,9 +379,9 @@
   "requiredFieldUsernameText":"Introduce el nombre de usuario, no usar characteres especiales.",
   "snackBarForgotPassMsg1":"Se envió un email a tu cuenta de correo.",
   "snackBarForgotPassMsg2":"Ooops, algo fue mal.",
-  "snackbarObservationRequired": "Por favor, determina la ubicación de la observación."
-
-
-
+  "snackbarObservationRequired": "Por favor, determina la ubicación de la observación.",
+  "snackbarDraftCreated":"Tu borrador de observación se ha creado.",
+  "snackbarDraftDeleted":"Tu borrador de observación se ha eliminado.",
+  "viewButton":"Ver"
 
 }

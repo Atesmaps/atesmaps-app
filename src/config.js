@@ -1,6 +1,6 @@
 //export const BASE_URL = 'http://10.0.2.2:3500';
-//export const BASE_URL = 'http://192.168.178.151:3500';
-export const BASE_URL = 'https://api.atesmaps.org';
+export const BASE_URL = 'http://192.168.178.151:3500';
+//export const BASE_URL = 'https://api.atesmaps.org';
 export const PULIC_BUCKET_URL = 'https://atesmaps.ams3.digitaloceanspaces.com';
 export const ENDPOINT = 'https://ams3.digitaloceanspaces.com';
 export const ACCESS_KEY = 'DO00M2AMEDPXB3XUV8DZ';

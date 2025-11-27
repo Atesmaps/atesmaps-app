@@ -42,7 +42,7 @@ i18n
   .init({
     resources,
     lng: getDeviceLanguage(), // default language
-    fallbackLng: 'en', // fallback language if translation is not found
+    fallbackLng: 'es', // fallback language if translation is not found
     supportedLngs: ['en', 'es', 'ca', 'fr'],
     interpolation: {
       escapeValue: false, // react already safes from xss

@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
-
 import { NavigationContainer } from '@react-navigation/native';
+
+import { navigationRef } from './NavigationHelper';
 import VersionCheck from 'react-native-version-check';
 import axios from 'axios';
 
@@ -29,7 +30,9 @@ import { BASE_URL } from '../config';
 const AppNav: () => Node = () => {
    // const isDarkMode = useColorScheme() === 'dark';
     const {isLoading, userToken} = useContext(AuthContext);
-  
+
+   
+    
     useEffect(()=>{
       // console.log(VersionCheck.getCountry());            // KR
       // console.log(VersionCheck.getPackageName());        // com.reactnative.app
@@ -63,25 +66,8 @@ const AppNav: () => Node = () => {
           // console.log('Does it need update?')
           // console.log(res);
           if(Platform.OS === 'ios'){
-           
             if(res.isNeeded) { showUpdateAlert('itms-apps://apps.apple.com/es/app/floc/id6444729278')};
-            // VersionCheck.getAppStoreUrl({ country:'ES', appID: '6444729278' }).then(url => {
-            //   console.log(VersionCheck.getCurrentVersion())
-            //   console.log(latestVersion)
-            //   console.log(res.isNeeded);  // true
-            //   console.log('storeURL:')
-            //   console.log(url)
-            //   if(res.isNeeded) { showUpdateAlert(url)};
-            // })
           }else{
-            // VersionCheck.getPlayStoreUrl({ country:'ES', packageName: 'com.atesmapsapp'  }).then(url => {
-            //   console.log(VersionCheck.getCurrentVersion())
-            //   console.log(latestVersion)
-            //   console.log(res.isNeeded);  // true
-            //   console.log('storeURL:')
-            //   console.log(url)
-            //   if(res.isNeeded) { showUpdateAlert(url)};
-            // })
             if(res.isNeeded) { showUpdateAlert('https://play.google.com/store/apps/details?id=com.atesmapsapp')};
           }
         });
@@ -98,22 +84,6 @@ const AppNav: () => Node = () => {
           {
             text: 'Update',
             onPress: () => {
-              // // Open the app store URL for updating
-              //  VersionCheck.getStoreUrl().then(res => {
-              //    console.log(res);  // true
-               
-              // });
-
-              // console.log(VersionCheck.getAppStoreUrl({ appID: '6444729278' }));
-              // Linking.openURL(
-              //   Platform.OS === 'ios'
-              //     ? VersionCheck.getAppStoreUrl({ appID: '6444729278' })
-              //     : VersionCheck.getPlayStoreUrl({ packageName: 'com.atesmapsapp' })
-              // );
-          //     const url = Platform.OS === 'android' ?
-          //     'https://play.google.com/store/apps/details?id=com.atesmapsapp'   
-          //  :  'https://apps.apple.com/es/app/floc/id6444729278'
-              //console.log(url)
               Linking.canOpenURL(url).then(supported => {
                 supported && Linking.openURL(url);
               }, (err) => console.log(err));
@@ -140,7 +110,8 @@ const AppNav: () => Node = () => {
     }
     
     return (
-      <NavigationContainer>
+      // <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         {/* <SafeAreaView > */}
           <StatusBar barStyle={'dark-content'} hidden={false} />
           {/* TODO: check update needed... */}

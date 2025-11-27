@@ -24,6 +24,7 @@ moment.updateLocale('es', {
 import { AuthProvider } from './context/AuthContext';
 import { ObservationProvider } from './context/ObservationContext';
 import { LocationProvider } from './context/LocationContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 // enableLatestRenderer();
 
@@ -31,11 +32,13 @@ function App(): React.JSX.Element {
   return (
     <I18nextProvider i18n={i18n}>
       <AuthProvider>
-        <LocationProvider>
-          <ObservationProvider>
-            <AppNav />
-          </ObservationProvider>
-        </LocationProvider>
+        <NotificationProvider>
+          <LocationProvider>
+            <ObservationProvider>
+              <AppNav />
+            </ObservationProvider>
+          </LocationProvider>
+        </NotificationProvider>
       </AuthProvider>
     </I18nextProvider>
   );

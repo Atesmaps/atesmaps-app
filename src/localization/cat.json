@@ -149,7 +149,7 @@
   "moderado": "Moderat",
   "fuerte": "Fort",
   "extremVel": "Extrem (>60km/h)",
-  "oriOrientación": "Orientació",
+  "oriOrientacion": "Orientació",
   "transNieveViento": "Transport de neu per vent",
   "no": "No",
   "intensa": "Intensa",
@@ -375,5 +375,8 @@
 "requiredFieldUsernameText": "Introdueix el nom d'usuari, no utilitzis caràcters especials.",
 "snackBarForgotPassMsg1": "S'ha enviat un correu al teu compte.",
 "snackBarForgotPassMsg2": "Ups, alguna cosa ha anat malament.",
-"snackbarObservationRequired": "Si us plau, determina la ubicació de l'observació."
+"snackbarObservationRequired": "Si us plau, determina la ubicació de l'observació.",
+"snackbarDraftCreated": "El teu esborrany d'observació s'ha creat.",
+"snackbarDraftDeleted": "El teu esborrany d'observació s'ha eliminat.",
+"viewButton":"Veure"
 }

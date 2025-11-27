@@ -3,7 +3,7 @@ import Base64Binary from 'base64-arraybuffer';
 //import fs from 'react-native-fs';
 import fs from 'react-native-file-selector';
 import * as mime from 'react-native-mime-types';
-import { ENDPOINT, ACCESS_KEY, ACCESS_SECRET } from './config';
+import { ENDPOINT, ACCESS_KEY, ACCESS_SECRET } from '../config';
 
 
 const uploadImageOnS3 = async (file: any) => {

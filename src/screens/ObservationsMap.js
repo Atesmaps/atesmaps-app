@@ -39,11 +39,20 @@ const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const CARD_MARGIN = (width * 0.2)/2;
+// const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
+
+//---- New CONSTANTS ---- 
+// 20 is the sum of margin/spacing between cards (10px left margin + 10px right margin)
+const CARD_SPACING = 20; 
+const CARD_SIZE = CARD_WIDTH + CARD_SPACING; 
+
+// SPACING_FOR_CARD_INSET is only needed for the onMarkerPress scroll target calculation
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
-const ObservationsMap: () => Node = ({ navigation  }) => {
+
+const ObservationsMap: () => Node = ({ navigation, route  }) => {
     const {LATITUDE_DELTA,LONGITUDE_DELTA, currentLocation} = useContext(LocationContext);
-    const {isLoading, getAllObservations, allObservations,} = useContext(ObservationContext);
+    const {isLoading, getAllObservations, allObservations, findObservationIndex} = useContext(ObservationContext);
     const { t, i18n } = useTranslation();
     const [newDelta, setNewDelta]=useState({longitudeDelta: 0.7470, latitudeDelta: 0.7470})
     const [newRegion, setNewRegion]=useState({ 
@@ -93,6 +102,28 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
   //   // setLocationFilter(newLocation);
   // },[]) 
 
+  useEffect(() => {
+    console.log('Triggered by notification....')
+    const { observationId } = route.params || {};
+
+    if (observationId && allObservations.length > 0) {
+        // ⚡ Use the Context Helper
+        const targetIndex = findObservationIndex(observationId);
+
+        if (targetIndex !== -1) {
+            console.log("📍 Deep Link found at index:", targetIndex);
+            
+            // Standard selection logic
+            setTimeout(() => {
+                onMarkerPress(targetIndex);
+            }, 500);
+            
+            // Clear param to prevent re-triggering
+            navigation.setParams({ observationId: null });
+        }
+    }
+}, [route.params?.observationId, allObservations]);
+
   useEffect(()=>{
     // console.log('calling getObservations');
     if (selectedLocation == 0){
@@ -111,8 +142,6 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     }else{
       location = locationsData[selectedLocation];
     }
-
-    //console.log(location)
 
     if(allObservations.length > 0){
  
@@ -141,137 +170,89 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
     }
   },[allObservations])
 
-  // useEffect(()=>{
-  //   console.log('New region has been set...');
-  //   // _map.current.animateToRegion(
-  //   //   {
-  //   //     latitude: Number(coordinates[1]),
-  //   //     longitude: Number(coordinates[0]),
-  //   //     latitudeDelta: newDelta.latitudeDelta,
-  //   //     longitudeDelta: newDelta.longitudeDelta,
-  //   //   },
-  //   //   100
-  //   // );
-  // },[newRegion])
  
-  // useEffect(() => {
-  //   mapAnimation.addListener(({ value }) => {
-  //     // let index = 0;
-  //    // let index = Math.floor((value-mapIndex*20) / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
-
-  //     //console.log('value:', value);
-     
-      
-  //   //   console.log(Math.ceil(value / CARD_WIDTH));
-  //   //  // console.log(index);
-  //   //   console.log(CARD_WIDTH + 20);
-  //     let index = Math.floor(value / CARD_WIDTH);
-  //     if (index > allObservations.length) {
-  //       console.log('Reset..')
-  //       index = allObservations.length - 1;
-  //     }
-  //     if (index < 0) {
-  //       console.log('Reset..')
-  //       index = 0;
-  //     }
-  
-  //     clearTimeout(regionTimeout);
-
-  //     const regionTimeout = setTimeout(() => {
-  //       if(flying){
-  //         // console.log('saltant...');
-  //         if (index === mapIndex) {
-  //           // console.log(`On saltem? ${index}`)
-  //           const { coordinates } = allObservations[index].location;
-  //           _map.current.animateToRegion(
-  //             {
-  //               latitude: coordinates[1] ,
-  //               longitude: coordinates[0],
-  //               latitudeDelta: 0.1170 ,
-  //               longitudeDelta: 0.1170 ,
-  //             },
-  //             350
-  //           );
-  //           setFlying(false);
-  //         }
-  //       }else{
-  //         if (index !== mapIndex) {
-  //           setMapIndex(index);
-  //           const { coordinates } = allObservations[index].location;
-  //           _map.current.animateToRegion(
-  //             {
-  //               latitude: coordinates[1] ,
-  //               longitude: coordinates[0],
-  //               latitudeDelta: 0.1170 ,
-  //               longitudeDelta: 0.1170 ,
-  //             },
-  //             350
-  //           );
-  //         }
-  //       }
-  //     }, 10);
-  //   });
-  // });
-
-  // const interpolations = allObservations.map((marker, index) => {
-  //   const inputRange = [
-  //     (index - 1) * (CARD_WIDTH + 20) ,
-  //     index * (CARD_WIDTH + 20),
-  //     ((index + 1) * (CARD_WIDTH + 20)),
-  //   ];
-  //   //NOTE: This is React Native integrated animated library:
-  //   let scale;
-  //   if(Platform.OS === 'ios'){
-  //     scale = mapAnimation.interpolate({
-  //       inputRange,
-  //       outputRange: [1, 1.5, 1],
-  //       extrapolate: "clamp"
-  //     });
-  //   }else{
-  //     scale = mapAnimation.interpolate({
-  //       inputRange,
-  //       outputRange: [0.5, 0.75, 0.5],
-  //       extrapolate: "clamp"
-  //     });
-  //   }
-  //   return { scale };
-  // });
-
-  const onMarkerPress = (mapEventData) => {
+  // const onMarkerPress = (mapEventData) => {
     
-    const markerID = mapEventData._targetInst.return.key;
+  //   const markerID = mapEventData._targetInst.return.key;
    
-    let x = (markerID * CARD_WIDTH) + (markerID * 20); 
-    if (Platform.OS === 'ios') {
-      x = x - SPACING_FOR_CARD_INSET;
-    } 
-    // mapIndex = Number(markerID);
-    setMapIndex( Number(markerID))
-    setFlying(true);
-    // flying = true;
-    _scrollView.current.scrollTo({x: x, y: 0, animated: true});
+  //   let x = (markerID * CARD_WIDTH) + (markerID * 20); 
+  //   if (Platform.OS === 'ios') {
+  //     x = x - SPACING_FOR_CARD_INSET;
+  //   } 
+  //   // mapIndex = Number(markerID);
+  //   setMapIndex( Number(markerID))
+  //   setFlying(true);
+  //   // flying = true;
+  //   _scrollView.current.scrollTo({x: x, y: 0, animated: true});
 
 
-    const { coordinates } = allObservations[Number(markerID)].location;
+  //   const { coordinates } = allObservations[Number(markerID)].location;
     
 
-    _map.current.animateToRegion(
-      {
-        latitude: Number(coordinates[1]),
-        longitude: Number(coordinates[0]),
-        latitudeDelta: newDelta.latitudeDelta,
-        longitudeDelta: newDelta.longitudeDelta,
-      },
-      350
-    );
+  //   _map.current.animateToRegion(
+  //     {
+  //       latitude: Number(coordinates[1]),
+  //       longitude: Number(coordinates[0]),
+  //       latitudeDelta: newDelta.latitudeDelta,
+  //       longitudeDelta: newDelta.longitudeDelta,
+  //     },
+  //     350
+  //   );
 
-    setNewRegion({
-      latitude: Number(coordinates[1]),
-      longitude: Number(coordinates[0]),
-      latitudeDelta: newDelta.latitudeDelta,
-      longitudeDelta: newDelta.longitudeDelta,
-    })
-  }
+  //   setNewRegion({
+  //     latitude: Number(coordinates[1]),
+  //     longitude: Number(coordinates[0]),
+  //     latitudeDelta: newDelta.latitudeDelta,
+  //     longitudeDelta: newDelta.longitudeDelta,
+  //   })
+  // }
+
+  // Add this new useEffect block to your component:
+
+  useEffect(() => {
+      // Check if we have observations and a valid map reference
+      if (allObservations.length > 0 && _map.current !== null) {
+          const targetIndex = mapIndex;
+          
+          // Ensure the index is valid before accessing the array
+          if (targetIndex >= 0 && targetIndex < allObservations.length) {
+              const { coordinates } = allObservations[targetIndex].location;
+
+              // Use the map reference to move the camera (Works for both platforms)
+              _map.current.animateToRegion(
+                  {
+                      latitude: Number(coordinates[1]),
+                      longitude: Number(coordinates[0]),
+                      // Use the current delta to maintain the zoom level
+                      latitudeDelta: newDelta.latitudeDelta,
+                      longitudeDelta: newDelta.longitudeDelta,
+                  },
+                  350 // Animation duration
+              );
+          }
+      }
+      // Dependencies: Only re-run when the selected card/marker changes, or zoom changes
+  }, [mapIndex, allObservations, newDelta]);
+
+  const onMarkerPress = (markerIndex) => { // Accepts index directly
+    
+      // 1. Calculate scroll position
+      let x = (markerIndex * CARD_WIDTH) + (markerIndex * 20); 
+      if (Platform.OS === 'ios') {
+        x = x - SPACING_FOR_CARD_INSET;
+      } 
+
+      // 2. Set 'flying' flag to skip index calculation in onMomentumScrollEnd
+      setFlying(true); 
+
+      // 3. Scroll the card view
+      _scrollView.current.scrollTo({x: x, y: 0, animated: true});
+
+      // 4. Update index. This triggers the dedicated useEffect to move the map camera.
+      setMapIndex(markerIndex); 
+      
+      // 5. Remove the direct map animation call that was here previously
+  };
 
   const getMapRegion = () => {     
 
@@ -362,7 +343,8 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                             key={index}
                             style={[styles.pin]}
                             coordinate={{latitude:Number(marker.location?.coordinates[1]),longitude:Number(marker.location?.coordinates[0])}}
-                            onPress={(e)=>onMarkerPress(e)}
+                            // onPress={(e)=>onMarkerPress(e)}
+                            onPress={() => onMarkerPress(index)}
                           >
                              {/* <Text>{index}</Text> */}
                             <Animated.Image style={[styles.pin,scaleStyle]}
@@ -454,55 +436,83 @@ const ObservationsMap: () => Node = ({ navigation  }) => {
                 onContentSizeChange={(width) => {
                    setScrollWidth(width);
                 }}
-                onMomentumScrollEnd={(event)=>{
-                  // console.log('momentum ended')
-                  // console.log('numberof cards on the scroll view: ',(scrollWidth/ (CARD_WIDTH + 20)));
-                  // console.log('number of observations found: ',allObservations.length);
-
-                  // console.log('current scroll position after snap',scrollWidth);
-                  // console.log('hipotetical selected mark:',(Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) )
-                  let index;
-                  if(flying){
-                    console.log('jumping to:', mapIndex);
-                    index = mapIndex;
+                onMomentumScrollEnd={(event) => {
+                  // 1. Check if the movement was caused by a user scroll, not a pin tap ('flying')
+                  if (flying) {
+                    // If flying is true, it means onMarkerPress just triggered the scroll. 
+                    // We rely on the setMapIndex(markerIndex) in onMarkerPress, so we exit.
                     setFlying(false);
-                  }else{ 
-                    if(Platform.os === 'ios'){
-                      index = (1+Math.ceil(scrollWidth / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
-                    }else{
-                      index = (Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
-                    }
-                    if (index !== mapIndex) {
-                      // console.log('setting new index and location.')
+                    return;
+                  }
+
+                  // 2. Get the scroll offset (most reliable measure of position)
+                  const offsetX = event.nativeEvent.contentOffset.x;
+                  
+                  // 3. Calculate the new index using rounding
+                  const cardSize = CARD_WIDTH + 20; // 20 is the horizontal margin/spacing
+                  let newIndex = Math.round(offsetX / cardSize);
+
+                  // 4. Boundary check
+                  if (newIndex < 0) newIndex = 0;
+                  if (newIndex >= allObservations.length) newIndex = allObservations.length - 1;
+
+                  // 5. Update state only if the index has genuinely changed
+                  if (newIndex !== mapIndex) {
+                    console.log('Scroll settled on new index:', newIndex);
+                    setMapIndex(newIndex); 
+                    // Map camera animation will be handled by the useEffect watching mapIndex
+                  }
+                }}
+                // onMomentumScrollEnd={(event)=>{
+                //   // console.log('momentum ended')
+                //   // console.log('numberof cards on the scroll view: ',(scrollWidth/ (CARD_WIDTH + 20)));
+                //   // console.log('number of observations found: ',allObservations.length);
+
+                //   // console.log('current scroll position after snap',scrollWidth);
+                //   // console.log('hipotetical selected mark:',(Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) )
+                //   let index;
+                //   if(flying){
+                //     console.log('jumping to:', mapIndex);
+                //     index = mapIndex;
+                //     setFlying(false);
+                //   }else{ 
+                //     if(Platform.os === 'ios'){
+                //       index = (1+Math.ceil(scrollWidth / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
+                //     }else{
+                //       index = (Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
+                //     }
+                //     if (index !== mapIndex) {
+                //       // console.log('setting new index and location.')
                      
                 
-                      if (index > 0){                        
-                        const { coordinates } = allObservations[index].location;
+                //       if (index > 0){                        
+                //         const { coordinates } = allObservations[index].location;
 
-                        _map.current.animateToRegion(
-                          {
-                            latitude: Number(coordinates[1]),
-                            longitude: Number(coordinates[0]),
-                            latitudeDelta: newDelta.latitudeDelta,
-                            longitudeDelta: newDelta.longitudeDelta,
-                          },
-                          350
-                        );
+                //         _map.current.animateToRegion(
+                //           {
+                //             latitude: Number(coordinates[1]),
+                //             longitude: Number(coordinates[0]),
+                //             latitudeDelta: newDelta.latitudeDelta,
+                //             longitudeDelta: newDelta.longitudeDelta,
+                //           },
+                //           350
+                //         );
                         
-                        setNewRegion({
-                          latitude: Number(coordinates[1]),
-                          longitude: Number(coordinates[0]),  
-                          latitudeDelta: newDelta.latitudeDelta,
-                          longitudeDelta: newDelta.longitudeDelta,
-                        })
-                        setMapIndex(Number(index));
-                      }
-                    }
-                  //console.log((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH))
-                  //console.log(Math.ceil((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH)));
-                  }
+                //         setNewRegion({
+                //           latitude: Number(coordinates[1]),
+                //           longitude: Number(coordinates[0]),  
+                //           latitudeDelta: newDelta.latitudeDelta,
+                //           longitudeDelta: newDelta.longitudeDelta,
+                //         })
+                //         setMapIndex(Number(index));
+                //       }
+                //     }
+                //   //console.log((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH))
+                //   //console.log(Math.ceil((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH)));
+                //   }
             
-                }}
+                // }}
+
                 // onScroll={(event)=>{
                 //   console.log(event.nativeEvent.contentOffset.y)
                 // }}

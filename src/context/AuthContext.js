@@ -9,6 +9,7 @@ import  Snackbar  from "react-native-snackbar";
 
 import {GoogleSignin, statusCodes} from '@react-native-google-signin/google-signin';
 import { appleAuth, appleAuthAndroid } from '@invertase/react-native-apple-authentication';
+import { unregisterDeviceToken } from '../services/deviceService'; 
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import uuid from 'react-native-uuid';
@@ -294,12 +295,27 @@ export const AuthProvider = ({children}) => {
     }
  
     const logout = async () => {
+         setIsLoading(true);
+
         try {
-            setIsLoading(true);
+            // We do this BEFORE removing the userToken, so the API call is authenticated
+            //const fcmToken = await messaging().getToken();
+            const storedFcmToken = await AsyncStorage.getItem('fcmToken');
+            if (storedFcmToken) {
+                console.log("Unregistering token:", storedFcmToken);
+                await unregisterDeviceToken(storedFcmToken);
+            }
+        } catch (e) {
+            console.log("Error during token cleanup (continuing logout):", e);
+        }
+
+        try {
+ 
             setUserToken(null);
             setUserDetails(null);
-            await AsyncStorage.removeItem('userToken');
-            await AsyncStorage.removeItem('userDetails');
+            // await AsyncStorage.removeItem('userToken');
+            // await AsyncStorage.removeItem('userDetails');
+            await AsyncStorage.multiRemove(['userToken', 'userDetails', 'fcmToken']);
         } catch (e) {
             console.log(e);
             Snackbar.show({
@@ -333,12 +349,6 @@ export const AuthProvider = ({children}) => {
         // console.log('checking if logged in....')
         isLoggedIn();
     }, [])
-
-
-    // useEffect(()=>{
-    //     console.log('user details updated....')
-    //     // isLoggedIn();
-    // }, [userDetails])
 
     return(
         <AuthContext.Provider value={{signUp, 

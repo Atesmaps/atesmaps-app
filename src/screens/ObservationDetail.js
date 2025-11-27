@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import moment from 'moment';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Geolocation from 'react-native-geolocation-service';
+//import Geolocation from 'react-native-geolocation-service';
 
 import axios from 'axios';
 import fs from "react-native-fs";

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "700806496723",
+    "project_id": "atesmaps-floc-1706229343199",
+    "storage_bucket": "atesmaps-floc-1706229343199.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700806496723:android:db3288478aaafb8bdbaf26",
+        "android_client_info": {
+          "package_name": "com.atesmapsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700806496723-ih527k9o6aheeudt7374s4b1rffodpnv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyrWxtn_cXjtjJggPM4DJOz_YFx_GRhoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700806496723-ih527k9o6aheeudt7374s4b1rffodpnv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "700806496723-icb53pqd5n0nanhpmkaqklcpi0f8jcag.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.atesmaps.pyrscope"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

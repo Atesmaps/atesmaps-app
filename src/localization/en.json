@@ -149,7 +149,7 @@
   "moderado": "Moderate",
   "fuerte": "Strong",
   "extremVel": "Extreme (>60km/h)",
-  "oriOrientación": "Aspect/Orientation",
+  "oriOrientacion": "Aspect/Orientation",
   "transNieveViento": "Snow transport by wind",
   "no": "No",
   "intensa": "Intense",
@@ -375,5 +375,8 @@
   "requiredFieldUsernameText": "Enter username, do not use special characters.",
   "snackBarForgotPassMsg1": "An email was sent to your account.",
   "snackBarForgotPassMsg2": "Oops, something went wrong.",
-  "snackbarObservationRequired": "Please set the observation location."
+  "snackbarObservationRequired": "Please set the observation location.",
+  "snackbarDraftCreated": "Your observation draft has been created.",
+  "snackbarDraftDeleted": "Your observation draft has been deleted.",
+  "goButton":"View"
 }

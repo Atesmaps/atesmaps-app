@@ -159,7 +159,7 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('oriOrientación')}:</Text>
+              <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
             
               { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
@@ -387,7 +387,7 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('oriOrientación')}:</Text>
+              <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
             
               { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
@@ -448,7 +448,7 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('oriOrientación')}:</Text>
+              <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
             
               { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
