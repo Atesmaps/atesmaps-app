@@ -1,643 +1,432 @@
-import React, {Node, useState, useEffect, useRef, useLayoutEffect, useContext } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from 'react';
 import {
     SafeAreaView,
-    ScrollView,
-    StyleSheet,
     View,
     Image, 
     Animated,
     Text,
-    TouchableOpacity,
+    StyleSheet,
     Dimensions,
     Platform,
+    TouchableOpacity,
 } from 'react-native';
 
+import { useFocusEffect } from '@react-navigation/native';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { useTranslation } from 'react-i18next';
-
-
-import MapView, {Marker, UrlTile} from 'react-native-maps';
-// import Geolocation from 'react-native-geolocation-service';
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 import moment from 'moment';
 
-// import Svg from 'react-native-svg';
-import Loading from '../components/Loading';
-
 import { PULIC_BUCKET_URL } from '../config';
-
 import { LocationContext } from '../context/LocationContext';
 import { ObservationContext } from '../context/ObservationContext';
-
 import CustomButton from "../components/CustomButton";
-// import {locationsData, locationsNames, filterNames, filterData} from './data/MapFilterData';
 import { useMapFilterData } from '../hooks/useMapFilterData';
+import Loading from '../components/Loading';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+// Constants
 const bluePin = require('../../assets/images/pins/atesmaps-blue.png');
-const redPin = require('../../assets/images/pins/atesmaps-red.png')
-
-const { width, height } = Dimensions.get("window");
+const redPin = require('../../assets/images/pins/atesmaps-red.png');
+const { width } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
-const CARD_MARGIN = (width * 0.2)/2;
-// const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
-
-//---- New CONSTANTS ---- 
-// 20 is the sum of margin/spacing between cards (10px left margin + 10px right margin)
 const CARD_SPACING = 20; 
-const CARD_SIZE = CARD_WIDTH + CARD_SPACING; 
-
-// SPACING_FOR_CARD_INSET is only needed for the onMarkerPress scroll target calculation
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
-
-const ObservationsMap: () => Node = ({ navigation, route  }) => {
-    const {LATITUDE_DELTA,LONGITUDE_DELTA, currentLocation} = useContext(LocationContext);
-    const {isLoading, getAllObservations, allObservations, findObservationIndex} = useContext(ObservationContext);
+const ObservationsMap = ({ navigation, route }) => {
+    // --- CONTEXT ---
+    const { LATITUDE_DELTA, LONGITUDE_DELTA, currentLocation } = useContext(LocationContext);
+    const { isLoading, getAllObservations, allObservations, findObservationIndex } = useContext(ObservationContext);
     const { t, i18n } = useTranslation();
-    const [newDelta, setNewDelta]=useState({longitudeDelta: 0.7470, latitudeDelta: 0.7470})
-    const [newRegion, setNewRegion]=useState({ 
+    const { locationsData, locationsNames, filterNames, filterData } = useMapFilterData();
+
+    // --- LOCAL STATE ---
+    const [newDelta, setNewDelta] = useState({ longitudeDelta: 0.7470, latitudeDelta: 0.7470 });
+    const [newRegion, setNewRegion] = useState({ 
       latitude: currentLocation.latitude, 
-      longitude:currentLocation.longitude, 
+      longitude: currentLocation.longitude, 
       latitudeDelta: LATITUDE_DELTA, 
-      longitudeDelta: LONGITUDE_DELTA}); 
-    // const [locationIsLoading, setLocationIsLoading] = useState(false);
+      longitudeDelta: LONGITUDE_DELTA
+    }); 
+
     const [flying, setFlying] = useState(false);
     const [mapIndex, setMapIndex] = useState(0);
-    const {locationsData, locationsNames, filterNames, filterData} = useMapFilterData();
-    const [dayFilter, setDayFilter] = useState(3);
-    const [locationFilter, setLocationFilter] = useState(currentLocation)
     const [selectedLocation, setSelectedLocation] = useState(0);
     const [selectedDay, setSelectedDay] = useState(0);
-
     const [scrollWidth, setScrollWidth] = useState(0);
 
-  
-    const mapI18nToMomentLocale = (i18nCode) => {
-        switch (i18nCode) {
-            case 'cat':
-                return 'ca'; // Catalan
-            case 'en':
-                return 'en'; // English
-            case 'fr':
-                return 'fr'; // French
-            case 'es':
-                return 'es'; // Spanish
-            default:
-                return 'en'; // Fallback to English
-        }
-    };
-
-    //NOTE: This is React Native integrated animated library:
-    let mapAnimation = new Animated.Value(0);
-    //TODO: use React Reanimated library instead.
-    //const mapAnimation = useSharedValue(0);
+    // --- REFS & ANIMATIONS ---
     const _map = useRef(null);
     const _scrollView = useRef(null);
-    
-  
-  // useEffect(()=>{
-  //   // console.log('Calling initial location set up');
-  //   const newLocation = { latitude: currentLocation.latitude, longitude:currentLocation.longitude, latitudeDelta: newDelta.latitudeDelta, longitudeDelta: newDelta.longitudeDelta }
-  //   setNewRegion(newLocation)
-  //   // setLocationFilter(newLocation);
-  // },[]) 
+    const mapAnimation = new Animated.Value(0);
 
-  useEffect(() => {
-    console.log('Triggered by notification....')
-    const { observationId } = route.params || {};
+    // Helper for date formatting
+    const mapI18nToMomentLocale = (code) => {
+        const map = { 'cat': 'ca', 'en': 'en', 'fr': 'fr', 'es': 'es' };
+        return map[code] || 'en';
+    };
 
-    if (observationId && allObservations.length > 0) {
-        // ⚡ Use the Context Helper
-        const targetIndex = findObservationIndex(observationId);
-
-        if (targetIndex !== -1) {
-            console.log("📍 Deep Link found at index:", targetIndex);
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            // Title is optional, but good for context
+            // title: t('mapTitle'), 
             
-            // Standard selection logic
-            setTimeout(() => {
-                onMarkerPress(targetIndex);
-            }, 500);
-            
-            // Clear param to prevent re-triggering
-            navigation.setParams({ observationId: null });
+            headerRight: () => (
+                <TouchableOpacity 
+                    onPress={() => {
+                        fetchData(); 
+                    }}
+                    style={{ marginRight: 10 }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
+                >
+                    <MaterialCommunityIcons 
+                        name="refresh" 
+                        size={26} 
+                        color="#48a5e9" // Using your app's primary blue color
+                    />
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, fetchData]);
+
+    // --- 1. DATA FETCHING LOGIC ---
+    const fetchData = useCallback(() => {
+        let locationToUse;
+        if (selectedLocation == 0){
+            locationToUse = currentLocation;
+        } else {
+            locationToUse = locationsData[selectedLocation];
         }
-    }
-}, [route.params?.observationId, allObservations]);
+        const days = filterData[selectedDay];
+        
+        console.log("🔄 Fetching observations...");
+        getAllObservations({ days: days, location: locationToUse });
+    }, [selectedLocation, selectedDay, currentLocation]);
 
-  useEffect(()=>{
-    // console.log('calling getObservations');
-    if (selectedLocation == 0){
-      location = currentLocation
-    }else{
-      location = locationsData[selectedLocation];
-    }
-    const days = filterData[selectedDay];
-    getAllObservations({days: days,location: location});
-    
-  },[selectedLocation,selectedDay]);
+    // --- 2. DEEP LINK HANDLING (Notifications) ---
+    useEffect(() => {
+        const { observationId } = route.params || {};
 
-  useEffect(()=>{
-    if (selectedLocation == 0){
-      location = currentLocation
-    }else{
-      location = locationsData[selectedLocation];
-    }
+        if (observationId) {
+            console.log("🔔 Deep Link Triggered for:", observationId);
 
-    if(allObservations.length > 0){
- 
-      // console.log('setting location to first obs...')
-      setMapIndex(0);
-      const { coordinates } = allObservations[0].location;
-      setNewRegion({
-        latitude:coordinates[1], 
-        longitude:coordinates[0],
-        latitudeDelta:newDelta.latitudeDelta,
-        longitudeDelta:newDelta.longitudeDelta
-      })
-      // setNewDelta({latitudeDelta:0.717,
-      //   longitudeDelta:0.717})
-    }else{
-      // console.log('reset Location to centroid.');
-      setNewRegion({
-        latitude:location.latitude, 
-        longitude:location.longitude,
-        latitudeDelta:newDelta.latitudeDelta,
-        longitudeDelta:newDelta.longitudeDelta
-      })
+            const targetIndex = findObservationIndex(observationId);
 
-      // setNewDelta({latitudeDelta:0.717,
-      //   longitudeDelta:0.717})
-    }
-  },[allObservations])
+            if (targetIndex !== -1) {
+                console.log("📍 Target found at index:", targetIndex);
+                const { coordinates } = allObservations[targetIndex].location;
+                
+                // setTimeout(() => {
+                //     onMarkerPress(targetIndex);
+                // }, 500); 
 
- 
-  // const onMarkerPress = (mapEventData) => {
-    
-  //   const markerID = mapEventData._targetInst.return.key;
-   
-  //   let x = (markerID * CARD_WIDTH) + (markerID * 20); 
-  //   if (Platform.OS === 'ios') {
-  //     x = x - SPACING_FOR_CARD_INSET;
-  //   } 
-  //   // mapIndex = Number(markerID);
-  //   setMapIndex( Number(markerID))
-  //   setFlying(true);
-  //   // flying = true;
-  //   _scrollView.current.scrollTo({x: x, y: 0, animated: true});
+                setTimeout(() => {
+                    // 1. Trigger UI Selection (Scroll card, turn pin red)
+                    onMarkerPress(targetIndex);
 
+                    // We don't wait for the state listener. We force the camera now.
+                    if (_map.current) {
+                        const targetLoc = {
+                            latitude: Number(coordinates[1]),
+                            longitude: Number(coordinates[0]),
+                        };
 
-  //   const { coordinates } = allObservations[Number(markerID)].location;
-    
+                        if (Platform.OS === 'android') {
+                            _map.current.animateCamera({
+                                center: targetLoc,
+                                // Optional: Force a zoom level if you want closer view
+                                // zoom: 15 
+                            }, { duration: 1000 });
+                        } else {
+                            _map.current.animateToRegion({
+                                ...targetLoc,
+                                latitudeDelta: newDelta.latitudeDelta,
+                                longitudeDelta: newDelta.longitudeDelta,
+                            }, 1000);
+                        }
+                    }
+                }, 1000);
+                
 
-  //   _map.current.animateToRegion(
-  //     {
-  //       latitude: Number(coordinates[1]),
-  //       longitude: Number(coordinates[0]),
-  //       latitudeDelta: newDelta.latitudeDelta,
-  //       longitudeDelta: newDelta.longitudeDelta,
-  //     },
-  //     350
-  //   );
+            } else {
+                // Prevent infinite loops: Only fetch if we aren't already loading
+                if (!isLoading) {
+                    console.log("⚠️ Deep Link ID not found in local list. Forcing data refresh...");
+                    fetchData(); 
+                }
+            }
+        }
+    }, [route.params?.observationId, allObservations]);
 
-  //   setNewRegion({
-  //     latitude: Number(coordinates[1]),
-  //     longitude: Number(coordinates[0]),
-  //     latitudeDelta: newDelta.latitudeDelta,
-  //     longitudeDelta: newDelta.longitudeDelta,
-  //   })
-  // }
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            const { observationId } = route.params || {};
 
-  // Add this new useEffect block to your component:
+            // 1. Check for Deep Link
+            if (observationId) {
+                console.log("⏸️ Navigation Focus: Deep Link active, skipping fetch.");
+                return;
+            }
 
-  useEffect(() => {
-      // Check if we have observations and a valid map reference
-      if (allObservations.length > 0 && _map.current !== null) {
-          const targetIndex = mapIndex;
-          
-          // Ensure the index is valid before accessing the array
-          if (targetIndex >= 0 && targetIndex < allObservations.length) {
-              const { coordinates } = allObservations[targetIndex].location;
+            // 2. Standard Reload
+            console.log("📍 Navigation Focus: Fetching Data...");
+            fetchData();
+        });
 
-              // Use the map reference to move the camera (Works for both platforms)
-              _map.current.animateToRegion(
-                  {
-                      latitude: Number(coordinates[1]),
-                      longitude: Number(coordinates[0]),
-                      // Use the current delta to maintain the zoom level
-                      latitudeDelta: newDelta.latitudeDelta,
-                      longitudeDelta: newDelta.longitudeDelta,
-                  },
-                  350 // Animation duration
-              );
-          }
-      }
-      // Dependencies: Only re-run when the selected card/marker changes, or zoom changes
-  }, [mapIndex, allObservations, newDelta]);
-
-  const onMarkerPress = (markerIndex) => { // Accepts index directly
-    
-      // 1. Calculate scroll position
-      let x = (markerIndex * CARD_WIDTH) + (markerIndex * 20); 
-      if (Platform.OS === 'ios') {
-        x = x - SPACING_FOR_CARD_INSET;
-      } 
-
-      // 2. Set 'flying' flag to skip index calculation in onMomentumScrollEnd
-      setFlying(true); 
-
-      // 3. Scroll the card view
-      _scrollView.current.scrollTo({x: x, y: 0, animated: true});
-
-      // 4. Update index. This triggers the dedicated useEffect to move the map camera.
-      setMapIndex(markerIndex); 
-      
-      // 5. Remove the direct map animation call that was here previously
-  };
-
-  const getMapRegion = () => {     
-
-    console.log('New region has been set:',newRegion)
-    return {latitude: newRegion.latitude, 
-            longitude: newRegion.longitude, 
-            latitudeDelta: newDelta.latitudeDelta,
-            longitudeDelta: newDelta.longitudeDelta
-          }
-  };
+        // Cleanup listener
+        return unsubscribe;
+    }, [navigation, fetchData, route.params]);
 
 
-  // if( isLoading ) {
-  //   return(
-  //     <Loading />
-  //   )
-  // }
+    // --- 3. SCREEN FOCUS LOGIC ---
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const { observationId } = route.params || {};
+            
+    //         // If handling a deep link, SKIP the generic reload to avoid resetting state
+    //         if (observationId) {
+    //             console.log("⏸️ Skipping Focus Reload (Deep Link active)");
+    //             return;
+    //         }
+
+    //         // Normal behavior: Refresh data on focus
+    //         console.log("👀 Screen Focused: Refreshing Data");
+    //         fetchData();
+
+    //     }, [fetchData, route.params?.observationId])
+    // );
+
+    // --- 4. CLEANUP ON LEAVE ---
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('blur', () => {
+            if (route.params?.observationId) {
+                console.log("🧹 Leaving Map: Clearing Observation ID param");
+                navigation.setParams({ observationId: undefined });
+            }
+        });
+        return unsubscribe;
+    }, [navigation, route.params?.observationId]);
+
+    // --- 5. MAP MOVEMENT LOGIC ---
+    // Moves camera when mapIndex changes (via scroll or pin tap)
+    useEffect(() => {
+        if (allObservations.length > 0 && _map.current && mapIndex < allObservations.length) {
+            const { coordinates } = allObservations[mapIndex].location;
+            
+            if (Platform.OS === 'android') {
+                _map.current.animateCamera({
+                    center: {
+                        latitude: Number(coordinates[1]),
+                        longitude: Number(coordinates[0]),
+                    }
+                }, { duration: 500 });
+            } else {
+                _map.current.animateToRegion({
+                    latitude: Number(coordinates[1]),
+                    longitude: Number(coordinates[0]),
+                    latitudeDelta: newDelta.latitudeDelta,
+                    longitudeDelta: newDelta.longitudeDelta,
+                }, 500);
+            }
+        }
+    }, [mapIndex, allObservations]);
+
+    // --- INTERACTION HANDLERS ---
+    const onMarkerPress = (markerIndex) => { 
+        let x = (markerIndex * CARD_WIDTH) + (markerIndex * 20); 
+        if (Platform.OS === 'ios') x = x - SPACING_FOR_CARD_INSET;
+
+        setFlying(true); 
+        _scrollView.current?.scrollTo({x: x, y: 0, animated: true});
+        setMapIndex(markerIndex); 
+    };
+
+    const onMomentumScrollEnd = (event) => {
+        if (flying) {
+            setFlying(false);
+            return;
+        }
+        const offsetX = event.nativeEvent.contentOffset.x;
+        const cardSize = CARD_WIDTH + 20;
+        let newIndex = Math.round(offsetX / cardSize);
+        
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= allObservations.length) newIndex = allObservations.length - 1;
+
+        if (newIndex !== mapIndex) {
+            setMapIndex(newIndex);
+        }
+    };
 
     return(
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
-              {isLoading ?
+            {isLoading ?
                 (<Loading />)
                 :
-                (<>
-                  <MapView
+                (
+                <MapView
                     ref={_map}
-                    // provider={this.props.provider}
-                    provider={Platform.OS == "android" ?  "google" : undefined}
+                    provider={Platform.OS === "android" ? "google" : undefined}
                     style={styles.map}
-                    showsUserLocation = {true}
-                    initialRegion={{latitude: newRegion.latitude, 
-                      longitude: newRegion.longitude, 
-                      latitudeDelta: newDelta.latitudeDelta,
-                      longitudeDelta: newDelta.longitudeDelta
-                    }}
+                    showsUserLocation={true}
+                    initialRegion={newRegion}
                     onRegionChangeComplete={(region) => {
-                      setNewDelta({latitudeDelta: region.latitudeDelta, longitudeDelta:region.longitudeDelta })
-                      setNewRegion({latitude: region.latitude, longitude:region.longitude, latitudeDelta: region.latitudeDelta, longitudeDelta:region.longitudeDelta })}
-                    }
-                     // region={newRegion}>
-                     //region={Platform.OS === 'ios' ? getMapRegion() : null}
-                    >
-                       <UrlTile
-                        // urlTemplate={"https://4umaps.atesmaps.org/{z}/{x}/{y}.png"}
+                        setNewDelta({latitudeDelta: region.latitudeDelta, longitudeDelta:region.longitudeDelta })
+                    }}
+                >
+                    <UrlTile
                         urlTemplate={"https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=0a7d6a77a3f34d94a359058bd54f0857"}
-                        /**
-                        * The maximum zoom level for this tile overlay. Corresponds to the maximumZ setting in
-                        * MKTileOverlay. iOS only.
-                        */
                         maximumZ={19}
-                        /**
-                        * flipY allows tiles with inverted y coordinates (origin at bottom left of map)
-                        * to be used. Its default value is false.
-                        */
                         flipY={false}
-                      />    
+                        zIndex={-1} 
+                    />    
                    
-                    
-                      {allObservations.map((marker, index)=>{
-                        //TODO: use React Reanimated library instead.
-                        // const scaleStyle = useAnimatedStyle(() => ({
-                        //     transform:  {scale: interpolations[index].scale} 
-                        // }));
-                        //NOTE: This is React Native integrated animated library:
-                        const scaleStyle = {
-                          ...Platform.select({
-                            ios: {
-                           
-                            },
-                            android: {
-                              width: 51,
-                              height: 60,
-                              marginBottom: 0,
-                            }
-                          }),
-                          // backgroundColor: (index === mapIndex ? 'red' : 'transparent'),
-                          transform: [
-                            {
-                              //scale: 0.75
-                              //scale: interpolations,
-                               scale: (Platform.OS === 'ios' ? (index === mapIndex ? 1 : 0.75) : (index === mapIndex ? 0.80 : 0.5)),
-                            },
-                          ],
-                        };
-                        return(
-                          <Marker
-                            key={index}
-                            style={[styles.pin]}
-                            coordinate={{latitude:Number(marker.location?.coordinates[1]),longitude:Number(marker.location?.coordinates[0])}}
-                            // onPress={(e)=>onMarkerPress(e)}
-                            onPress={() => onMarkerPress(index)}
-                          >
-                             {/* <Text>{index}</Text> */}
-                            <Animated.Image style={[styles.pin,scaleStyle]}
-                                source={(index === mapIndex ? redPin : bluePin)}
-                            /> 
-                          </Marker>
+                    {allObservations.map((marker, index) => {
+                        const isSelected = index === mapIndex;
+                        // Determine scale based on selection
+                        const scale = Platform.OS === 'ios' ? (isSelected ? 1 : 0.75) : (isSelected ? 0.80 : 0.5);
+                        
+                        return (
+                            <Marker
+                                key={`${index}_${marker._id}`}
+                                coordinate={{latitude: Number(marker.location?.coordinates[1]), longitude: Number(marker.location?.coordinates[0])}}
+                                onPress={() => onMarkerPress(index)}
+                                tracksViewChanges={false} // Android Optimization
+                            >
+                                <Animated.Image 
+                                    style={[styles.pin, { transform: [{ scale }] }]}
+                                    source={isSelected ? redPin : bluePin}
+                                    resizeMode="contain"
+                                /> 
+                            </Marker>
                         )
-                      })}
-                
-                  </MapView>
-                  </> 
-                  )}
-                  <View style={{position: 'absolute', left:10, top: 10}}>
+                    })}
+                </MapView>)}
+                {/* 🔽 DROPDOWN FILTERS */}
+                <View style={{position: 'absolute', left:10, top: 10}}>
                     <SelectList 
-                      setSelected={(val) => {
-                        setSelectedLocation(val)
-                      }}
-                      data={locationsNames} 
-                      placeholder={t('cerca')}
-                      save="key"
-                    // defaultOption={{ key:'0', value:'Cerca de mi' }}
-                      search={false}
-                      boxStyles={{ backgroundColor: '#FFF',  height: 40, borderWidth: 0, minWidth: 190}}
-                      dropdownStyles={{backgroundColor: '#FFF',borderWidth: 0,  maxWidth:190}}
+                        setSelected={setSelectedLocation}
+                        data={locationsNames} 
+                        placeholder={t('cerca')}
+                        save="key"
+                        search={false}
+                        boxStyles={{ backgroundColor: '#FFF', height: 40, borderWidth: 0, minWidth: 190}}
+                        dropdownStyles={{backgroundColor: '#FFF', borderWidth: 0, maxWidth:190}}
                     />
+                </View>
+                <View style={{position: 'absolute', right:10, top: 10}}>
+                    <SelectList 
+                        setSelected={setSelectedDay}
+                        data={filterNames} 
+                        placeholder={"3 "+t("dias")}
+                        search={false}
+                        save="key"
+                        boxStyles={{border:'none', height: 40, borderWidth: 0, backgroundColor: '#FFF', minWidth: 120}}
+                        dropdownStyles={{backgroundColor: '#FFF', borderWidth: 0, maxWidth:120}}
+                    />
+                </View>
+
+                {isLoading && (
+                    <View style={styles.loadingOverlay}>
+                        <Loading /> 
+                        {/* <ActivityIndicator size="large" color="#48a5e9" /> */}
                     </View>
-                    <View style={{position: 'absolute', right:10, top: 10}}>
-                    <SelectList 
-                      setSelected={(val) => {
-                        setSelectedDay(val)
-                      }} 
-                      data={filterNames} 
-                      placeholder={"3 "+t("dias")}
-                      search={false}
-                      //defaultOption={{ key:'0', value:'3 días' }}
-                      save="key"
-                      boxStyles={{border:'none', height: 40, borderWidth: 0, backgroundColor: '#FFF', minWidth: 120}}
-                      dropdownStyles={{backgroundColor: '#FFF',borderWidth: 0,  maxWidth:120}}
-                    />
-                  </View>
-             
-              {/* <ScrollView
-                horizontal
-                scrollEventThrottle={1}
-                showsHorizontalScrollIndicator={false}
-                height={50}
-                style={styles.chipsScrollView}
-                
-                contentInset={{ // iOS only
-                  top:0,
-                  left:0,
-                  bottom:0,
-                  right:20
-                }}
-                contentContainerStyle={{
-                  paddingRight: Platform.OS === 'android' ? 20 : 0
-                }}
-              >
-                <TouchableOpacity key={1} style={styles.chipsItem}>
-                 {category.icon} 
-                  <Text>7 dias</Text>
-                </TouchableOpacity>
-                <TouchableOpacity key={2} style={styles.chipsItem}>
-                  {category.icon} 
-                  <Text>15 dias</Text>
-                </TouchableOpacity>
-                <TouchableOpacity key={3} style={styles.chipsItem}>
-                  {category.icon} 
-                  <Text>30 dias</Text>
-                </TouchableOpacity>
-                <TouchableOpacity key={4} style={styles.chipsItem}>
-                  {category.icon} 
-                  <Text>60 dias</Text>
-                </TouchableOpacity>
-              </ScrollView> */}
-              {!isLoading &&
-             
-              (
-              <Animated.ScrollView
-                ref={_scrollView}
-                horizontal
-                pagingEnabled
-                scrollEventThrottle={12}
-                decelerationRate={0}
-                showsHorizontalScrollIndicator={true}
-                snapToInterval={CARD_WIDTH + 20}
-                snapToAlignment={Platform.OS === 'android' ? "start" : "center"}
-                style={styles.scrollView}
-                onContentSizeChange={(width) => {
-                   setScrollWidth(width);
-                }}
-                onMomentumScrollEnd={(event) => {
-                  // 1. Check if the movement was caused by a user scroll, not a pin tap ('flying')
-                  if (flying) {
-                    // If flying is true, it means onMarkerPress just triggered the scroll. 
-                    // We rely on the setMapIndex(markerIndex) in onMarkerPress, so we exit.
-                    setFlying(false);
-                    return;
-                  }
-
-                  // 2. Get the scroll offset (most reliable measure of position)
-                  const offsetX = event.nativeEvent.contentOffset.x;
-                  
-                  // 3. Calculate the new index using rounding
-                  const cardSize = CARD_WIDTH + 20; // 20 is the horizontal margin/spacing
-                  let newIndex = Math.round(offsetX / cardSize);
-
-                  // 4. Boundary check
-                  if (newIndex < 0) newIndex = 0;
-                  if (newIndex >= allObservations.length) newIndex = allObservations.length - 1;
-
-                  // 5. Update state only if the index has genuinely changed
-                  if (newIndex !== mapIndex) {
-                    console.log('Scroll settled on new index:', newIndex);
-                    setMapIndex(newIndex); 
-                    // Map camera animation will be handled by the useEffect watching mapIndex
-                  }
-                }}
-                // onMomentumScrollEnd={(event)=>{
-                //   // console.log('momentum ended')
-                //   // console.log('numberof cards on the scroll view: ',(scrollWidth/ (CARD_WIDTH + 20)));
-                //   // console.log('number of observations found: ',allObservations.length);
-
-                //   // console.log('current scroll position after snap',scrollWidth);
-                //   // console.log('hipotetical selected mark:',(Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) )
-                //   let index;
-                //   if(flying){
-                //     console.log('jumping to:', mapIndex);
-                //     index = mapIndex;
-                //     setFlying(false);
-                //   }else{ 
-                //     if(Platform.os === 'ios'){
-                //       index = (1+Math.ceil(scrollWidth / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
-                //     }else{
-                //       index = (Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET) / (CARD_WIDTH + 20)) - Math.ceil((scrollWidth-SPACING_FOR_CARD_INSET - event.nativeEvent.contentOffset.x) / (CARD_WIDTH + 20))) ;
-                //     }
-                //     if (index !== mapIndex) {
-                //       // console.log('setting new index and location.')
-                     
-                
-                //       if (index > 0){                        
-                //         const { coordinates } = allObservations[index].location;
-
-                //         _map.current.animateToRegion(
-                //           {
-                //             latitude: Number(coordinates[1]),
-                //             longitude: Number(coordinates[0]),
-                //             latitudeDelta: newDelta.latitudeDelta,
-                //             longitudeDelta: newDelta.longitudeDelta,
-                //           },
-                //           350
-                //         );
-                        
-                //         setNewRegion({
-                //           latitude: Number(coordinates[1]),
-                //           longitude: Number(coordinates[0]),  
-                //           latitudeDelta: newDelta.latitudeDelta,
-                //           longitudeDelta: newDelta.longitudeDelta,
-                //         })
-                //         setMapIndex(Number(index));
-                //       }
-                //     }
-                //   //console.log((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH))
-                //   //console.log(Math.ceil((scrollWidth-(SPACING_FOR_CARD_INSET*2) / CARD_WIDTH) - (scrollWidth - event.nativeEvent.contentOffset.x) / (CARD_WIDTH)));
-                //   }
-            
-                // }}
-
-                // onScroll={(event)=>{
-                //   console.log(event.nativeEvent.contentOffset.y)
-                // }}
-                contentInset={{
-                  top: 0,
-                  left: SPACING_FOR_CARD_INSET,
-                  bottom: 0,
-                  right: SPACING_FOR_CARD_INSET
-                }}
-                contentContainerStyle={{
-                  paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
-                }}
-                //TODO: Update to React NAtive Reanimated library instead.
-                onScroll={Animated.event(
-                  [
-                    {
-                      nativeEvent: {
-                        contentOffset: {
-                          x: mapAnimation,
-                        }
-                      },
-                    },
-                  ],
-                  {useNativeDriver: true}
                 )}
-              >
-                 {allObservations.map((marker, index)=>(
-                    
-                    <View style={styles.card} key={index}>
-                    {marker.images.length > 0 && (
-                      <Image 
-                        source={{uri:PULIC_BUCKET_URL+'/'+marker.directoryId+'/'+marker.images[0]}}
-                        style={styles.cardImage}
-                        resizeMode="cover"
-                      /> 
-                    )}
-                    {marker.images.length === 0 && (
-                      <Image 
-                        source={require('../../assets/images/backgrounds/no-image.jpg')}
-                        style={styles.cardImage}
-                        resizeMode="cover"
-                      /> 
-                    )}
-                      <View style={styles.textContent}>
-                        <View style={[styles.obsIcons, {justifyContent: 'space-between'}]}>
 
-                          <Text numberOfLines={2} style={styles.cardtitle}>{(marker.title.length > 30 ? marker.title.substring(0, 30)+'...' : marker.title)} </Text>
-                          <Text style={styles.cardDescription}>{moment(marker.date).locale(mapI18nToMomentLocale(i18n.language)).format('Do MMMM YY')}</Text>
-                        </View> 
-                        <View style={styles.obsIcons}>
-                        <Text numberOfLines={1} style={styles.cardDescription}>{t('tipoIObs')}:</Text>
-                        {marker.observationTypes.quick.status == true && (
-                          <Image source={require("../../assets/images/icons/buttonIcons/button-quick.png")}
-                                style={styles.obsIcon}
-                                resizeMode="cover"
-                          />
-                        )}
-                         {marker.observationTypes.weather.status == true && (
-                          <Image source={require("../../assets/images/icons/buttonIcons/button-meteo.png")}
-                                style={styles.obsIcon}
-                                resizeMode="cover"
-                          />
-                        )}
-                        {marker.observationTypes.snowpack.status == true && (
-                          <Image source={require("../../assets/images/icons/buttonIcons/button-snow.png")}
-                                style={styles.obsIcon}
-                                resizeMode="cover"
-                          />
-                        )}
-                        {marker.observationTypes.accident.status == true && (
-                          <Image source={require("../../assets/images/icons/buttonIcons/button-accident.png")}
-                                style={styles.obsIcon}
-                                resizeMode="cover"
-                          />
-                        )}     
-                        {marker.observationTypes.avalanche.status == true && (
-                          <Image source={require("../../assets/images/icons/buttonIcons/button-avalanche.png")}
-                                style={styles.obsIcon}
-                                resizeMode="cover"
-                          />
-                        )}                                                                                          
-                        </View>
-                       
-                        <CustomButton text={t('view')}  
-                            bgColor={"#48a5e9"} 
-                            fgColor='white' 
-                            customStyle={{width: '100%', padding: 6, height: 30}}
-                            iconName={null} 
-                            onPress={() => {
-                              navigation.navigate('ObservationModal',{item: marker, modal: 'modal' });
-                            }} />
-                        
-
-                        {/* <View style={styles.button}>
-                          <TouchableOpacity
-                            // onPress={() => {}}
-                            style={[styles.signIn, {
-                              borderColor: '#FF6347',
-                              borderWidth: 1
-                            }]}
-                          >
-                            <Text style={[styles.textSign, {
-                              color: '#FF6347'
-                            }]}>Ver</Text>
-                          </TouchableOpacity>
-                        </View> */}
-                      </View> 
-                    </View>
-                  ))}
-
-              </Animated.ScrollView>
-            )}
+                {/* 🃏 CARD LIST (Hidden during load to prevent jumps) */}
+                {!isLoading && (
+                    <Animated.ScrollView
+                        ref={_scrollView}
+                        horizontal
+                        pagingEnabled
+                        scrollEventThrottle={1}
+                        showsHorizontalScrollIndicator={true}
+                        snapToInterval={CARD_WIDTH + 20}
+                        snapToAlignment={"center"}
+                        style={styles.scrollView}
+                        onMomentumScrollEnd={onMomentumScrollEnd}
+                        contentInset={{
+                            top: 0,
+                            left: SPACING_FOR_CARD_INSET,
+                            bottom: 0,
+                            right: SPACING_FOR_CARD_INSET
+                        }}
+                        contentContainerStyle={{
+                            paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
+                        }}
+                    >
+                        {allObservations.map((marker, index) => (
+                            <View style={styles.card} key={index}>
+                                {/* Image Logic */}
+                                {marker.images.length > 0 ? (
+                                  <Image 
+                                    source={{uri:PULIC_BUCKET_URL+'/'+marker.directoryId+'/'+marker.images[0]}}
+                                    style={styles.cardImage}
+                                    resizeMode="cover"
+                                  /> 
+                                ) : (
+                                  <Image 
+                                    source={require('../../assets/images/backgrounds/no-image.jpg')}
+                                    style={styles.cardImage}
+                                    resizeMode="cover"
+                                  /> 
+                                )}
+                                
+                                <View style={styles.textContent}>
+                                    <View style={[styles.obsIcons, {justifyContent: 'space-between'}]}>
+                                        <Text numberOfLines={2} style={styles.cardtitle}>
+                                            {(marker.title.length > 30 ? marker.title.substring(0, 30)+'...' : marker.title)}
+                                        </Text>
+                                        <Text style={styles.cardDescription}>
+                                            {moment(marker.date).locale(mapI18nToMomentLocale(i18n.language)).format('Do MMMM YY')}
+                                        </Text>
+                                    </View> 
+                                    
+                                    {/* Observation Type Icons */}
+                                    <View style={styles.obsIcons}>
+                                        <Text numberOfLines={1} style={styles.cardDescription}>{t('tipoIObs')}:</Text>
+                                        {marker.observationTypes.quick.status && (
+                                            <Image source={require("../../assets/images/icons/buttonIcons/button-quick.png")} style={styles.obsIcon} resizeMode="cover"/>
+                                        )}
+                                        {marker.observationTypes.weather.status && (
+                                            <Image source={require("../../assets/images/icons/buttonIcons/button-meteo.png")} style={styles.obsIcon} resizeMode="cover"/>
+                                        )}
+                                        {marker.observationTypes.snowpack.status && (
+                                            <Image source={require("../../assets/images/icons/buttonIcons/button-snow.png")} style={styles.obsIcon} resizeMode="cover"/>
+                                        )}
+                                        {marker.observationTypes.accident.status && (
+                                            <Image source={require("../../assets/images/icons/buttonIcons/button-accident.png")} style={styles.obsIcon} resizeMode="cover"/>
+                                        )}     
+                                        {marker.observationTypes.avalanche.status && (
+                                            <Image source={require("../../assets/images/icons/buttonIcons/button-avalanche.png")} style={styles.obsIcon} resizeMode="cover"/>
+                                        )}                                                                                          
+                                    </View>
+                                   
+                                    <CustomButton text={t('view')}  
+                                        bgColor={"#48a5e9"} 
+                                        fgColor='white' 
+                                        customStyle={{width: '100%', padding: 6, height: 30}}
+                                        iconName={null} 
+                                        onPress={() => {
+                                          navigation.navigate('ObservationModal',{item: marker, modal: 'modal' });
+                                        }} 
+                                    />
+                                </View> 
+                            </View>
+                        ))}
+                    </Animated.ScrollView>
+                )}
             </View>
         </SafeAreaView>
-        
-)};
-
-
-
+    );
+};
 
 const styles = StyleSheet.create({
   safeContainer: {
       flex: 1,
-    //  flexDirection: 'column',
-       justifyContent: 'center',
+      justifyContent: 'center',
   },
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -647,15 +436,12 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   }, 
-  spacer: {
-    width: '100%',
-    marginTop: 10,
-    marginBottom: 10,
-    backgroundColor: 'gray',
-    height: 1,
-  },
-  space: {
-    height: 50,
+  loadingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255,255,255,0.5)', 
+      zIndex: 100
   },
   scrollView: {
     position: "absolute",
@@ -669,13 +455,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   obsIcon:{
-    // marginTop: 2,
     marginLeft: 5,
     height: 15,
     width: 30,
   },
   card: {
-    // padding: 10,
     elevation: 2,
     backgroundColor: "#FFF",
     borderTopLeftRadius: 5,
@@ -701,37 +485,11 @@ const styles = StyleSheet.create({
   },
   cardtitle: {
     fontSize: 12,
-    // marginTop: 5,
     fontWeight: "bold",
   },
   cardDescription: {
     fontSize: 12,
     color: "#444",
-  },
-  chipsScrollView: {
-    flex: 1,
-    flexDirection: 'row',
-    width:'100%',
-    position:'absolute', 
-    top:Platform.OS === 'ios' ? 10 : 10, 
-  
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal:10
-  },
-  chipsItem: {
-    flexDirection:"row",
-    backgroundColor:'#fff', 
-    borderRadius:20,
-    padding:8,
-    paddingHorizontal:20, 
-    marginHorizontal:10,
-    height:35,
-    shadowColor: '#ccc',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
   },
   pin: {
       ...Platform.select({
@@ -741,11 +499,6 @@ const styles = StyleSheet.create({
           marginBottom: 55,
         },
         android: {
-      
-          marginBottom: 0,
-        },
-        default: {
-          // other platforms, web for example
           marginBottom: 0,
         },
       }),

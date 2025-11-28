@@ -81,9 +81,9 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
             title={t('guardar')}
           />
         )
-        // headerRight: (props) => (
         //   <HeaderBackButton labelVisible={true} onPress={()=>{}}></HeaderBackButton>
         // )
+        // headerRight: (props) => (
       });
       //TODO: Here we can dynamically change the header of the screen....
       //check documentation here: https://reactnavigation.org/docs/navigation-prop/#setparams

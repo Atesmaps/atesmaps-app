@@ -7,7 +7,7 @@ import api from '../api/axiosConfig';
 import  Snackbar  from "react-native-snackbar";
 // x    
 
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from './AuthContext';
 import { useTranslation } from 'react-i18next';
 
 export const ObservationContext = createContext();

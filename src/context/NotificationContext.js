@@ -1,12 +1,21 @@
-import React, { createContext, useEffect, useState, useContext } from 'react';
-import { Platform, PermissionsAndroid, Alert } from 'react-native';
+import React, { 
+  createContext, 
+  useEffect, 
+  useState, 
+  useContext,
+  useRef } from 'react';
+import { 
+  Platform, 
+  PermissionsAndroid, 
+  Alert,
+  AppState } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import i18n from '../localization/i18n';
 import { registerDeviceToken, resetBadgeCount } from '../services/deviceService'; 
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import * as NavigationHelper from '../navigation/NavigationHelper';
 import { useTranslation } from 'react-i18next';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee, { AndroidImportance, AndroidBadgeIconType } from '@notifee/react-native';
 import { AuthContext } from './AuthContext';
 
 
@@ -24,45 +33,41 @@ export const NotificationProvider = ({ children }) => {
   const [fcmToken, setFcmToken] = useState(null);
   const {t} = useTranslation();
 
-  useEffect(() => {
-    if (!userToken) {
-        console.log("🔕 User logged out. Notification listeners paused.");
-        return; 
-    }
-   
-    const init = async () => {
-      
-        // 1. Visually clear the red dot on the phone
+  const appState = useRef(AppState.currentState);
+
+  const clearBadges = async () => {
+      try {
+        // A. Visually clear the red dot on the phone (Native OS)
         await notifee.setBadgeCount(0);
         
-        // 2. Tell the database to reset the counter to 0
-        if (isUserLoggedIn) {
+        // B. Reset the database counter (Server)
+        if (userToken) {
             await resetBadgeCount(); 
+            console.log("✅ Badges cleared on Server & Device");
         }
-    };
-    init();
-  }, []);
-
-  const handleNotificationNavigation = (remoteMessage) => {
-    if (!remoteMessage) return;
-    
-    console.log('🔔 Notification caused app to open:', remoteMessage);
-    
-    // Extract the observationId from the 'data' payload
-    // Note: data values are always strings in FCM
-    const observationId = remoteMessage.data?.observationId;
-    console.log(remoteMessage.data)
-
-    if (observationId) {
-      // console.log('📍 Deep linking to Observation:', observationId);
-      // Navigate using the Ref
-      //NavigationHelper.navigate('ObservationsMap', { observationId: observationId });
-      NavigationHelper.navigate('Mapa', { 
-        screen: 'Observaciones', 
-        params: { observationId: observationId }
-      });
-    }
+      } catch (e) {
+        console.log("⚠️ Error clearing badges:", e);
+      }
   };
+
+  useEffect(() => {
+      const subscription = AppState.addEventListener("change", async (nextAppState) => {
+        if (
+          appState.current.match(/inactive|background/) && 
+          nextAppState === "active"
+        ) {
+          await clearBadges();
+        }
+
+        appState.current = nextAppState;
+      });
+
+      return () => {
+        subscription.remove();
+      };
+  }, [userToken]);
+
+
 
   // 2. Main Initialization Logic
   useEffect(() => {
@@ -179,8 +184,11 @@ export const NotificationProvider = ({ children }) => {
         id: 'atesmaps-channel-id',
         name: 'Floc Notifications',
         //importance: 4, // AndroidImportance.HIGH
-        importance: AndroidImportance.HIGH,
+        importance: AndroidImportance.DEFAULT,
         vibration: true,
+        sound: 'default',
+        badge: true,
+        badgeIconType: AndroidBadgeIconType.SMALL,
       });
     }
   };
@@ -215,6 +223,24 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to get FCM token:', error);
+    }
+  };
+
+    const handleNotificationNavigation = (remoteMessage) => {
+    if (!remoteMessage) return;
+    
+    console.log('🔔 Notification caused app to open:', remoteMessage);
+    
+    // Extract the observationId from the 'data' payload
+    // Note: data values are always strings in FCM
+    const observationId = remoteMessage.data?.observationId;
+    console.log(remoteMessage.data)
+
+    if (observationId) {
+      NavigationHelper.navigate('Mapa', { 
+        screen: 'Observaciones', 
+        params: { observationId: observationId }
+      });
     }
   };
 

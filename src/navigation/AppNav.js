@@ -94,18 +94,10 @@ const AppNav: () => Node = () => {
         { cancelable: false }
       );
     };
-  
-    //console.log(`Auth Context userTokenm value: ${userToken}`);
-    // const backgroundStyle = {
-    //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-    // };
 
     if( isLoading ) {
         return(
             <Loading />
-            // <View style={{flex:1, justifyContent: 'center', alignItems:'center'}}>
-            //     <ActivityIndicator size={'large'}/> 
-            // </View>
         )
     }
     

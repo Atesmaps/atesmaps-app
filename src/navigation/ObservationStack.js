@@ -38,7 +38,7 @@ return(
     <Stack.Navigator> 
       <Stack.Group>
         <Stack.Screen name="Observaciones" component={Observations} options={{
-            title: t('observacionesTitle')
+            title: t('misObs')
         }} />
         <Stack.Screen 
           name="Observación" 
