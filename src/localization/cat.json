@@ -378,5 +378,6 @@
 "snackbarObservationRequired": "Si us plau, determina la ubicació de l'observació.",
 "snackbarDraftCreated": "El teu esborrany d'observació s'ha creat.",
 "snackbarDraftDeleted": "El teu esborrany d'observació s'ha eliminat.",
-"viewButton":"Veure"
+"viewButton":"Veure",
+"otrasObs2": "Altres observacions - Prem continuat per copiar",
 }

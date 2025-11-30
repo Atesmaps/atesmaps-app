@@ -34,7 +34,8 @@ return(
             title: t('observacionesTitle'),
         }}  />
       </Stack.Group>
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+      {/* <Stack.Group screenOptions={{ presentation: 'modal' }}> */}
+      <Stack.Group>
         <Stack.Screen name="ObservationModal" component={ShowObservation} options={{
             title: t('observationTitle'),
         }}  />

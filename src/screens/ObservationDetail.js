@@ -243,7 +243,7 @@ export default function ObservationDetail({ route, navigation }) {
               // setEditingObservation({...editingObservation, location:pickedLocation});
               navigation.navigate('Observaciones');
             }}
-            title="Guardar"
+            title={t('guardar')}
           />
         )
       });

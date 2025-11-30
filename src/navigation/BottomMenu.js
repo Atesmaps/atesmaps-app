@@ -11,13 +11,13 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabs() {
   const {t} = useTranslation();
   return (
-    <Tab.Navigator screenOptions={{tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 90}}}>
+    <Tab.Navigator screenOptions={{unmountOnBlur: true, tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 90}}}>
       {bottomMenuData.map((item, idx) => (
         <Tab.Screen 
           key={`tab_item${idx+1}`}
           name={item.name}
           component={item.component}
-          
+          initialParams={item.params}
           options={{
           headerShown: false, 
           title: t(item.title), 

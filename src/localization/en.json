@@ -378,5 +378,6 @@
   "snackbarObservationRequired": "Please set the observation location.",
   "snackbarDraftCreated": "Your observation draft has been created.",
   "snackbarDraftDeleted": "Your observation draft has been deleted.",
-  "goButton":"View"
+  "goButton":"View",
+  "otrasObs2": "Other observations - Press and hold to copy",
 }

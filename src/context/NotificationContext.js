@@ -140,12 +140,18 @@ export const NotificationProvider = ({ children }) => {
             text: t('viewButton'), // Add a button to navigate immediately
             onPress: () => {
               if (obsId) {
-                //NavigationHelper.navigate('Ob
-                // servationsMap', { observationId: obsId });
                 NavigationHelper.navigate('Mapa', { 
-                  screen: 'Observaciones', 
-                  params: { observationId: obsId }
+                  screen: 'ObservationModal', 
+                  params: { 
+                      observationId: obsId,
+                      isNotification: true,
+                  }
                 });
+                // NavigationHelper.navigate('Mis Observaciones', { 
+                //   screen: 'Detalles', 
+                //   params: { observationId: obsId },
+                //   timestamp: Date.now()
+                // });
               }
             } 
           }
@@ -214,6 +220,15 @@ export const NotificationProvider = ({ children }) => {
   const fetchToken = async () => {
     console.log('calling fetch token...')
     try {
+      if (Platform.OS === 'ios') {
+        const apnsToken = await messaging().getAPNSToken();
+        
+        if (!apnsToken) {
+            console.log('⏳ No APNs token yet. Waiting...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+
       const token = await messaging().getToken();
       if (token) {
         console.log('🔥 FCM Token:', token);
@@ -237,10 +252,17 @@ export const NotificationProvider = ({ children }) => {
     console.log(remoteMessage.data)
 
     if (observationId) {
-      NavigationHelper.navigate('Mapa', { 
-        screen: 'Observaciones', 
-        params: { observationId: observationId }
-      });
+       NavigationHelper.navigate('Mapa', { 
+                  screen: 'ObservationModal', 
+                  params: { 
+                      observationId: observationId,
+                      isNotification: true,
+                  }
+                });
+      // NavigationHelper.navigate('Mis Observaciones', { 
+      //   screen: 'Detalles', 
+      //   params: { observationId: observationId }
+      // });
     }
   };
 

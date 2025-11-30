@@ -382,6 +382,7 @@
   "snackbarObservationRequired": "Por favor, determina la ubicación de la observación.",
   "snackbarDraftCreated":"Tu borrador de observación se ha creado.",
   "snackbarDraftDeleted":"Tu borrador de observación se ha eliminado.",
-  "viewButton":"Ver"
+  "viewButton":"Ver",
+  "otrasObs2": "Otras observaciones - Presiona contínuo para copiar",
 
 }

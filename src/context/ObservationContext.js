@@ -68,19 +68,11 @@ export const ObservationProvider = ({children}) => {
         // console.log(`API call to get observations with filter values Days: ${filter.days} and location:`);
         // console.log(filter.location);
         try{
-           
-            const response = await api.get(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`);
-            // response = await sentRequest(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`, "get", '');
-            // if(response && response.status != 200){
-            //     if (userDetails){ 
-            //         showUpdateAlert();
-            //     }else{
-            //         console.log("Error no valid Token");
-            //         logout();
-            //     }
-            // } else if (response && response.data) {
-            //     setAllObservations(response.data);
-            // }
+            //enable location filter...
+            //const response = await api.get(`/observations?days=${filter.days}&long=${filter.location.longitude}&lat=${filter.location.latitude}`);
+            // disable location filter
+            const response = await api.get(`/observations?days=${filter.days}`);
+     
             if (response && response.data) {
                 setAllObservations(response.data);
             }
@@ -104,9 +96,7 @@ export const ObservationProvider = ({children}) => {
         let user = {username: 'Anonymous'};
         try{
             const response = await api.get(`/users/${userId}`);
-            //let response = null
-            //response = await sentRequest(`/users/${userId}`, "get", '');
-            //console.log(response.data);
+       
             user = response.data;
         }catch (err){
             console.log(err);
@@ -114,6 +104,8 @@ export const ObservationProvider = ({children}) => {
         setIsLoading(false);
         return user;
     }
+
+   
 
     const getData = async (page = currentPage) => {
         setIsLoading(true);
@@ -247,6 +239,19 @@ export const ObservationProvider = ({children}) => {
         setIsLoading(false);       
     }
 
+    const getObservationDetails = async (observationId) => {
+        setIsLoading(true);
+        let observation;
+        try{
+            const response = await api.get(`/observations/${observationId}`);
+            observation = response.data;
+        }catch (err){
+            console.log(err);
+        }
+        setIsLoading(false);
+        return observation;
+    }
+
     const findObservationIndex = (id) => {
         if (!allObservations || allObservations.length === 0) return -1;
         return allObservations.findIndex((obs) => obs._id === id || obs.id === id);
@@ -270,6 +275,7 @@ export const ObservationProvider = ({children}) => {
                 updateObservations, 
                 setObservations,
                 deleteObservation,
+                getObservationDetails,
                 setSelectedIndex,
                 setEditingObservation,
                 updateSelectedIndex,

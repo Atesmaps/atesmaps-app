@@ -378,5 +378,6 @@
   "snackbarObservationRequired": "Veuillez définir l'emplacement de l'observation.",
   "snackbarDraftCreated": "Votre brouillon d'observation a été créé.",
   "snackbarDraftDeleted": "Votre brouillon d'observation a été supprimé.",
-  "viewButton":"Voir"
+  "viewButton":"Voir",
+  "otrasObs2": "Autres observations - Appuyez longuement pour copier",
 }

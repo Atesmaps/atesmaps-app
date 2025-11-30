@@ -1,4 +1,4 @@
-import React, {useState, useLayoutEffect, useEffect, useContext} from "react";
+import React, {useState, useLayoutEffect, useEffect, useCallback, useContext} from "react";
 import { 
   SafeAreaView,
   ScrollView, 
@@ -8,10 +8,13 @@ import {
   Animated,
   StyleSheet, 
   Dimensions,
-  Platform
+  Platform,
+  BackHandler
+  //TouchableOpacity
 } from "react-native";
 import { HeaderBackButton } from '@react-navigation/elements'
-
+import { useFocusEffect } from '@react-navigation/native';
+import * as NavigationHelper from '../navigation/NavigationHelper';
 import moment from 'moment';
 import { PULIC_BUCKET_URL } from '../config';
 import MapView, {Marker, UrlTile} from 'react-native-maps';
@@ -19,6 +22,8 @@ import Svg from 'react-native-svg';
 import { ObservationContext } from '../context/ObservationContext';
 import { useTranslation } from "react-i18next";
 import { useMomentLocale } from "../hooks/useMomentLocale";
+import Loading from "../components/Loading";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
@@ -29,42 +34,179 @@ export default function ShowObservation({ route, navigation }) {
     const {t} = useTranslation();
     const momentLocale = useMomentLocale();
   
-
-    const [item, setItem] = useState(route.params?.item);
+    const [item, setItem] = useState(route.params?.item || null);
     const [userName, setUserName] = useState('');
-    const {getObservationUserDetails} = useContext(ObservationContext);
+    const {getObservationUserDetails, getObservationDetails} = useContext(ObservationContext);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    const observationId = route.params?.observationId;
+    const isNotification = route.params?.isNotification || false;
 
-   
+    const handleBackPress = useCallback(() => {
+        console.log("🧹 Cleaning params before Going Back");
+
+        console.log(isNotification)
+
+        if(isNotification){
+          NavigationHelper.reset('Mapa', { 
+              screen: 'ObservationsMap',
+              params: {  } 
+          });
+        }else{
+          navigation.goBack();
+        }
+       
+        
+        // A. Clear the params while the screen is still alive/focused
+        // navigation.setParams({ 
+        //     observationId: null, 
+        //     fromNotification: null,
+        //     item: null
+        // });
+
+        // // B. Navigate based on source
+        // // if (route.params?.fromNotification) {
+        // //      navigation.navigate('Mapa', { screen: 'ObservationsMap' });
+        // // } else {
+        //      navigation.pop();
+        // // }
+        
+        return true; // Tells Android "I handled this event"
+    }, [navigation, route.params?.isNotification]);
+
+    // useEffect(() => {
+    //     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+    //         // 1. Do your cleanup logic here
+    //         console.log("🗑️ Modal is being dismissed!");
+    //         NavigationHelper.reset('Mapa', { 
+    //             screen: 'ObservationsMap',
+    //             params: {  } 
+    //         });
+    //         // Example: Clear params on the Map Screen (if you need to)
+    //         // Note: You can't setParams on a screen you are leaving easily, 
+    //         // but you can use Context functions here.
+            
+    //         // Example: Refresh data context
+    //         // refreshObservations(); 
+    //     });
+
+    //     return unsubscribe;
+    // }, [navigation, route.params?.isNotification]);
+
+
+    // 3. Intercept ANDROID HARDWARE Back Button
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            handleBackPress // 👈 Use our custom handler
+        );
+
+        return () => backHandler.remove();
+    }, [handleBackPress]);
+       
     useLayoutEffect( () => {
       navigation.setOptions({
-        // title: item.title === '' ? 'No title' : item.title,
         title: t('observationTitle'),
         headerLeft: (props) => (
           <HeaderBackButton labelVisible={false} onPress={()=>{
-            navigation.goBack();
+      
+              // navigation.setParams({ 
+              //   observationId: undefined,
+              //   isNotification: false
+              // });
+              // navigation.goBack();
+              handleBackPress();
+         
+              
           }}></HeaderBackButton>
-        )
+        ),
+        // headerRight: (props) => {
+        //   if (!isNotification) {
+        //       return null;
+        //   } 
+        //   return (
+        //     <TouchableOpacity 
+        //           onPress={() => {          
+        //             navigation.push('Mapa', { 
+        //               screen: 'Observaciones', 
+        //               params: { observationId: route.params.observationId,
+        //                         isNotification: true,
+        //                }
+        //             });
+        //           }}
+        //           style={{ marginRight: 10 }}
+        //           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
+        //       >
+        //       <MaterialCommunityIcons 
+        //                             size={30} 
+        //                             color="#48a5e9"
+        //                             name="map"/>
+        //     </TouchableOpacity>
+        // )},
       });
-    })
-    useEffect(()=>{
-      
-      const getUserDetais = async (id) => {
-        const user = await getObservationUserDetails(id);
-        // console.log("--------");
-        // console.log(user);
-        setUserName(user.username);
-      }
-      // console.log(route.params?.modal)
-      if (route.params?.modal){
-        setUserName(item.user.username);
-      }else{
-        getUserDetais(item.user);
-      }
+      return (()=>{       
 
-     
-     
+      })
+    },[navigation,observationId])
+
+    useEffect(() => {
+      const initData = async () => {
+        let currentItem = item;
+
+        // A. If we only have ID, fetch the data first
+        if (!currentItem && observationId) {
+            try {
+                console.log("🔄 Fetching observation details...");
+                const fetchedData = await getObservationDetails(observationId);
+                if (fetchedData) {
+                    setItem(fetchedData);
+                    currentItem = fetchedData;
+                   
+                }
+            } catch (e) {
+                console.error("Error loading observation:", e);
+            }
+            setIsLoading(false);
+        }
+
+        // B. Once we have the item, resolve User Name
+        if (currentItem) {
+            // Scenario 1: User object is already populated (from API or List)
+            if (currentItem.user && currentItem.user.username) {
+                setUserName(currentItem.user.username);
+            } 
+            // Scenario 2: User is just an ID string
+            else if (currentItem.user) {
+                const userId = typeof currentItem.user === 'object' ? currentItem.user._id : currentItem.user;
+                const userDetails = await getObservationUserDetails(userId);
+                setUserName(userDetails?.username || 'Anonymous');
+            }
+            setIsLoading(false);
+        }
+      };
+
+      initData();
       
-    },[])
+    }, [observationId]);
+    
+
+   
+    // useEffect(()=>{
+    //   const getUserDetais = async (id) => {
+    //     const user = await getObservationUserDetails(id);
+    //     // console.log("--------");
+    //     // console.log(user);
+    //     setUserName(user.username);
+    //   }
+    //   // console.log(route.params?.modal)
+    //   if (route.params?.modal){
+    //     setUserName(item.user.username);
+    //   }else if(route.params?.observationId){
+      
+    //   }else{
+    //     getUserDetais(item.user);
+    //   }
+    // },[])
   
     const weatherObs = () => {
       if (item.observationTypes.weather.status == true) {
@@ -266,10 +408,10 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>
+              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>
             </View>
           </View>
         )
@@ -285,7 +427,7 @@ export default function ShowObservation({ route, navigation }) {
                 style={styles.rightImage}
                 source={require("../../assets/images/icons/buttonIcons/button-avalanche.png")}
               />
-              <Text style={styles.subtitle}>Avalancha</Text>
+              <Text style={styles.subtitle}>{t('avalancha')}</Text>
             </View>
             <View style={styles.spacer}/> 
             <View style={styles.linkContainer}>
@@ -405,7 +547,7 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              <Text style={styles.link}>{t('exposicion')}:</Text>
               { item.observationTypes.avalanche.values.windExposure === 1 && (<Text style={styles.description}>{t('sotavento')}Sotavento</Text>)}
               { item.observationTypes.avalanche.values.windExposure === 2 && (<Text style={styles.description}>{t('cargaHumeda')}Carga cruzada</Text>)}
               { item.observationTypes.avalanche.values.windExposure === 3 && (<Text style={styles.description}>{t('otrasHumeda')}Otras situaciones</Text>)}
@@ -413,10 +555,10 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.avalanche.values.comments}</Text>
+              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.avalanche.values.comments}</Text>
             </View>
           </View>
         )
@@ -591,10 +733,10 @@ export default function ShowObservation({ route, navigation }) {
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.snowpack.values.comments}</Text>
+              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.snowpack.values.comments}</Text>
             </View>
           </View>
         )
@@ -688,10 +830,10 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.quick.values.avalancheConditions?.tempChanges && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('fusion')}</Text></View>)}
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('otrasObs')}:</Text>
+              <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.quick.values.comments}</Text>
+              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.quick.values.comments}</Text>
             </View>
           </View>
         )
@@ -715,8 +857,8 @@ export default function ShowObservation({ route, navigation }) {
       </View>
       )  
     }
-    const getMapRegion = () => {       
-      return {latitude: Number(item.location?.coordinates[1])+0.004,
+    const getMapRegion = () => {    
+      return {latitude: Number(item.location?.coordinates[1]),
               longitude: Number(item.location?.coordinates[0]),
               latitudeDelta: 0.0170,
               longitudeDelta: 0.0170
@@ -809,8 +951,15 @@ export default function ShowObservation({ route, navigation }) {
         </Animated.ScrollView>
       )
     }
+    if( isLoading || !item ) {
+      console.log('loading....')
+      return(
+          <Loading />
+      )
+    }
 
     return (
+    
       <SafeAreaView style={styles.safeContainer}>
         <ScrollView
         contentInsetAdjustmentBehavior="automatic"
@@ -828,7 +977,7 @@ export default function ShowObservation({ route, navigation }) {
             {weatherObs()}
           </View>
         </ScrollView>
-        </SafeAreaView>
+      </SafeAreaView>
     );
 }
 

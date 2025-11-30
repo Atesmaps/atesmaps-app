@@ -9,6 +9,7 @@ const bottomMenuData = [
     name: 'Mis Observaciones',
     title: 'misObs',
     component: ObservationStack,
+    params: {},
     icon: 'eye',
   },
   // {
@@ -20,12 +21,14 @@ const bottomMenuData = [
     name: 'Mapa',
     title: 'map',
     component: MapStack,
+    params: {isNotification: false},
     icon: 'map',
   },
   {
     name: 'Perfil',
     title: 'perfil',
     component: ProfileStack,
+    params: {},
     icon: 'account',
   },
 //   {

@@ -1,178 +1,182 @@
-import React, {createContext, useState, useEffect} from 'react';
-import { PermissionsAndroid, Platform } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-//import Geolocation from '@react-native-community/geolocation';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
 export const LocationContext = createContext();
 
-export const LocationProvider = ({children}) => {
+export const LocationProvider = ({ children }) => {
+    // Default Delta (Zoom Level)
     const LATITUDE_DELTA = 0.0922;
     const LONGITUDE_DELTA = 0.0421;
 
-    const [
-      currentLongitude,
-      setCurrentLongitude
-    ] = useState('...');
-    const [
-      currentLatitude,
-      setCurrentLatitude
-    ] = useState('...');
-    const [
-      locationStatus,
-      setLocationStatus
-    ] = useState('');
-
-    const [currentLocation, setCurrentlocation] = useState({latitude: 42.677973,
+    // Default fallback location (e.g., Pyrenees) in case everything fails
+    const DEFAULT_LOCATION = {
+        latitude: 42.677973,
         longitude: 1.218886,
         latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,});
-    
-    const [position, setPosition] = useState( {coords: {latitude: 42.677973,
-                                                longitude: 1.218886,
-                                                altitude: 0,
-                                                accuracy: 0,
-                                                altitudeAccuracy: null,
-                                                heading: 0,
-                                                speed:0 }});
-    
-    const [trackingLocation, setTrackingLocation ] = useState(false); 
-    const [watchId, setWatchId ] = useState(null);                                              
-  
-        useEffect(() => {
-          console.log('Requesting location permision')
-          const requestLocationPermission = async () => {
-            if (Platform.OS === 'ios') {
-              try {
-                const granted = await Geolocation.requestAuthorization('always');
-                // console.log(granted);
-                if (granted === 'granted') {
-                  getOneTimeLocation();
-                  if (trackingLocation) subscribeLocation();
-                }else{
-                  console.log(granted);
-                  setLocationStatus('Permission Denied');
-                } 
-                
-              }catch (err) {
-                console.warn(err);
-              }
-            } else {
-              try {
-                const granted = await PermissionsAndroid.request(
-                  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                  {
-                    title: 'Location Access Required',
-                    message: 'This App needs to Access your location',
-                  },
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                  //To Check, If Permission is granted
-                  getOneTimeLocation();
-                  if (trackingLocation) subscribeLocation();
-                  //subscribeLocation();
-                } else {
-                  setLocationStatus('Permission Denied');
-                }
-              } catch (err) {
-                console.warn(err);
-              }
+        longitudeDelta: LONGITUDE_DELTA,
+    };
+
+    const [locationStatus, setLocationStatus] = useState('Initializing...');
+    const [currentLocation, setCurrentLocation] = useState(DEFAULT_LOCATION);
+    const [position, setPosition] = useState(null); // Raw position data
+    const [watchId, setWatchId] = useState(null);
+
+    // --- 1. PERMISSION HANDLER (Platform Agnostic) ---
+    const requestPermissions = async () => {
+        if (Platform.OS === 'ios') {
+            try {
+                // Request 'whenInUse' first (Standard for Maps)
+                // This async call helps avoid the "UI Unresponsiveness" warning
+                const auth = await Geolocation.requestAuthorization('whenInUse');
+                return auth === 'granted';
+            } catch (err) {
+                console.warn("iOS Permission Error:", err);
+                return false;
             }
-          };
-          requestLocationPermission();
-          return () => {
-            Geolocation.clearWatch(watchId);
-            //console.log(watchId);
-            //console.log('cleared the watchpostion process')
-          };
-        }, []);
-      
-        const getOneTimeLocation = () => {
-          setLocationStatus('Getting Location ...');
-          Geolocation.getCurrentPosition(
-            //Will give you the current location
-            (position) => {
-              setLocationStatus('You are Here');
-              // console.log('You are Here One time:')
-              //getting the Longitude from the location json
-              const currentLongitude = 
-                JSON.stringify(position.coords.longitude);
-      
-              //getting the Latitude from the location json
-              const currentLatitude = 
-                JSON.stringify(position.coords.latitude);
-
-
-              const currentLocation = { ...position.coords, latitudeDelta: LATITUDE_DELTA, longitudeDelta: LONGITUDE_DELTA }
-              // console.log('----Location Context-----')
-              // console.log(currentLocation.latitude, currentLocation.longitude);
-              setCurrentlocation(currentLocation);
-      
-              //Setting Longitude state
-              setCurrentLongitude(currentLongitude);
-              
-              //Setting Longitude state
-              setCurrentLatitude(currentLatitude);
-            },
-            (error) => {
-              setLocationStatus(error.message);
-            },
-            {
-              enableHighAccuracy: false,
-              timeout: 3000,
-              maximumAge: 1000
-            },
-          );
-        };
-      
-        const subscribeLocation = () => {
-         let id = Geolocation.watchPosition(
-            (position) => {
-              //Will give you the location on location change
-              
-              setLocationStatus('You are Here');
-              console.log('Subscription pushe location:')
-              console.log(position);
-      
-              //getting the Longitude from the location json        
-              const currentLongitude =
-                JSON.stringify(position.coords.longitude);
-      
-              //getting the Latitude from the location json
-              const currentLatitude = 
-                JSON.stringify(position.coords.latitude);
-      
-              //Setting Longitude state
-              setCurrentLongitude(currentLongitude);
-      
-              //Setting Latitude state
-              setCurrentLatitude(currentLatitude);
-
-              setPosition(position)
-            },
-            (error) => {
-              setLocationStatus(error.message);
-            },
-            {
-              enableHighAccuracy: false,
-              maximumAge: 1000
-            },
-          );
-          // console.log(watchId);
-          setWatchId(id);
-        };
-      
-        const unsubscribeLocation = (id) => {
-          console.log('Calling unsubscribe method in context')
-          console.log(watchId);
-          Geolocation.clearWatch(watchId);
+        } 
+        
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: 'Location Access Required',
+                        message: 'This App needs to Access your location',
+                        buttonPositive: 'OK',
+                    },
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            } catch (err) {
+                console.warn("Android Permission Error:", err);
+                return false;
+            }
         }
-    
-    
+        return false;
+    };
 
+    // --- 2. ROBUST LOCATION GETTER ---
+    // Tries High Accuracy (GPS) -> Falls back to Low Accuracy (Wifi/Cell)
+    const getOneTimeLocation = useCallback(async () => {
+        setLocationStatus('Getting Location...');
+        
+        const hasPermission = await requestPermissions();
+        
+        if (!hasPermission) {
+            setLocationStatus('Permission Denied');
+            return;
+        }
+
+        // OPTION A: Try GPS first (High Accuracy)
+        Geolocation.getCurrentPosition(
+            // Success Handler
+            (pos) => {
+                updateLocationState(pos);
+            },
+            // Error Handler
+            (error) => {
+                console.log(`⚠️ GPS Failed (${error.code}). Trying Network...`);
+                
+                // If GPS timed out (3) or unavailable (2), try Network
+                if (error.code === 3 || error.code === 2) {
+                    Geolocation.getCurrentPosition(
+                        (pos) => updateLocationState(pos),
+                        (err) => {
+                            console.error("❌ Location Failed:", err);
+                            setLocationStatus('Location Error');
+                        },
+                        {
+                            enableHighAccuracy: false, // ⚡ Use Network/Wifi (Faster)
+                            timeout: 10000,
+                            maximumAge: 30000
+                        }
+                    );
+                } else {
+                    setLocationStatus(error.message);
+                }
+            },
+            {
+                // GPS Options
+                enableHighAccuracy: true, 
+                timeout: 15000, // 15s timeout (Fixes Android "Code 3" error)
+                maximumAge: 10000, 
+                showLocationDialog: true,
+                forceRequestLocation: true 
+            }
+        );
+    }, []);
+
+    // Helper to update state
+    const updateLocationState = (pos) => {
+        // console.log("✅ Location Found:", pos.coords.latitude, pos.coords.longitude);
+        setLocationStatus('You are Here');
+        
+        const newRegion = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+        };
+
+        setCurrentLocation(newRegion);
+        setPosition(pos);
+    };
+
+    // --- 3. SUBSCRIPTION LOGIC (Optional) ---
+    const subscribeLocation = async () => {
+        const hasPermission = await requestPermissions();
+        if (!hasPermission) return;
+
+        // Clear old watch if exists
+        if (watchId !== null) {
+            Geolocation.clearWatch(watchId);
+        }
+
+        const id = Geolocation.watchPosition(
+            (pos) => {
+                updateLocationState(pos);
+            },
+            (error) => { 
+                setLocationStatus(error.message);
+            },
+            {
+                enableHighAccuracy: true,
+                distanceFilter: 10, // Update every 10 meters
+                interval: 5000, 
+                fastestInterval: 2000,
+            }
+        );
+        setWatchId(id);
+    };
+
+    const unsubscribeLocation = () => {
+        if (watchId !== null) {
+            Geolocation.clearWatch(watchId);
+            setWatchId(null);
+        }
+    };
+
+    // --- INITIALIZE ON MOUNT ---
+    useEffect(() => {
+        getOneTimeLocation();
+        
+        return () => {
+            if (watchId !== null) Geolocation.clearWatch(watchId);
+        };
+    }, []);
 
     return(
-        <LocationContext.Provider value={{ currentLocation, LATITUDE_DELTA , LONGITUDE_DELTA, position, watchId, unsubscribeLocation, subscribeLocation, getOneTimeLocation}}> 
+        <LocationContext.Provider value={{ 
+            currentLocation, 
+            LATITUDE_DELTA, 
+            LONGITUDE_DELTA, 
+            position, 
+            locationStatus,
+            watchId, 
+            unsubscribeLocation, 
+            subscribeLocation, 
+            getOneTimeLocation
+        }}> 
             {children}
         </LocationContext.Provider>
     )
