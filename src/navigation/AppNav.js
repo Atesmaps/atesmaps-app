@@ -103,7 +103,26 @@ const AppNav: () => Node = () => {
     
     return (
       // <NavigationContainer>
-      <NavigationContainer ref={navigationRef}>
+       <NavigationContainer 
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef.getCurrentRoute().name;
+        }}
+        onStateChange={async () => {
+         
+          const previousRouteName = routeNameRef.current;
+          const currentRoute = navigationRef.getCurrentRoute();
+          const currentRouteName = currentRoute?.name;
+          
+          if (previousRouteName !== currentRouteName) {
+            if (currentRouteName) {
+              await analyticsService.logScreenView(currentRouteName);
+            }  
+            console.log(`📊 Tracked Screen: ${currentRouteName}`);
+          }
+          
+          routeNameRef.current = currentRouteName;
+        }}>
         {/* <SafeAreaView > */}
           <StatusBar barStyle={'dark-content'} hidden={false} />
           {/* TODO: check update needed... */}

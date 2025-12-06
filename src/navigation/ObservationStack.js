@@ -37,17 +37,17 @@ const {lastIndex, selectedIndex} = useContext(ObservationContext);
 return(
     <Stack.Navigator> 
       <Stack.Group>
-        <Stack.Screen name="Observaciones" component={Observations} options={{
+        <Stack.Screen name="Mis Observaciones" component={Observations} options={{
             title: t('misObs')
         }} />
         <Stack.Screen 
-          name="Observación" 
+          name="Nueva Observacion" 
           component={ObservationDetail}
           options={{
             title: t('observationTitle'),
             headerShown: true,
         }} />
-        <Stack.Screen name="Detalles" component={ShowObservation} options={{
+        <Stack.Screen name="Ver Observacion" component={ShowObservation} options={{
             title: t('observationDetailsTitle')
         }} />
         <Stack.Screen name="Imagenes" component={ObservationImageList} options={{

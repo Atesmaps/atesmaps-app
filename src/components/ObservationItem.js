@@ -46,11 +46,11 @@ export default function Item({ item, index,  navigation  }) {
             style={{height:50,width:50, justifyContent:"center",alignItems:"center"}}
             onPress={() => {
               if(item.status > 0){
-                navigation.navigate('Detalles',{item});
+                navigation.navigate('Ver Observacion',{item});
               }else{
                  updateSelectedIndex(index);
                 // setSelectedIndex(index);
-                 navigation.navigate('Observación',{item, index});
+                 navigation.navigate('Nueva Observacion',{item, index});
               }
             }}
         > 
