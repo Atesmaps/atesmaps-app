@@ -9,7 +9,8 @@ import {
   StyleSheet, 
   Dimensions,
   Platform,
-  BackHandler
+  BackHandler,
+  TextInput
   //TouchableOpacity
 } from "react-native";
 import { HeaderBackButton } from '@react-navigation/elements'
@@ -38,6 +39,7 @@ export default function ShowObservation({ route, navigation }) {
     const [userName, setUserName] = useState('');
     const {getObservationUserDetails, getObservationDetails} = useContext(ObservationContext);
     const [isLoading, setIsLoading] = useState(true);
+    const [userScores, setUserScores] = useState({ Ta: '-', Ra: '-' });
     
     const observationId = route.params?.observationId;
     const isNotification = route.params?.isNotification || false;
@@ -174,12 +176,15 @@ export default function ShowObservation({ route, navigation }) {
             // Scenario 1: User object is already populated (from API or List)
             if (currentItem.user && currentItem.user.username) {
                 setUserName(currentItem.user.username);
+                setUserScores({ Ta: currentItem.user.terrainExperience, Ra: currentItem.user.avalancheExperience })
+                
             } 
             // Scenario 2: User is just an ID string
             else if (currentItem.user) {
                 const userId = typeof currentItem.user === 'object' ? currentItem.user._id : currentItem.user;
                 const userDetails = await getObservationUserDetails(userId);
                 setUserName(userDetails?.username || 'Anonymous');
+                setUserScores({ Ta: userDetails?.terrainExperience, Ra: userDetails?.avalancheExperience })
             }
             setIsLoading(false);
         }
@@ -320,6 +325,19 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.weather.values.windCarry === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
               { item.observationTypes.weather.values.windCarry === 4 && (<Text style={styles.description}>{t('intensa')}</Text>)}
             </View>
+            <View style={[styles.linkContainer,{marginTop:5}]}>
+              <Text style={styles.link}>{t('otrasObs2')}:</Text>
+            </View>
+            <View style={styles.linkContainer}>
+               {Platform.OS === 'ios' && <TextInput selectable={true} 
+                          editable={false} 
+                          multiline={true}
+                          scrollEnabled={false}
+                          style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>
+                          {item.observationTypes.weather.values.comments}
+              </TextInput>}
+              {Platform.OS === 'android' && <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>}
+            </View>
           </View>
         )
       }
@@ -411,7 +429,14 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>
+               {Platform.OS === 'ios' && <TextInput selectable={true} 
+                          editable={false} 
+                          multiline={true}
+                          scrollEnabled={false}
+                          style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>
+                          {item.observationTypes.accident.values.comments}
+              </TextInput>}
+             {Platform.OS === 'android' &&  <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.accident.values.comments}</Text>}
             </View>
           </View>
         )
@@ -558,7 +583,14 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.avalanche.values.comments}</Text>
+              {Platform.OS === 'ios' && <TextInput selectable={true} 
+                          editable={false} 
+                          multiline={true}
+                          scrollEnabled={false}
+                          style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>
+                          {item.observationTypes.avalanche.values.comments}
+              </TextInput>}
+             {Platform.OS === 'android' && <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.avalanche.values.comments}</Text>}
             </View>
           </View>
         )
@@ -656,6 +688,7 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.snowpack.values.compresionTest === 2 && (<Text style={styles.description}>{t('hits2')}</Text>)}
               { item.observationTypes.snowpack.values.compresionTest === 3 && (<Text style={styles.description}>{t('hits3')}</Text>)}
               { item.observationTypes.snowpack.values.compresionTest === 4 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
+              { item.observationTypes.snowpack.values.compresionTest === 5 && (<Text style={styles.description}>{item.observationTypes.snowpack.values.customCompresionTest}</Text>)}
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
@@ -736,7 +769,14 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.snowpack.values.comments}</Text>
+               {Platform.OS === 'ios' &&<TextInput selectable={true} 
+                          editable={false} 
+                          multiline={true}
+                          scrollEnabled={false}
+                          style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>
+                          {item.observationTypes.snowpack.values.comments}
+              </TextInput>}
+             {Platform.OS === 'android' && <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.snowpack.values.comments}</Text>}
             </View>
           </View>
         )
@@ -833,7 +873,15 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('otrasObs2')}:</Text>
             </View>
             <View style={styles.linkContainer}>
-              <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.quick.values.comments}</Text>
+              
+              {Platform.OS === 'ios' && <TextInput selectable={true} 
+                          editable={false} 
+                          multiline={true}
+                          scrollEnabled={false}
+                          style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>
+                {item.observationTypes.quick.values.comments}
+              </TextInput>}
+              {Platform.OS === 'android'  && <Text selectable={true} style={[styles.description,{paddingVertical: 5, maxWidth:'100%', textAlign:'left'}]}>{item.observationTypes.quick.values.comments}</Text>}
             </View>
           </View>
         )
@@ -866,15 +914,48 @@ export default function ShowObservation({ route, navigation }) {
       
     };
 
+    const experienceLevel = (value) =>{
+      if (value <  4){
+        return t('expBaja');
+      }else if(value < 8){
+        return t('expMedia');
+      }else{
+        return t('expAlta');
+      }
+    }
+
     const obsHeader = () => {
       return (
       <View style={styles.obsHeader}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={{fontSize: 12}}>{moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}</Text>
+        <View style={styles.headerContent}>
+          <View style={styles.headerLeft}>
+                <Text style={styles.title} numberOfLines={2}>
+                    {item.title}
+                </Text>
+                <Text style={styles.headerSubText}>
+                    {moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}
+                </Text>
+                <Text style={styles.headerSubText}>
+                    {t('userTitle')}: {userName}
+                </Text> 
+            </View>
+            <View style={styles.headerRight}>
+                <View style={styles.scoreBadge}>
+                    <Text style={styles.scoreLabel}>{t('ta')}</Text>
+                    <Text style={styles.scoreValue}>
+                        {userScores.Ta === -1 ? '-' : experienceLevel(userScores.Ta)}
+                    </Text>
+                </View>
+                
+            </View>
+        </View>
+        {/* <Text style={styles.title}>{item.title}</Text> */}
+        {/* <Text style={{fontSize: 12}}>{moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}</Text> */}
+        
          {/*{ item.status === 0 && (<Text style={{fontSize: 12}}>Tomada: Durante la salida (sobre el terreno)</Text>)}
         { item.status === 1 && (<Text style={{fontSize: 12}}>Tomada: Immediatamente después de la salida (parquing)</Text>)}
         { item.status === 2 && (<Text style={{fontSize: 12}}>Tomada: Posteriormente (casa/refugio)</Text>)} */}
-        <Text style={{fontSize: 12}}>{t('userTitle')}: {userName}</Text> 
+        {/* <Text style={{fontSize: 12}}>{t('userTitle')}: {userName}</Text>  */}
       </View>
       )
     }
@@ -1034,6 +1115,58 @@ const styles = StyleSheet.create({
     top:10,
     left: 20,
     borderRadius:5,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1, // Takes up remaining space
+    paddingRight: 10,
+  },
+  headerRight: {
+    paddingTop:7,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    minWidth: 50,
+  },
+  headerSubText: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 2,
+  },
+  
+  // Score Badge Styling
+  scoreBadge: {
+    flexDirection: 'column', 
+    alignItems: 'flex-end',
+    //justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  scoreLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#888',
+    marginRight: 4,
+  },
+  scoreValue: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingRight:5,
+    color: '#333',
+  },
+
+  title:{
+    fontWeight: 'bold', 
+    fontSize: 18, // Slightly adjusted
+    marginBottom: 4,
+    color: '#000',
   },
   locationCard: {
     backgroundColor: "#FFF",

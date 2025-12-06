@@ -131,7 +131,7 @@ useLayoutEffect(() => {
 const updateData = () => {
     console.log('------Quick report---------');
     const values = getValues();
-    console.log(values.activityType);
+    //console.log(values.activityType);
     if( values.activityType == 7 && (values.customActivityType === null || values.customActivityType == "")){
         setInputError(true);
         Snackbar.show({

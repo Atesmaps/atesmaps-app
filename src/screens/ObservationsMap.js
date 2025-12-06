@@ -36,6 +36,8 @@
 
   const bluePin = require('../../assets/images/pins/atesmaps-blue.png');
   const redPin = require('../../assets/images/pins/atesmaps-red.png')
+  const greenPin = require('../../assets/images/pins/atesmaps-green.png');
+  const violetPin = require('../../assets/images/pins/atesmaps-purpule.png')
 
 
   const { width, height } = Dimensions.get("window");
@@ -322,6 +324,16 @@
       );
     }
 
+    const pinColorSelect = (experience) => {
+      if (experience <  4){
+        return violetPin;
+      }else if(experience < 8){
+        return bluePin;
+      }else{
+        return greenPin;
+      }
+    }
+
     // const getMapRegion = () => {     
 
     //   console.log('New region has been set:',newRegion)
@@ -412,11 +424,14 @@
                               style={[styles.pin]}
                               coordinate={{latitude:Number(marker.location?.coordinates[1]),longitude:Number(marker.location?.coordinates[0])}}
                               // onPress={(e)=>onMarkerPress(e)}
+                              centerOffset={Platform.OS === 'android' ? { x: 0, y: 0 }: { x: 0, y: -30 }} // iOS Only: Offset by half height
+                              anchor={Platform.OS === 'android' ? { x: 0.5, y: 1 } : { x: 0.5, y: 0.5 }}
+                              
                               onPress={() => onMarkerPress(index)}
                             >
                               {/* <Text>{index}</Text> */}
                               <Animated.Image style={[styles.pin,scaleStyle]}
-                                  source={(index === mapIndex ? redPin : bluePin)}
+                                  source={(index === mapIndex ? redPin : pinColorSelect(marker.user.terrainExperience))}
                               /> 
                             </Marker>
                           )

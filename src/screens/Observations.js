@@ -272,8 +272,7 @@ export default function ObservationDetail({ navigation }) {
               <Pressable
                   style={{ justifyContent: 'flex-end'}}
                   onPress={()  => {
-                    
-                    Linking.openURL('https://atesmaps.org/geovisor.html');
+                      Linking.openURL('https://atesmaps.org/geovisor');
                     }}
                 >
                 

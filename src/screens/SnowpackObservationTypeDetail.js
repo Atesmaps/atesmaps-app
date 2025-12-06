@@ -53,7 +53,7 @@ const SnowpackObservationTypeDetail: () => Node = ({ route, navigation }) => {
 
 const { editingObservation, selectedIndex, setEditingObservation,updateObservations  } = useContext(ObservationContext);
 const [snowpackValues, setSnowpackValues] = useState(editingObservation.observationTypes?.snowpack ? editingObservation.observationTypes?.snowpack : {status: false, values: {}});
-
+const [inputError, setInputError ] = useState(false);
 
 const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     defaultValues: {
@@ -84,6 +84,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue } = us
         skiPenetration:snowpackValues.values?.skiPenetration ? snowpackValues.values?.skiPenetration : null,
         handTest:snowpackValues.values?.handTest ? snowpackValues.values?.handTest : null, 
         compresionTest:snowpackValues.values?.compresionTest ? snowpackValues.values?.compresionTest : null,
+        customCompresionTest:snowpackValues.values?.customCompresionTest ? snowpackValues.values?.customCompresionTest : null,
         extensionTest:snowpackValues.values?.extensionTest ? snowpackValues.values?.extensionTest : null,
         fractureType1:snowpackValues.values?.fractureType?.type_1 ? snowpackValues.values?.fractureType?.type_1 : null,
         fractureType2:snowpackValues.values?.fractureType?.type_2 ? snowpackValues.values?.fractureType?.type_2 : null,
@@ -161,97 +162,111 @@ const updateData = () => {
     // console.log('------Quick report---------');
     const values = getValues();
     // console.log(values);
-    let aux = {values: {}}
+    if( values.compresionTest == 5 && (values.customCompresionTest === null || values.customCompresionTest == "")){
+        setInputError(true);
+        Snackbar.show({
+            text: t('snackbarErrorMsgCt'),
+            duration: Snackbar.LENGTH_SHORT,
+            numberOfLines: 2,
+            textColor: "#fff",
+            backgroundColor: "#B00020",
+        });
+    }else{
+        setInputError(false);
+        let aux = {values: {}}
 
-    // aux['values'].observationType= values.observationType;
+        // aux['values'].observationType= values.observationType;
 
-    aux['values'].altitude= values.altitude;
+        aux['values'].altitude= values.altitude;
 
-    aux['values']['altitudeRange'] = {
-        'range_1': values.altitudeRange1,
-        'range_2': values.altitudeRange2,
-        'range_3': values.altitudeRange3,
-        'range_4': values.altitudeRange4,
+        aux['values']['altitudeRange'] = {
+            'range_1': values.altitudeRange1,
+            'range_2': values.altitudeRange2,
+            'range_3': values.altitudeRange3,
+            'range_4': values.altitudeRange4,
+        }
+        aux['values']['orientation'] = {
+            'N': values.orientationN,
+            'NE': values.orientationNE,
+            'E': values.orientationE,
+            'SE': values.orientationSE,
+            'SO': values.orientationSO,
+            'O': values.orientationO,
+            'NO': values.orientationNO,
+        }
+        
+        aux['values']['layerSnowType'] = {
+            'type_1': values.layerSnowType1,
+            'type_2': values.layerSnowType2,
+            'type_3': values.layerSnowType3,
+            'type_4': values.layerSnowType4,
+            'type_5': values.layerSnowType5,
+            'type_6': values.layerSnowType6,
+        }
+
+        aux['values']['fractureType'] = {
+            'type_1': values.fractureType1,
+            'type_2': values.fractureType2,
+            'type_3': values.fractureType3,
+            'type_4': values.fractureType4,
+            'type_5': values.fractureType5,
+            'type_6': values.fractureType6,
+        }
+
+        aux['values']['fractureTypeCt'] = {
+            'type_1': values.fractureType1Ct,
+            'type_2': values.fractureType2Ct,
+            'type_3': values.fractureType3Ct,
+            'type_4': values.fractureType4Ct,
+            'type_5': values.fractureType5Ct,
+            'type_6': values.fractureType6Ct,
+        }
+
+        aux['values'].depth= values.depth;
+        aux['values'].woumpfs= values.woumpfs;
+        aux['values'].sounds= values.sounds;
+        aux['values'].cracks= values.cracks;
+        aux['values'].snowType= values.snowType;
+        aux['values'].snowHumidity= values.snowHumidity;
+        aux['values'].footPenetration= values.footPenetration;
+        aux['values'].skiPenetration= values.skiPenetration;
+
+        aux['values'].handTest= values.handTest;
+        aux['values'].compresionTest= values.compresionTest;
+        aux['values'].customCompresionTest = values.customCompresionTest;
+
+        aux['values'].extensionTest= values.extensionTest;
+        aux['values'].geoAccuracy= values.geoAccuracy;
+        
+        // aux['values'].fractureType= values.fractureType;
+        aux['values'].fractureDepth= values.fractureDepth;
+        aux['values'].fractureDepthCt= values.fractureDepthCt;
+        aux['values'].layerHardness= values.layerHardness;
+        aux['values'].weakLayerHardness= values.weakLayerHardness;
+        aux['values'].comments= values.comments;
+        
+
+        aux.status = true;
+        
+        // console.log(aux.status);
+        setSnowpackValues(aux);
+        
+        let observation = editingObservation;
+        observation.observationTypes['snowpack'] = aux; 
+        setEditingObservation({...editingObservation, observationTypes: observation.observationTypes['snowpack']});
+        updateObservations(observation);
+        // console.log("Value updated...");
+        // console.log('---------------------------');
+        navigation.navigate('Observación',{selectedIndex});
+        Snackbar.show({
+            text: t('snowObsSnackBarText2'),
+            duration: Snackbar.LENGTH_SHORT,
+            numberOfLines: 2,
+            textColor: "#fff",
+            backgroundColor: "#62a256",
+        });
+        navigation.navigate('Observación',{selectedIndex});
     }
-    aux['values']['orientation'] = {
-        'N': values.orientationN,
-        'NE': values.orientationNE,
-        'E': values.orientationE,
-        'SE': values.orientationSE,
-        'SO': values.orientationSO,
-        'O': values.orientationO,
-        'NO': values.orientationNO,
-    }
-    
-    aux['values']['layerSnowType'] = {
-        'type_1': values.layerSnowType1,
-        'type_2': values.layerSnowType2,
-        'type_3': values.layerSnowType3,
-        'type_4': values.layerSnowType4,
-        'type_5': values.layerSnowType5,
-        'type_6': values.layerSnowType6,
-    }
-
-    aux['values']['fractureType'] = {
-        'type_1': values.fractureType1,
-        'type_2': values.fractureType2,
-        'type_3': values.fractureType3,
-        'type_4': values.fractureType4,
-        'type_5': values.fractureType5,
-        'type_6': values.fractureType6,
-    }
-
-    aux['values']['fractureTypeCt'] = {
-        'type_1': values.fractureType1Ct,
-        'type_2': values.fractureType2Ct,
-        'type_3': values.fractureType3Ct,
-        'type_4': values.fractureType4Ct,
-        'type_5': values.fractureType5Ct,
-        'type_6': values.fractureType6Ct,
-    }
-
-    aux['values'].depth= values.depth;
-    aux['values'].woumpfs= values.woumpfs;
-    aux['values'].sounds= values.sounds;
-    aux['values'].cracks= values.cracks;
-    aux['values'].snowType= values.snowType;
-    aux['values'].snowHumidity= values.snowHumidity;
-    aux['values'].footPenetration= values.footPenetration;
-    aux['values'].skiPenetration= values.skiPenetration;
-
-    aux['values'].handTest= values.handTest;
-    aux['values'].compresionTest= values.compresionTest;
-    aux['values'].extensionTest= values.extensionTest;
-    aux['values'].geoAccuracy= values.geoAccuracy;
-    
-    // aux['values'].fractureType= values.fractureType;
-    aux['values'].fractureDepth= values.fractureDepth;
-    aux['values'].fractureDepthCt= values.fractureDepthCt;
-    aux['values'].layerHardness= values.layerHardness;
-    aux['values'].weakLayerHardness= values.weakLayerHardness;
-    aux['values'].comments= values.comments;
-    
-
-    aux.status = true;
-    
-    // console.log(aux.status);
-    setSnowpackValues(aux);
-    
-    let observation = editingObservation;
-    observation.observationTypes['snowpack'] = aux; 
-    setEditingObservation({...editingObservation, observationTypes: observation.observationTypes['snowpack']});
-    updateObservations(observation);
-    // console.log("Value updated...");
-    // console.log('---------------------------');
-    navigation.navigate('Observación',{selectedIndex});
-    Snackbar.show({
-        text: t('snowObsSnackBarText2'),
-        duration: Snackbar.LENGTH_SHORT,
-        numberOfLines: 2,
-        textColor: "#fff",
-        backgroundColor: "#62a256",
-    });
-    navigation.navigate('Observación',{selectedIndex});
 }
 
 const accuracyOptions = [
@@ -299,6 +314,7 @@ const ctOptions = [
         {label: t('hits2')},
         {label: t('hits3')},
         {label: t('noConcluyente')},
+        {label: t('otraOpcion')}
     ];
 
 const ectOptions = [
@@ -555,7 +571,7 @@ return(
                         circleSize={14}
                     /> */}
                     <Text>{t('nieveSup')}:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="layerSnowType1"
                                         title={t('nueva')} 
@@ -630,6 +646,7 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                     
                     {/* <Text>Test Cizalla de mano</Text>
                         <RadioButtonRN
                             textColor={'black'}
@@ -654,6 +671,15 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    <CustomInput
+                            name="customCompresionTest"
+                            placeholder={t('otroResultado')}
+                            control={control}
+                            customError={inputError}
+                            customStyles={{width:"100%"}}
+                            // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
+                            // onPress={showDatepicker}
+                            />
                     
                 </View>
                 <View style={styles.formContainer} >
@@ -668,7 +694,7 @@ return(
                         circleSize={14}
                     /> */}
                     <Text>{t('tipoFracturaCT')}:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType1Ct"
                                         title={t('colapsoSubito')}
@@ -740,7 +766,7 @@ return(
                         circleSize={14}
                     /> */}
                     <Text>{t('tipoFracturaECT')}:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>Puedes marcar multiples opciones</Text>    
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType1"
                                         title={t('colapsoSubito')} 

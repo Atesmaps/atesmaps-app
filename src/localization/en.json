@@ -380,4 +380,12 @@
   "snackbarDraftDeleted": "Your observation draft has been deleted.",
   "goButton":"View",
   "otrasObs2": "Other observations - Press and hold to copy",
+  "expAlta": "High",
+  "expMedia": "Medium",
+  "expBaja": "Low",
+  "ra": "Exp. in Avalanches:",
+  "ta": "Exp. in Avalanch Terrain:",
+  "otraOpcion": "Other result:",
+  "otroResultado": "Custom CT Result",
+  "snackbarErrorMsgCt": "Indicate the CT test result"
 }
