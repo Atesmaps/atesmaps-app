@@ -1,5 +1,6 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { analyticsService } from '../services/analyticsService';
 
 import { navigationRef } from './NavigationHelper';
 import VersionCheck from 'react-native-version-check';
@@ -29,6 +30,7 @@ import { BASE_URL } from '../config';
 
 const AppNav: () => Node = () => {
    // const isDarkMode = useColorScheme() === 'dark';
+    const routeNameRef = useRef();
     const {isLoading, userToken} = useContext(AuthContext);
 
    
@@ -113,10 +115,17 @@ const AppNav: () => Node = () => {
           const previousRouteName = routeNameRef.current;
           const currentRoute = navigationRef.getCurrentRoute();
           const currentRouteName = currentRoute?.name;
+
+
           
           if (previousRouteName !== currentRouteName) {
             if (currentRouteName) {
-              await analyticsService.logScreenView(currentRouteName);
+              try{
+                await analyticsService.logScreenView(currentRouteName);
+              }catch (e){
+                  console.log(`Analytics Error: ${e.message}`);
+              }
+             
             }  
             console.log(`📊 Tracked Screen: ${currentRouteName}`);
           }

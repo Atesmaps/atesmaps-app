@@ -159,7 +159,7 @@ const updateData = () => {
         textColor: "#fff",
         backgroundColor: "#62a256",
     });
-    navigation.navigate('Observación',{selectedIndex});
+    navigation.navigate('Nueva Observacion',{selectedIndex});
 }
 
 const removeData = () => {
@@ -181,7 +181,7 @@ const removeData = () => {
         textColor: "#fff",
         backgroundColor: "#B00020",
     });
-    navigation.navigate('Observación',{selectedIndex});
+    navigation.navigate('Nueva Observacion',{selectedIndex});
 }
 
 //Riding conditions:

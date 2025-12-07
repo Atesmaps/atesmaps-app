@@ -1,5 +1,7 @@
 import React, {createContext, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { analyticsService } from '../services/analyticsService';
+import i18n from '../localization/i18n';
 import axios from 'axios';
 
 
@@ -87,8 +89,20 @@ export const AuthProvider = ({children}) => {
                 //const {} = jwtDecode(appleAuthRequestResponse.identityToken);
               
                 let response = await axios.post(`${BASE_URL}/auth/apple-signin`,{'tokenId': appleAuthRequestResponse.identityToken, user:{email,fullName}, platform:Platform.OS});
-
+                
                 let user = response.data.user;
+                
+                try{
+                    await analyticsService.identifyUser(user._id, {
+                        language: i18n.language, // e.g. 'en'
+                        experience_level: user.terrainExperience.toString() // e.g. 'Expert'
+                    });
+
+                    await analyticsService.logEvent('login', { method: 'apple' });
+                }catch(e){
+                    console.log(`Analytics Error (Login Apple): ${e.message}`);
+                }
+               
 
                 console.log(user)
                 console.log('This is after logging:')
@@ -187,6 +201,18 @@ export const AuthProvider = ({children}) => {
             let response = await axios.post(`${BASE_URL}/auth/google-signin`,{'tokenId': userInfo.idToken, platform:Platform.OS});
     
             let user = response.data.user;
+
+            try{
+                await analyticsService.identifyUser(user._id, {
+                    language: i18n.language, // e.g. 'en'
+                    experience_level: user.terrainExperience.toString() // e.g. 'Expert'
+                });
+
+                await analyticsService.logEvent('login', { method: 'google' });
+            }catch(e){
+                console.log(`Analytics Error (Login Google): ${e.message}`);
+            }
+               
             // console.log('This is after logging:')
             // console.log(user);
             // console.log('------------------------')
@@ -247,6 +273,17 @@ export const AuthProvider = ({children}) => {
             //console.log(response.data.accessToken);
             //let user = {userName, userEmail, userId} = response.data;
             let user = response.data.user;
+
+            try{
+                await analyticsService.identifyUser(user._id, {
+                    language: i18n.language, // e.g. 'en'
+                    experience_level: user.terrainExperience.toString() // e.g. 'Expert'
+                });
+
+                await analyticsService.logEvent('login', { method: 'email' });
+            }catch(e){
+                console.log(`Analytics Error (Login Email): ${e.message}`);
+            }
             // console.log('This is after logging:')
             // console.log(user);
             // console.log('------------------------')

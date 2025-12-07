@@ -9,6 +9,7 @@ import {
   Platform,
   Pressable,
   ActivityIndicator,
+  TouchableOpacity,
   Button,
    } from 'react-native';
 
@@ -41,9 +42,10 @@ export default function ObservationDetail({ navigation }) {
     useLayoutEffect(() => {
       navigation.setOptions({
         // title: 'lolObservaciones',
+         
         headerRight: userDetails.status ? () => (
-                <Pressable
-                  onPress={async ()  => {
+            <TouchableOpacity 
+                    onPress={async ()  => {
                     // getOneTimeLocation()
                     // await newObservation({
                     //   title: 'Nueva Observación',
@@ -59,15 +61,19 @@ export default function ObservationDetail({ navigation }) {
                     //   submitted: false,
                     // });
                     let index = lastIndex;      
-                    navigation.navigate('Observación', {index})
+                    navigation.navigate('Nueva Observacion', {index})
                     }}
+                    style={{ marginRight: 10, marginBottom: 10  }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
                 >
-                  <MaterialCommunityIcons size={25} 
-                                        color={'#307df6'} 
-                                        name="eye-plus"/>
-                </Pressable>
+                  <MaterialCommunityIcons size={30} 
+                              color={'#307df6'} 
+                              name="eye-plus"/>
+                             
+                </TouchableOpacity>
+               
             ) :  null
-      });
+      })
       //TODO: Here we can dynamically change the header of the screen....
       //check documentation here: https://reactnavigation.org/docs/navigation-prop/#setparams
     }, [navigation, userDetails]);

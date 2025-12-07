@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import axios from 'axios';
 import api from '../api/axiosConfig';
+import { analyticsService } from '../services/analyticsService';
 
 import  Snackbar  from "react-native-snackbar";
 // x    
@@ -174,6 +175,9 @@ export const ObservationProvider = ({children}) => {
             updateSelectedIndex(aux.length-1)
             await AsyncStorage.setItem('list', JSON.stringify(aux)); 
             setEditingObservation(observation);
+
+            await analyticsService.logObservationDraftCreate( userDetails._id);
+
             Snackbar.show({
                 text: t('snackbarDraftCreated'),
                 duration: Snackbar.LENGTH_SHORT,

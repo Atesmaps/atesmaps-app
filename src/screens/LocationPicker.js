@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useLayoutEffect, useContext, useRef } from 'react';
 import type {Node} from 'react';
-
 import {
     StyleSheet,
     View,
@@ -11,6 +10,8 @@ import {
     Button,
     TouchableOpacity,
   } from 'react-native';
+
+import { HeaderBackButton } from '@react-navigation/elements'
 
 import Svg from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +58,13 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
     useLayoutEffect( () => {
       navigation.setOptions({
         // title: value === '' ? 'No title' : value,
+        headerLeft:()=>(
+                  <HeaderBackButton 
+                    labelVisible={false}
+                    onPress={() => {
+                        navigation.goBack();
+                    }}>
+                  </HeaderBackButton>),
         headerRight: () => (
           <Button
             onPress={async () => {
@@ -68,7 +76,7 @@ const LocationPicker: () => Node = ({ route, navigation }) => {
               setEditingObservation(observation);
               updateObservations(observation);
               
-              navigation.navigate('Observación', {index, update:true})
+              navigation.navigate('Nueva Observacion', {index, update:true})
 
               Snackbar.show({
                 text: t('obsLocationSnackbarSuccessText'),

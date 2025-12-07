@@ -24,7 +24,8 @@ import { ObservationContext } from '../context/ObservationContext';
 import { useTranslation } from "react-i18next";
 import { useMomentLocale } from "../hooks/useMomentLocale";
 import Loading from "../components/Loading";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { analyticsService } from '../services/analyticsService';
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
@@ -188,6 +189,17 @@ export default function ShowObservation({ route, navigation }) {
             }
             setIsLoading(false);
         }
+
+        try{
+          analyticsService.logObservationView(
+              currentItem._id, 
+              currentItem.title,
+              setType(currentItem)
+          );
+        }catch (e){
+           console.log(`Analytics Error (Show Observation): ${e.message}`);
+        }
+        
       };
 
       initData();
@@ -212,6 +224,18 @@ export default function ShowObservation({ route, navigation }) {
     //     getUserDetais(item.user);
     //   }
     // },[])
+
+    const setType = (obs) => {
+    
+      let type = ''
+      if (obs.observationTypes.quick.status) type = type + 'Quick, '
+      if (obs.observationTypes.avalanche.status) type = type + 'Avalanche, '
+      if (obs.observationTypes.accident.status) type = type + 'Accident, '
+      if (obs.observationTypes.snowpack.status) type = type + 'Snowpack, '
+      if (obs.observationTypes.weather.status) type = type + 'Weather '
+      
+      return type;
+    }
   
     const weatherObs = () => {
       if (item.observationTypes.weather.status == true) {

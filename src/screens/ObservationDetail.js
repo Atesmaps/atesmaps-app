@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useLayoutEffect, useContext, useRef} from "react";
 import { Text, View, ActivityIndicator, Button, Platform, ScrollView, StyleSheet, SafeAreaView, Keyboard } from "react-native";
+import { HeaderBackButton } from '@react-navigation/elements'
 import { useForm, Controller } from "react-hook-form";
 import moment from 'moment';
 
@@ -148,7 +149,7 @@ export default function ObservationDetail({ route, navigation }) {
         });
    
         if (response.status === 201){
-            console.log('uploading images...');
+            //console.log('uploading images...');
             aux_images.forEach(image => {
               uploadFile(image);
             });
@@ -172,9 +173,12 @@ export default function ObservationDetail({ route, navigation }) {
             //   submitted: false,
             // });
             setIsLoading(false);
-            navigation.navigate('Observaciones');
+            navigation.navigate('Mis Observaciones');
             deleteObservation();
             
+          
+            await analyticsService.logObservationCreate( userDetails._id, data.title);
+
             Snackbar.show({
               text: t('snackbarObservationText'),
               duration: Snackbar.LENGTH_SHORT,
@@ -233,6 +237,13 @@ export default function ObservationDetail({ route, navigation }) {
     useLayoutEffect(() => {
       navigation.setOptions({
         // title: value === '' ? 'No title' : value,
+        headerLeft:()=>(
+          <HeaderBackButton 
+            labelVisible={false}
+            onPress={() => {
+                navigation.goBack();
+            }}>
+          </HeaderBackButton>),
         headerRight: () => (
           <Button
             onPress={() => {
@@ -241,7 +252,7 @@ export default function ObservationDetail({ route, navigation }) {
               // handleSubmit(onSave)();
               // let index = route.params?.index;
               // setEditingObservation({...editingObservation, location:pickedLocation});
-              navigation.navigate('Observaciones');
+              navigation.navigate('Mis Observaciones');
             }}
             title={t('guardar')}
           />
@@ -575,7 +586,7 @@ export default function ObservationDetail({ route, navigation }) {
                   //   images: [],
                   //   submitted: false,
                   // });
-                  navigation.navigate('Observaciones');
+                  navigation.navigate('Mis Observaciones');
                 }} />
           </View>
        

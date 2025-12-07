@@ -137,7 +137,7 @@ useLayoutEffect(() => {
     // console.log(observation);
     // console.log('---------------------------');
     
-    navigation.navigate('Observación',{selectedIndex});
+    
     Snackbar.show({
         text: t('avalancheObsSnackBarText'),
         duration: Snackbar.LENGTH_SHORT,
@@ -145,6 +145,7 @@ useLayoutEffect(() => {
         textColor: "#fff",
         backgroundColor: "#B00020",
     });
+    navigation.navigate('Nueva Observacion',{selectedIndex});
 }
 
 
@@ -217,7 +218,7 @@ const updateData = () => {
     
     // console.log("Value updated...");
     // console.log('---------------------------');
-    navigation.navigate('Observación',{selectedIndex});
+   
     Snackbar.show({
         text: t('avalancheObsSnackBarText2'),
         duration: Snackbar.LENGTH_SHORT,
@@ -225,6 +226,7 @@ const updateData = () => {
         textColor: "#fff",
         backgroundColor: "#62a256",
     });
+    navigation.navigate('Nueva Observacion',{selectedIndex});
 
 }
 

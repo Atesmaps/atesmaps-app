@@ -5,11 +5,8 @@ import { useTranslation } from 'react-i18next';
 
 import {
     StyleSheet,
-    Button,
-    Pressable,
-    useColorScheme,
-    View,
-    Text,
+  
+    TouchableOpacity,
   } from 'react-native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -48,16 +45,30 @@ return(
           //   />
           // ),
            headerRight: () => (
-            <Pressable
-                    onPress={async ()  => {
-                      console.log('LogOut triggered...');
-                      logout();
-                      setCurrentPage(1);
-                    }}>
-                  <MaterialCommunityIcons size={25} 
-                                        color={'red'} 
-                                        name="logout-variant"/>
-                </Pressable>
+            // <Pressable
+            //         onPress={async ()  => {
+            //           console.log('LogOut triggered...');
+            //           logout();
+            //           setCurrentPage(1);
+            //         }}>
+            //       <MaterialCommunityIcons size={25} 
+            //                             color={'red'} 
+            //                             name="logout-variant"/>
+            //     </Pressable>
+            <TouchableOpacity 
+                onPress={async ()  => {
+         
+                  logout();
+                  setCurrentPage(1);
+                }}
+                style={{ marginRight: 10, marginBottom: 10 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
+            >
+              <MaterialCommunityIcons size={30} 
+                                      color={'red'} 
+                                      name="logout-variant"/>
+                          
+            </TouchableOpacity>
             //  <Button
             //   onPress={() => {
             //     console.log('LogOut triggered...');

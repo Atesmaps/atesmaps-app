@@ -16,7 +16,7 @@ import {
 // import fs from "react-native-fs";
 const Base64Binary = require('base64-arraybuffer');
 import { useTranslation } from 'react-i18next';
-
+import { HeaderBackButton } from '@react-navigation/elements'
 import { ObservationContext } from '../context/ObservationContext';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -106,28 +106,33 @@ useLayoutEffect(() => {
     // title: value === '' ? 'No title' : value,
    
     headerRight:() => (
-            <Pressable
-              onPress={async ()  => {
-                //console.log('mostrar imagepicker....');
-                //sheetRef.current.snapTo(0); 
-                setOpen(true);
+             <TouchableOpacity 
+                onPress={async ()  => {
+                  setOpen(true);
                 }}
+                style={{ marginRight: 10, marginBottom: 10 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
             >
-              <MaterialCommunityIcons size={25} 
-                                    color={'#307df6'} 
-                                    name="camera-plus"/>
-            </Pressable>),
+              <MaterialCommunityIcons size={30} 
+                          color={'#307df6'} 
+                          name="camera-plus"/>
+                          
+            </TouchableOpacity>),
+            // <Pressable
+            //   onPress={async ()  => {
+            //     //console.log('mostrar imagepicker....');
+            //     //sheetRef.current.snapTo(0); 
+            //     setOpen(true);
+            //     }}
+            // >
+            //   <MaterialCommunityIcons size={30} 
+            //                         color={'#307df6'} 
+            //                         name="camera-plus"/>
+            // </Pressable>),
     headerLeft:()=>(
-            <Pressable style={{
-                    // alignItems: 'center',
-                  //  justifyContent: 'center',
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                    //borderRadius: 4,
-                    elevation: 3,
-                
-               
-                  }} onPress={() => {
+             <HeaderBackButton 
+                labelVisible={false}
+                onPress={() => {
                     console.log('updating images list for observation')
                     let aux = editingObservation;
                     aux.images = images;
@@ -138,8 +143,8 @@ useLayoutEffect(() => {
                     //navigation.navigate('Observación', {selectedIndex, update:true})
                     navigation.goBack();
                   }}>
-                  <MaterialIcons name='arrow-back' size={25}  style={{marginRight: 5}}/>
-                </Pressable>
+
+              </HeaderBackButton>
       // <Button
       //       onPress={() => {
       //         console.log('updating images list for observation')

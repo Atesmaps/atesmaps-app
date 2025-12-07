@@ -155,7 +155,7 @@ const removeData = () => {
         textColor: "#fff",
         backgroundColor: "#B00020",
     });
-    navigation.navigate('Observación',{selectedIndex});
+    navigation.navigate('Nueva Observacion',{selectedIndex});
 }
 
 const updateData = () => {
@@ -257,7 +257,7 @@ const updateData = () => {
         updateObservations(observation);
         // console.log("Value updated...");
         // console.log('---------------------------');
-        navigation.navigate('Observación',{selectedIndex});
+        //navigation.navigate('Nueva Observacion',{selectedIndex});
         Snackbar.show({
             text: t('snowObsSnackBarText2'),
             duration: Snackbar.LENGTH_SHORT,
@@ -265,7 +265,7 @@ const updateData = () => {
             textColor: "#fff",
             backgroundColor: "#62a256",
         });
-        navigation.navigate('Observación',{selectedIndex});
+        navigation.navigate('Nueva Observacion',{selectedIndex});
     }
 }
 
