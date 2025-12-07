@@ -42,7 +42,6 @@ export default function ObservationDetail({ navigation }) {
     useLayoutEffect(() => {
       navigation.setOptions({
         // title: 'lolObservaciones',
-         
         headerRight: userDetails.status ? () => (
             <TouchableOpacity 
                     onPress={async ()  => {
@@ -63,7 +62,7 @@ export default function ObservationDetail({ navigation }) {
                     let index = lastIndex;      
                     navigation.navigate('Nueva Observacion', {index})
                     }}
-                    style={{ marginRight: 10, marginBottom: 10  }}
+                    style={{ marginRight: 10, marginBottom: Platform.OS === 'ios' ? 10 : 0  }}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
                 >
                   <MaterialCommunityIcons size={30} 

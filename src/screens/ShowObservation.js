@@ -960,10 +960,10 @@ export default function ShowObservation({ route, navigation }) {
                     {moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}
                 </Text>
                 <Text style={styles.headerSubText}>
-                    {t('userTitle')}: {userName}
+                    {t('userTitle')}: {userName} ({t('ta')} <Text style={styles.scoreValue}>{userScores.Ta === -1 ? '-' : experienceLevel(userScores.Ta)}</Text>)
                 </Text> 
             </View>
-            <View style={styles.headerRight}>
+            {/* <View style={styles.headerRight}>
                 <View style={styles.scoreBadge}>
                     <Text style={styles.scoreLabel}>{t('ta')}</Text>
                     <Text style={styles.scoreValue}>
@@ -971,7 +971,7 @@ export default function ShowObservation({ route, navigation }) {
                     </Text>
                 </View>
                 
-            </View>
+            </View> */}
         </View>
         {/* <Text style={styles.title}>{item.title}</Text> */}
         {/* <Text style={{fontSize: 12}}>{moment(item.date).locale(momentLocale).format('Do MMMM YY - HH:mm')}</Text> */}
@@ -1166,12 +1166,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column', 
     alignItems: 'flex-end',
     //justifyContent: 'center',
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    // backgroundColor: '#f0f0f0',
+    //paddingHorizontal: 10,
+    //paddingVertical: 5,
+    //borderRadius: 12,
+    //borderWidth: 1,
+   //borderColor: '#e0e0e0',
   },
   scoreLabel: {
     fontSize: 10,
@@ -1180,7 +1180,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   scoreValue: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
     paddingRight:5,
     color: '#333',

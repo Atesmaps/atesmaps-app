@@ -383,8 +383,8 @@
   "expAlta": "High",
   "expMedia": "Medium",
   "expBaja": "Low",
-  "ra": "Exp. in Avalanches:",
-  "ta": "Exp. in Avalanch Terrain:",
+  "ra": "exp. in Avalanches:",
+  "ta": "exp. in Avalanch Terrain:",
   "otraOpcion": "Other result:",
   "otroResultado": "Custom CT Result",
   "snackbarErrorMsgCt": "Indicate the CT test result"

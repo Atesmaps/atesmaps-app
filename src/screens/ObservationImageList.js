@@ -110,7 +110,7 @@ useLayoutEffect(() => {
                 onPress={async ()  => {
                   setOpen(true);
                 }}
-                style={{ marginRight: 10, marginBottom: 10 }}
+                style={{ marginRight: 10, marginBottom: Platform.OS === 'ios' ? 10 : 0 }}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
             >
               <MaterialCommunityIcons size={30} 

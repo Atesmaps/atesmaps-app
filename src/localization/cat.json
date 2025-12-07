@@ -383,8 +383,8 @@
 "expAlta": "Alta",
 "expMedia": "Mitjana",
 "expBaja": "Baixa",
-"ra": "Exp. en allaus:",
-"ta": "Exp. en terreny d'allaus:",
+"ra": "exp. en allaus:",
+"ta": "exp. en Terreny d'Allaus:",
 "otraOpcion": "Un altre resultat:",
 "otroResultado": "Resultat del CT",
 "snackbarErrorMsgCt": "Indica el resultat del test CT"
