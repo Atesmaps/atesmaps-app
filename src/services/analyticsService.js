@@ -52,7 +52,7 @@ class AnalyticsService {
   async logObservationCreate(userId, title) {
     try {
         await this.logEvent(EVENTS.OBSERVATION_CREATE, {
-            userId: userId,
+            creator_id: userId,
             title: title
         });
     } catch (error) {
@@ -63,7 +63,7 @@ class AnalyticsService {
    async logObservationDraftCreate(userId) {
     try {
         await this.logEvent(EVENTS.OBSERVATION_CREATE_DRAFT, {
-            userId: userId
+            creator_id: userId
         });
     } catch (error) {
       console.error('Analytics Error (Observation Create Draft):', error);

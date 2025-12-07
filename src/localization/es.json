@@ -388,8 +388,8 @@
   "expAlta":"Alta",
   "expMedia":"Media",
   "expBaja":"Baja",
-  "ra":"Exp. en Avalanchas:",
-  "ta":"Exp. en Terreno de aludes:",
+  "ra":"exp. en Avalanchas:",
+  "ta":"exp. en Terreno de aludes:",
   "otraOpcion":"Otro resultado:",
   "otroResultado":"Resultado del CT",
   "snackbarErrorMsgCt":"Indica resultado del test CT"
