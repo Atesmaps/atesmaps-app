@@ -12,7 +12,8 @@ import {
     View,
     Button,
     Text,
-    TextInput
+    TextInput,
+    TouchableOpacity
 } from 'react-native';
 
 import CustomRadioButton from "../components/CustomRadioButton";
@@ -33,7 +34,7 @@ const { editingObservation, selectedIndex, setEditingObservation, updateObservat
 const [ accidentValues, setAccidentValues ] = useState(editingObservation.observationTypes?.accident ? editingObservation.observationTypes?.accident : {status: false, values: {}});
 const [inputError, setInputError ] = useState(false);
 
-const { control, handleSubmit, formState: { errors }, getValues, setValue, reset } = useForm({
+const { control, handleSubmit, formState: { errors }, getValues, setValue, reset, watch } = useForm({
     //defaultValues: preloadedValues
     defaultValues: {
         activityType: accidentValues.values.activityType ? accidentValues.values.activityType : null,
@@ -183,6 +184,12 @@ const removeData = () => {
     navigation.navigate('Nueva Observacion',{selectedIndex});
 }
 
+const clearSection = (fields) => {
+    fields.forEach(field => {
+        // For React Hook Form, setting to null or undefined clears the selection
+        setValue(field, null, { shouldValidate: true, shouldDirty: true });
+    });
+};
 
 //Activity options:
 const activityData = [
@@ -246,6 +253,14 @@ return(
                             // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
                             // onPress={showDatepicker}
                             />
+                    {watch('activityType') !== null && watch('activityType') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['activityType','customActivityType'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
@@ -259,7 +274,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-                   
+                    {watch('accidentOrigin') !== null && watch('accidentOrigin') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['accidentOrigin'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.formContainer} >
                 <Text>{t('infoGrupo')}:</Text>
@@ -405,6 +427,20 @@ return(
                         />
 
                     </View> 
+                    {watch([
+                        'avalancheSize1', 'avalancheSize2', 'avalancheSize3',
+                        'avalancheSize4', 'avalancheSize5'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'avalancheSize1', 'avalancheSize2', 'avalancheSize3',
+                                'avalancheSize4', 'avalancheSize5'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -423,7 +459,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-
+                    {watch('terrainTraps') !== null && watch('terrainTraps') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['terrainTraps'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.spacer}></View>
                 
@@ -439,22 +482,22 @@ return(
                         customStyles={[styles.inputContainer, {height: '20%'}]}
                         placeholder={t('letrasMax')}
                         />
-                       <View style={{width:'100%',flexDirection: 'row'}}>
-                            <CustomCheckbox name="contactMe" 
-                                            title={t('contacto')}
-                                            control={control}  
-                                            // customStyles={styles.inputContainer}
-                                            // rules={{required: 'Campo obligatorio'}}
-                            />
-                      </View> 
-                      <Text>{t('datosContacto')}</Text>
+                    <View style={{width:'100%',flexDirection: 'row'}}>
+                        <CustomCheckbox name="contactMe" 
+                                        title={t('contacto')}
+                                        control={control}  
+                                        // customStyles={styles.inputContainer}
+                                        // rules={{required: 'Campo obligatorio'}}
+                        />
+                    </View> 
 
-                        <View style={{marginTop: 30}}>
-                            <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
-                        </View>
-                        <View>
-                            <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
-                        </View>
+                    <Text>{t('datosContacto')}</Text>
+                    <View style={{marginTop: 30}}>
+                        <CustomButton text={t('guardar')} bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(updateData)} />
+                    </View>
+                    <View>
+                        <CustomButton text={t('deleteData')} bgColor={"#B00020"} fgColor='white' iconName={null} onPress={removeData} />
+                    </View>
                 </View>
             </View>
             <View style={styles.space} />
@@ -539,7 +582,19 @@ const styles = StyleSheet.create({
     }, 
     space: {
         height: 150,
-    }
+    },
+    absoluteClear: {
+        position: 'absolute',
+        top: 35,    // Vertical alignment
+        right: 20,  // 20px from the right border
+        zIndex: 10, // Ensures it stays clickable above other elements
+    },
+    clearText: {
+        color: '#B00020',
+        fontSize: 12,
+        fontWeight: '600',
+        //textTransform: 'uppercase', // Optional: makes it look more like a button
+    },
 });
 
 export default AccidentObservationTypeDetail;

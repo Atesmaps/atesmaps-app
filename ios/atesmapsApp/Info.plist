@@ -28,6 +28,16 @@
 				<string>com.googleusercontent.apps.700806496723-icb53pqd5n0nanhpmkaqklcpi0f8jcag</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>floc</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>floc</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -42,7 +52,7 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>

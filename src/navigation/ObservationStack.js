@@ -47,7 +47,10 @@ return(
             title: t('observationTitle'),
             headerShown: true,
         }} />
-        <Stack.Screen name="Ver Observacion" component={ShowObservation} options={{
+        <Stack.Screen name="Ver Observacion" 
+        component={ShowObservation} 
+        getId={({ params }) => params?.observationId}
+        options={{
             title: t('observationDetailsTitle')
         }} />
         <Stack.Screen name="Imagenes" component={ObservationImageList} options={{

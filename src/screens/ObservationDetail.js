@@ -3,7 +3,7 @@ import { Text, View, ActivityIndicator, Button, Platform, ScrollView, StyleSheet
 import { HeaderBackButton } from '@react-navigation/elements'
 import { useForm, Controller } from "react-hook-form";
 import moment from 'moment';
-
+import { useMomentLocale } from "../hooks/useMomentLocale";
 import DateTimePicker from '@react-native-community/datetimepicker';
 //import Geolocation from 'react-native-geolocation-service';
 
@@ -23,9 +23,12 @@ import { LocationContext } from '../context/LocationContext';
 import  Snackbar  from "react-native-snackbar";
 // import { UpdateIdentityPoolCommand } from "@aws-sdk/client-cognito-identity";
 import { useTranslation } from "react-i18next";
+import { useConnection } from '../hooks/useConnection';
 
 export default function ObservationDetail({ route, navigation }) {
     const {t} = useTranslation();
+     const isConnected = useConnection();
+    const momentLocale = useMomentLocale();
     const {editingObservation,setEditingObservation, newObservation, selectedIndex, observations,setCurrentPage, setLastPage, getData, deleteObservation, updateObservations } = useContext(ObservationContext);
     const {userDetails,userToken} = useContext(AuthContext);
     const {currentLocation, LATITUDE_DELTA,LONGITUDE_DELTA,getOneTimeLocation } = useContext(LocationContext)
@@ -202,7 +205,7 @@ export default function ObservationDetail({ route, navigation }) {
     const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
       defaultValues: {
         title: observation.title,
-        date: moment(observation.date).format('MMMM Do YYYY, HH:mm:ss'),
+        date: moment(observation.date).locale(momentLocale).format('Do MMMM YY - HH:mm'),
         location: checkLocation(observation),//formatLocation(observation.location),
         whenObsTaken: observation.whenObsTaken
       }
@@ -338,7 +341,7 @@ export default function ObservationDetail({ route, navigation }) {
       
       const currentDate = selectedDate;
       currentDate && setRawDate(currentDate);   
-      setValue('date',moment(currentDate).format('MMMM Do YYYY, HH:mm:ss'))
+      setValue('date',moment(currentDate).locale(momentLocale).format('Do MMMM YY - HH:mm'))
     };
 
     const showDatepicker = () => {
@@ -448,7 +451,7 @@ export default function ObservationDetail({ route, navigation }) {
           <Text style={[styles.intro,{marginTop:10}]}>{t('fecha')}</Text>
           <CustomInput
             name="date"
-            placeholder={moment().format('MMMM Do YYYY, HH:mm:ss')}
+            placeholder={moment().locale(momentLocale).format('Do MMMM YY - HH:mm')}
             control={control}
             rules={{required: t('obsFormDateValidationText')}}
             onPress={showDatepicker}
@@ -469,7 +472,7 @@ export default function ObservationDetail({ route, navigation }) {
             }} 
           />
 
-          <CustomButton 
+          {/* <CustomButton 
             text={`${t('foto')} (${editingObservation.images ? editingObservation.images.length : 0})`}
             type="custom"
             order="bottom"
@@ -479,6 +482,25 @@ export default function ObservationDetail({ route, navigation }) {
               console.log('photos library to be called');
               navigation.navigate('Imagenes',{index});
             }} 
+          /> */}
+
+          <CustomButton 
+              text={isConnected 
+                  ? `${t('foto')} (${editingObservation.images ? editingObservation.images.length : 0})`
+                  : `${t('foto')} (${editingObservation.images ? editingObservation.images.length : 0})`  
+              }
+              type="custom"
+              order="bottom"
+              iconName={isConnected ? 'arrow-forward-ios' : 'block'}
+              bgColor={isConnected ? "#fff" : "#e0e0e0"} 
+              fColor={isConnected ? "gray" : "#a0a0a0"}
+              disabled={!isConnected}
+              onPress={() => {
+                  if (isConnected) {
+                      console.log('photos library to be called');
+                      navigation.navigate('Imagenes', { index });
+                  }
+              }} 
           />
 
          {/* <CustomRadioButton 
@@ -561,7 +583,24 @@ export default function ObservationDetail({ route, navigation }) {
             <CustomButton text="Incident" type="custom" order="bottom" bgColor={"#e15141"} fgColor='white' iconName={"add-circle"} onPress={()=>{console.log('seting type Incident')}} /> */}
           </View>
           <View style={{marginTop: 40}}>
-            <CustomButton text={t('subir')}  bgColor={"#62a256"} fgColor='white' iconName={null} onPress={handleSubmit(onSubmit)} />
+            {/* <CustomButton 
+                  // Cambiamos el texto para dar seguridad al usuario
+                  text={isConnected ? t('subir') : t('guardarLocal')} 
+                  
+                  // Cambiamos el color a uno más neutro si está offline
+                  bgColor={isConnected ? "#62a256" : "#808080"} 
+                  fgColor='white' 
+                  
+                  // Mostramos un icono de guardado local si no hay red
+                  iconName={isConnected ? null : "save"} 
+                  
+                  // Importante: No deshabilitamos este botón, pero cambiamos su lógica
+                  onPress={handleSubmit(onSubmit)} 
+                  
+            
+                  disabled={false} 
+                /> */}
+            <CustomButton text={t('subir')} disabled={!isConnected} bgColor={isConnected ? "#62a256" : "#808080"}  fgColor='white'  onPress={handleSubmit(onSubmit)} />
           </View>
           <View style={{marginBottom: 30}}>
             <CustomButton text={t('eliminar')}

@@ -12,11 +12,13 @@ const CustomButton = ({
   iconName = 'arrow-forward-ios',
   leftIconImage,
   leftIconStyles = {},
-  customStyle = {}
+  customStyle = {},
+  disabled = false,
 }) => {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={disabled ? null : onPress}
+      disabled={disabled}
       style={[
         styles.container,
         styles[`container_${type}`],

@@ -6,7 +6,7 @@ import MapStack from './MapStack';
 
 const bottomMenuData = [
   {
-    name: 'Mis Observaciones',
+    name: 'Mis Observaciones Dash',
     title: 'misObs',
     component: ObservationStack,
     params: {},

@@ -10,9 +10,12 @@ import {
   Dimensions,
   Platform,
   BackHandler,
-  TextInput
-  //TouchableOpacity
+  TextInput,
+  Share, 
+  Alert,
+  TouchableOpacity
 } from "react-native";
+import ImageView from "react-native-image-viewing";
 import { HeaderBackButton } from '@react-navigation/elements'
 import { useFocusEffect } from '@react-navigation/native';
 import * as NavigationHelper from '../navigation/NavigationHelper';
@@ -24,7 +27,7 @@ import { ObservationContext } from '../context/ObservationContext';
 import { useTranslation } from "react-i18next";
 import { useMomentLocale } from "../hooks/useMomentLocale";
 import Loading from "../components/Loading";
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { analyticsService } from '../services/analyticsService';
 
 const { width, height } = Dimensions.get("window");
@@ -43,7 +46,14 @@ export default function ShowObservation({ route, navigation }) {
     const [userScores, setUserScores] = useState({ Ta: '-', Ra: '-' });
     
     const observationId = route.params?.observationId;
+    console.log(route.params);
     const isNotification = route.params?.isNotification || false;
+
+    const [isImageViewVisible, setImageViewVisible] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [formattedImages, setFormattedImages] = useState([]);
+
+   
 
     const handleBackPress = useCallback(() => {
         console.log("🧹 Cleaning params before Going Back");
@@ -59,43 +69,8 @@ export default function ShowObservation({ route, navigation }) {
           navigation.goBack();
         }
        
-        
-        // A. Clear the params while the screen is still alive/focused
-        // navigation.setParams({ 
-        //     observationId: null, 
-        //     fromNotification: null,
-        //     item: null
-        // });
-
-        // // B. Navigate based on source
-        // // if (route.params?.fromNotification) {
-        // //      navigation.navigate('Mapa', { screen: 'ObservationsMap' });
-        // // } else {
-        //      navigation.pop();
-        // // }
-        
         return true; // Tells Android "I handled this event"
     }, [navigation, route.params?.isNotification]);
-
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-    //         // 1. Do your cleanup logic here
-    //         console.log("🗑️ Modal is being dismissed!");
-    //         NavigationHelper.reset('Mapa', { 
-    //             screen: 'ObservationsMap',
-    //             params: {  } 
-    //         });
-    //         // Example: Clear params on the Map Screen (if you need to)
-    //         // Note: You can't setParams on a screen you are leaving easily, 
-    //         // but you can use Context functions here.
-            
-    //         // Example: Refresh data context
-    //         // refreshObservations(); 
-    //     });
-
-    //     return unsubscribe;
-    // }, [navigation, route.params?.isNotification]);
-
 
     // 3. Intercept ANDROID HARDWARE Back Button
     useEffect(() => {
@@ -112,40 +87,27 @@ export default function ShowObservation({ route, navigation }) {
         title: t('observationTitle'),
         headerLeft: (props) => (
           <HeaderBackButton labelVisible={false} onPress={()=>{
-      
-              // navigation.setParams({ 
-              //   observationId: undefined,
-              //   isNotification: false
-              // });
-              // navigation.goBack();
-              handleBackPress();
-         
-              
+              handleBackPress();       
           }}></HeaderBackButton>
         ),
-        // headerRight: (props) => {
-        //   if (!isNotification) {
-        //       return null;
-        //   } 
-        //   return (
-        //     <TouchableOpacity 
-        //           onPress={() => {          
-        //             navigation.push('Mapa', { 
-        //               screen: 'Observaciones', 
-        //               params: { observationId: route.params.observationId,
-        //                         isNotification: true,
-        //                }
-        //             });
-        //           }}
-        //           style={{ marginRight: 10 }}
-        //           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
-        //       >
-        //       <MaterialCommunityIcons 
-        //                             size={30} 
-        //                             color="#48a5e9"
-        //                             name="map"/>
-        //     </TouchableOpacity>
-        // )},
+        headerRight: (props) => {
+          
+          return (
+            <TouchableOpacity 
+                  onPress={() => {
+                  
+                    console.log(item)
+                    onShareObservation(item)
+                  }}
+                  style={{ marginRight: 10 }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} 
+              >
+              <MaterialCommunityIcons 
+                                    size={25} 
+                                    color="#48a5e9"
+                                    name="share-variant"/>
+            </TouchableOpacity>
+        )},
       });
       return (()=>{       
 
@@ -187,6 +149,12 @@ export default function ShowObservation({ route, navigation }) {
                 setUserName(userDetails?.username || 'Anonymous');
                 setUserScores({ Ta: userDetails?.terrainExperience, Ra: userDetails?.avalancheExperience })
             }
+            if (currentItem.images && currentItem.directoryId) {
+                const formatted = currentItem.images.map(img => ({
+                    uri: `${PULIC_BUCKET_URL}/${currentItem.directoryId}/${img}`
+                }));
+                setFormattedImages(formatted); // Assuming you have a useState for this
+            }
             setIsLoading(false);
         }
 
@@ -204,7 +172,61 @@ export default function ShowObservation({ route, navigation }) {
 
       initData();
       
-    }, [observationId]);
+  }, [observationId]);
+  
+  // const formattedImages = item.images.map(img => ({
+  //   uri: `${PULIC_BUCKET_URL}/${item.directoryId}/${img}`
+  // }));
+
+  const onShareObservation = async (observation) => {
+    try {
+      // 1. Construir el mensaje
+      // IMPORTANTE: El link debe coincidir con el "path" definido en tu objeto linking
+      // Si en linking pusiste "obs/:observationId", aquí debe ser obs/ID
+      const shareUrl = `https://atesmaps.org/obs/${observation._id}`;
+      
+      const message = `${t('compartirObs')}: ${observation.title}\n\n${t('link')}: ${shareUrl}`;
+
+      // 2. Abrir el diálogo nativo
+      const result = await Share.share({
+        message: message,
+        title: observation.title, // iOS solamente
+      });
+
+      if (result.action === Share.sharedAction) {
+        // Éxito al compartir
+      }
+    } catch (error) {
+      Alert.alert(t('error'), error.message);
+    }
+  };
+    // const onShareObservation = async (observation) => {
+    //   try {
+    //     // 1. Construct the message
+    //     const message = `
+    //                       ${t('compartirObs')}: ${observation.title}
+    //                       ${t('link')}: floc://atesmaps.org/observation/${observation._id}
+    //                     `;
+
+    //     // 2. Open the native Share dialog
+    //     const result = await Share.share({
+    //       message: message,
+    //       title: observation.title, // iOS only
+    //     });
+
+    //     if (result.action === Share.sharedAction) {
+    //       if (result.activityType) {
+    //         // Shared with a specific activity type (iOS)
+    //       } else {
+    //         // Shared
+    //       }
+    //     } else if (result.action === Share.dismissedAction) {
+    //       // Dismissed
+    //     }
+    //   } catch (error) {
+    //     Alert.alert(t('error'), error.message);
+    //   }
+    // };
     
 
    
@@ -333,21 +355,21 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
             
-              { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NE</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>E</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SE</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>S</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SO</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>O</Text></View>)}
-              { item.observationTypes.weather.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
+              { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('sur')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surOeste')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('oeste')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norOeste')}</Text></View>)}        
             
             <View style={styles.linkContainer}>
               <Text style={styles.link}>{t('transNieveViento')}:</Text>
-              { item.observationTypes.weather.values.windCarry === 1 && (<Text style={styles.description}>{t('no')}</Text>)}
-              { item.observationTypes.weather.values.windCarry === 2 && (<Text style={styles.description}>{t('suave')} </Text>)}
-              { item.observationTypes.weather.values.windCarry === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
-              { item.observationTypes.weather.values.windCarry === 4 && (<Text style={styles.description}>{t('intensa')}</Text>)}
+              { item.observationTypes.weather.values.windCarry === 1 && (<Text style={styles.description}>{t('sinTransporte')}</Text>)}
+              { item.observationTypes.weather.values.windCarry === 2 && (<Text style={styles.description}>{t('transporteSuave')} </Text>)}
+              { item.observationTypes.weather.values.windCarry === 3 && (<Text style={styles.description}>{t('transporteModerado')}</Text>)}
+              { item.observationTypes.weather.values.windCarry === 4 && (<Text style={styles.description}>{t('transporteIntenso')}</Text>)}
             </View>
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('otrasObs2')}:</Text>
@@ -580,16 +602,14 @@ export default function ShowObservation({ route, navigation }) {
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
-            
-              { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NE</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>E</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SE</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>S</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SO</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>O</Text></View>)}
-              { item.observationTypes.avalanche.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
-            
+              { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('sur')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surOeste')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('oeste')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norOeste')}</Text></View>)}  
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('granoCapaDebil')}:</Text>
               <Text style={styles.description}>{item.observationTypes.avalanche.values.snowType}</Text>
@@ -648,16 +668,14 @@ export default function ShowObservation({ route, navigation }) {
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
-            
-              { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>N</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NE</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>E</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SE</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>S</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>SO</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>O</Text></View>)}
-              { item.observationTypes.snowpack.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>NO</Text></View>)}        
-            
+              { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.S && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('sur')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.SO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surOeste')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.O && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('oeste')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.NO && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norOeste')}</Text></View>)}  
             <View style={[styles.linkContainer,{marginTop: 5}]}>
               <Text style={styles.link}>{t('profManti')}:</Text>
               <Text style={styles.description}>{item.observationTypes.snowpack.values.depth} cm</Text>
@@ -704,6 +722,8 @@ export default function ShowObservation({ route, navigation }) {
               { item.observationTypes.snowpack.values.handTest === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 4 && (<Text style={styles.description}>{t('dificil')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 5 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 6 && (<Text style={styles.description}>{item.observationTypes.snowpack.values.customHandTest}</Text>)}
+
             </View>
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
@@ -718,12 +738,12 @@ export default function ShowObservation({ route, navigation }) {
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('tipoFracturaCT')}:</Text>
             </View>
-            
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoSubito')}</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarSubito')}</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarResistente')}</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoProgresivo')}</Text></View>)}
-              { item.observationTypes.snowpack.values.fractureTypeCt?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('roturaBreak')}</Text></View>)}
+
+              { item.observationTypes.snowpack.values.fractureTypeCt === 1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt === 2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarSubito')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt === 3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarResistente')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt === 4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoProgresivo')}</Text></View>)}
+              { item.observationTypes.snowpack.values.fractureTypeCt === 5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('roturaBreak')}</Text></View>)}
              
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
@@ -733,21 +753,38 @@ export default function ShowObservation({ route, navigation }) {
 
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('eCTTest')}:</Text>
+              { item.observationTypes.snowpack.values.ectResistencia === 1 && (<Text style={styles.description}>{t('hits1')}</Text>)}
+              { item.observationTypes.snowpack.values.ectResistencia === 2 && (<Text style={styles.description}>{t('hits2')}</Text>)}
+              { item.observationTypes.snowpack.values.ectResistencia === 3 && (<Text style={styles.description}>{t('hits3')}</Text>)}
+              { item.observationTypes.snowpack.values.ectResistencia === 4 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
+              { item.observationTypes.snowpack.values.ectResistencia === 5 && (<Text style={styles.description}>{item.observationTypes.snowpack.values.customExtensionTestResistance}</Text>)}
+            </View>
+
+            <View style={[styles.linkContainer,{marginTop:5}]}>
+              <Text style={styles.link}>{t('ectPropagation')}:</Text>
               { item.observationTypes.snowpack.values.extensionTest === 1 && (<Text style={styles.description}>{t('propagación')}</Text>)}
               { item.observationTypes.snowpack.values.extensionTest === 2 && (<Text style={styles.description}>{t('sinPropagación')}</Text>)}
               { item.observationTypes.snowpack.values.extensionTest === 3 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
             </View>
 
-            <View style={[styles.linkContainer,{marginTop:5}]}>
-              <Text style={styles.link}>{t('tipoFracturaECT')}:</Text>
-            </View>
+          {(item.observationTypes.snowpack.values.fractureType?.type_1 || 
+            item.observationTypes.snowpack.values.fractureType?.type_2 ||
+            item.observationTypes.snowpack.values.fractureType?.type_3 || 
+            item.observationTypes.snowpack.values.fractureType?.type_4 || 
+            item.observationTypes.snowpack.values.fractureType?.type_5 ) && (
+            <>
+              <View style={[styles.linkContainer,{marginTop:5}]}>
+                <Text style={styles.link}>{t('tipoFracturaECT')}:</Text>
+              </View>
             
               { item.observationTypes.snowpack.values.fractureType?.type_1 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoSubito')}</Text></View>)}
               { item.observationTypes.snowpack.values.fractureType?.type_2 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarSubito')}</Text></View>)}
               { item.observationTypes.snowpack.values.fractureType?.type_3 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('planarResistente')}</Text></View>)}
               { item.observationTypes.snowpack.values.fractureType?.type_4 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('colapsoProgresivo')}</Text></View>)}
               { item.observationTypes.snowpack.values.fractureType?.type_5 && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('roturaBreak')}</Text></View>)}
-             
+             </>
+            )}
+            
 
             <View style={[styles.linkContainer,{marginTop: 5}]}>
               <Text style={styles.link}>{t('profFractECT')}:</Text>
@@ -1030,32 +1067,90 @@ export default function ShowObservation({ route, navigation }) {
       )
     }
 
+    // const imagesCards = () => {
+    //   return (
+    //     <Animated.ScrollView
+    //     // contentInsetAdjustmentBehavior="automatic"
+    //     horizontal
+    //     scrollEventThrottle={1}
+    //     showsHorizontalScrollIndicator={false}
+    //     style={styles.scrollView}
+    //     pagingEnabled
+    //     snapToInterval={CARD_WIDTH + 20}
+    //     snapToAlignment="center" 
+    //     >
+    //       {item.images.map((image, index)=>(
+    //         <View key={index} style={styles.card}>
+    //           <Image 
+    //             source={{uri:PULIC_BUCKET_URL+'/'+item.directoryId+'/'+image}}
+    //             style={styles.cardImage}
+    //             resizeMode="cover" 
+    //           />  
+    //         </View>
+    //         )
+    //       )} 
+     
+    //     </Animated.ScrollView>
+    //   )
+    // }
+
     const imagesCards = () => {
       return (
-        <Animated.ScrollView
-        // contentInsetAdjustmentBehavior="automatic"
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        style={styles.scrollView}
-        pagingEnabled
-        snapToInterval={CARD_WIDTH + 20}
-        snapToAlignment="center" 
-        >
-          {item.images.map((image, index)=>(
-            <View key={index} style={styles.card}>
-              <Image 
-                source={{uri:PULIC_BUCKET_URL+'/'+item.directoryId+'/'+image}}
-                style={styles.cardImage}
-                resizeMode="cover" 
-              />  
-            </View>
-            )
-          )} 
-     
-        </Animated.ScrollView>
-      )
-    }
+        <View>
+          <Animated.ScrollView
+            horizontal
+            scrollEventThrottle={1}
+            showsHorizontalScrollIndicator={false}
+            style={styles.scrollView}
+            pagingEnabled
+            snapToInterval={CARD_WIDTH + 20}
+            snapToAlignment="center" 
+          >
+            {item.images.map((image, index) => (
+              <TouchableOpacity 
+                key={index} 
+                activeOpacity={0.9}
+                style={styles.card}
+                onPress={() => {
+                  setCurrentImageIndex(index);
+                  setImageViewVisible(true);
+                }}
+              >
+                <Image 
+                  source={{ uri: `${PULIC_BUCKET_URL}/${item.directoryId}/${image}` }}
+                  style={styles.cardImage}
+                  resizeMode="cover" 
+                />  
+              </TouchableOpacity>
+            ))} 
+          </Animated.ScrollView>
+
+          {/* COMPONENTE FANCY BOX / IMAGE VIEW */}
+          <ImageView
+            images={formattedImages}
+            imageIndex={currentImageIndex}
+            visible={isImageViewVisible}
+            onRequestClose={() => setImageViewVisible(false)}
+            
+            // Configuraciones de UX
+            swipeToCloseEnabled={true}   // Deslizar abajo para cerrar
+            doubleTapToZoomEnabled={true} // Doble toque para zoom rápido
+            // delayLongPress={1000}
+            
+            // Opcional: Footer con el contador de fotos
+            FooterComponent={({ imageIndex }) => (
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>
+                  {imageIndex + 1} / {formattedImages.length}
+                </Text>
+              </View>
+            )}
+          />
+        </View>
+      );
+    };
+
+    
     if( isLoading || !item ) {
       console.log('loading....')
       return(
@@ -1272,6 +1367,17 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     height: 30,
     width: 30,
+  },
+  footer: {
+    height: 50,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footerText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   pin: {
     ...Platform.select({

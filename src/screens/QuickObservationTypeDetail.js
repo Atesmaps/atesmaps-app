@@ -11,7 +11,8 @@ import {
     View,
     Button,
     Text,
-    TextInput
+    TextInput,
+    TouchableOpacity
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +34,7 @@ const { editingObservation, selectedIndex, setEditingObservation, updateObservat
 const [ quickValues, setQuickValues ] = useState(editingObservation.observationTypes?.quick ? editingObservation.observationTypes?.quick : {status: false, values: {}});
 const [inputError, setInputError ] = useState(false);
 
-const { control, handleSubmit, formState: { errors }, getValues, setValue, reset } = useForm({
+const { control, handleSubmit, formState: { errors }, getValues, setValue, reset, watch } = useForm({
     //defaultValues: preloadedValues
     defaultValues: {
         deepPowder: quickValues.values.snowConditions?.deepPowder ? quickValues.values.snowConditions?.deepPowder : null,
@@ -212,6 +213,13 @@ const updateData = () => {
     }
 }
 
+const clearSection = (fields) => {
+    fields.forEach(field => {
+        // For React Hook Form, setting to null or undefined clears the selection
+        setValue(field, null, { shouldValidate: true, shouldDirty: true });
+    });
+};
+
 const removeData = () => {
     // console.log('------Quick report---------');
     // console.log("Delete Quick report observation...");  
@@ -288,6 +296,14 @@ return(
                             // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
                             // onPress={showDatepicker}
                             />
+                    {watch('activityType') !== null && watch('activityType') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['activityType','customActivityType'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 
                 <View style={styles.formContainer} >
@@ -302,6 +318,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('ridingQuality') !== null && watch('ridingQuality') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['ridingQuality'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 
                 <View style={styles.formContainer} >
@@ -357,6 +381,20 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
+                    {watch([
+                        'deepPowder', 'wet', 'crusty', 
+                        'hard', 'windAffected'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'deepPowder', 'wet', 'crusty', 
+                        'hard', 'windAffected'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -425,6 +463,20 @@ return(
                         />
                         <View style={styles.checkboxGroup}></View>
                     </View> 
+                    {watch([
+                        'rodeMellow', 'rodeSteep', 'rodeAlpine','rodeDense', 
+                        'rodeClear', 'rodeOpen','rodeShade','rodeSunny'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'rodeMellow', 'rodeSteep', 'rodeAlpine','rodeDense', 
+                                'rodeClear', 'rodeOpen','rodeShade','rodeSunny'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -509,6 +561,22 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
+                    {watch([
+                        'warmDay', 'coldDay', 'cloudyDay','sunnyDay', 
+                        'windyDay', 'foggyDay','wetDay','rainyDay', 'weakSnowDay',
+                        'intenseSnowDay'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                 'warmDay', 'coldDay', 'cloudyDay','sunnyDay', 
+                                 'windyDay', 'foggyDay','wetDay','rainyDay', 'weakSnowDay',
+                                 'intenseSnowDay'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -572,7 +640,20 @@ return(
                         />
                      
                     </View> 
-                 
+                    {watch([
+                        'newConditions', 'avalanches', 'sounds','tempChanges', 
+                        'snowAccumulation'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'newConditions', 'avalanches', 'sounds','tempChanges', 
+                                'snowAccumulation'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -684,7 +765,19 @@ const styles = StyleSheet.create({
     }, 
     space: {
         height: 150,
-    }
+    },
+    absoluteClear: {
+        position: 'absolute',
+        top: 35,    // Vertical alignment
+        right: 20,  // 20px from the right border
+        zIndex: 10, // Ensures it stays clickable above other elements
+    },
+    clearText: {
+        color: '#B00020',
+        fontSize: 12,
+        fontWeight: '600',
+        //textTransform: 'uppercase', // Optional: makes it look more like a button
+    },
 });
 
 export default QuickObservationTypeDetail;

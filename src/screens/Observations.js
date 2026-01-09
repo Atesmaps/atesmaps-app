@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { ObservationContext } from '../context/ObservationContext';
 import { LocationContext } from '../context/LocationContext';
+import { useConnection } from '../hooks/useConnection';
 
 
 import Item from '../components/ObservationItem';
@@ -31,6 +32,7 @@ export default function ObservationDetail({ navigation }) {
     const {isLoading, lastIndex, observations, historicObservations, newObservation, currentPage, setCurrentPage, setLastPage, lastPage, getData} = useContext(ObservationContext);
     const {userDetails} = useContext(AuthContext);
     const { t } = useTranslation();
+    const isConnected = useConnection();
 
     //const [user, setUser] = useState(userDetails);
     const [drafts, setDrafts] = useState(observations);
@@ -241,6 +243,26 @@ export default function ObservationDetail({ navigation }) {
         />
     }
 
+    let offLineList;
+    console.log(isConnected)
+    if (isConnected) {
+      
+      offLineList = uploadedList
+    }else{
+      
+      offLineList = <View style={styles.empty}>
+        <MaterialCommunityIcons 
+            // name='add-a-photo'
+            name='cloud-off-outline'
+            size={50} 
+            color={'gray'}
+            style={{marginBottom: 20}}/>
+        
+        <Text style={styles.offlineText}>{t('offlineMode')}</Text>
+      </View>
+    }
+ 
+
 
     return (
         <View style={styles.listContainer}>
@@ -288,7 +310,7 @@ export default function ObservationDetail({ navigation }) {
               </View>
               <View style={styles.spacer}/>
             </View>
-            {uploadedList}
+            {offLineList}
             
         </View>
        

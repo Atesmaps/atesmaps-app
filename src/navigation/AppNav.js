@@ -27,12 +27,31 @@ import { AuthContext } from '../context/AuthContext';
 import Loading from '../components/Loading';
 import { BASE_URL } from '../config';
 
+import OfflineBanner from '../components/OfflineBanner';
+
+
+
 
 const AppNav: () => Node = () => {
    // const isDarkMode = useColorScheme() === 'dark';
     const routeNameRef = useRef();
     const {isLoading, userToken} = useContext(AuthContext);
 
+    useEffect(() => {
+      const handleDeepLink = (event) => {
+        console.log("🔗 Deep Link Detectado en JS:", event.url);
+      };
+
+      // Listener para cuando la app está en segundo plano (Background/Foreground)
+      const subscription = Linking.addEventListener('url', handleDeepLink);
+      
+      // Para cuando la app está totalmente cerrada (Cold Start)
+      Linking.getInitialURL().then(url => {
+        if (url) console.log("🚀 URL de apertura inicial:", url);
+      });
+
+      return () => subscription.remove();
+    }, []);
    
     
     useEffect(()=>{
@@ -97,27 +116,50 @@ const AppNav: () => Node = () => {
       );
     };
 
+
+    const linking = {
+      prefixes: ['https://atesmaps.org', 'floc://'],
+      config: {
+        screens: {
+          'Mis Observaciones Dash':{
+            initialRouteName: 'Mis Observaciones',
+            screens: {
+              'Ver Observacion': {
+                path: 'obs/:observationId',
+                // getId: ({ params }) => params?.observationId,
+                parse: {
+                  observationId: (id) => `${id}`, // Asegura que el ID sea string
+                },
+                
+              },
+            } 
+          }
+        },
+      },
+    };
+
     if( isLoading ) {
         return(
             <Loading />
         )
     }
     
+   
+
     return (
       // <NavigationContainer>
+      <>
+       <OfflineBanner />
        <NavigationContainer 
         ref={navigationRef}
         onReady={() => {
           routeNameRef.current = navigationRef.getCurrentRoute().name;
         }}
+        linking={linking}
         onStateChange={async () => {
-         
           const previousRouteName = routeNameRef.current;
           const currentRoute = navigationRef.getCurrentRoute();
-          const currentRouteName = currentRoute?.name;
-
-
-          
+          const currentRouteName = currentRoute?.name;          
           if (previousRouteName !== currentRouteName) {
             if (currentRouteName) {
               try{
@@ -137,7 +179,8 @@ const AppNav: () => Node = () => {
           {/* TODO: check update needed... */}
           { userToken !== null ? <BottomTabs /> : <AuthStack />}
         {/* </SafeAreaView> */}
-      </NavigationContainer>
+       </NavigationContainer>
+      </>
     );
   };
 

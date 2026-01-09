@@ -11,7 +11,8 @@ import {
     Button,
     View,
     Text,
-    TextInput
+    TextInput,
+    TouchableOpacity 
 } from 'react-native';
 
 import  Snackbar  from "react-native-snackbar";
@@ -51,11 +52,13 @@ const SnowpackObservationTypeDetail: () => Node = ({ route, navigation }) => {
         //check documentation here: https://reactnavigation.org/docs/navigation-prop/#setparams
       }, [navigation]);
 
-const { editingObservation, selectedIndex, setEditingObservation,updateObservations  } = useContext(ObservationContext);
+const {editingObservation, selectedIndex, setEditingObservation,updateObservations  } = useContext(ObservationContext);
 const [snowpackValues, setSnowpackValues] = useState(editingObservation.observationTypes?.snowpack ? editingObservation.observationTypes?.snowpack : {status: false, values: {}});
 const [inputError, setInputError ] = useState(false);
+const [inputError2, setInputError2 ] = useState(false);
+const [inputError3, setInputError3 ] = useState(false);
 
-const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
+const { control, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm({
     defaultValues: {
         // range_1: snowpackValues.values.altitudeRange?.range_1 ? snowpackValues.values.altitudeRange?.range_1 : null,
         // range_2: snowpackValues.values.altitudeRange?.range_2 ? snowpackValues.values.altitudeRange?.range_2 : null,
@@ -83,15 +86,19 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue } = us
         footPenetration:snowpackValues.values?.footPenetration ? snowpackValues.values?.footPenetration : null,
         skiPenetration:snowpackValues.values?.skiPenetration ? snowpackValues.values?.skiPenetration : null,
         handTest:snowpackValues.values?.handTest ? snowpackValues.values?.handTest : null, 
+        customHandTest:snowpackValues.values?.customHandTest ? snowpackValues.values?.customHandTest : null,
         compresionTest:snowpackValues.values?.compresionTest ? snowpackValues.values?.compresionTest : null,
         customCompresionTest:snowpackValues.values?.customCompresionTest ? snowpackValues.values?.customCompresionTest : null,
         extensionTest:snowpackValues.values?.extensionTest ? snowpackValues.values?.extensionTest : null,
+        extensionTestResistance:snowpackValues.values?.extensionTestResistance ? snowpackValues.values?.extensionTestResistance : null,
+        customExtensionTestResistance:snowpackValues.values?.customExtensionTestResistance ? snowpackValues.values?.customExtensionTestResistance : null,
         fractureType1:snowpackValues.values?.fractureType?.type_1 ? snowpackValues.values?.fractureType?.type_1 : null,
         fractureType2:snowpackValues.values?.fractureType?.type_2 ? snowpackValues.values?.fractureType?.type_2 : null,
         fractureType3:snowpackValues.values?.fractureType?.type_3 ? snowpackValues.values?.fractureType?.type_3 : null,
         fractureType4:snowpackValues.values?.fractureType?.type_4 ? snowpackValues.values?.fractureType?.type_4 : null,
         fractureType5:snowpackValues.values?.fractureType?.type_5 ? snowpackValues.values?.fractureType?.type_5 : null,
         fractureType6:snowpackValues.values?.fractureType?.type_6 ? snowpackValues.values?.fractureType?.type_6 : null,
+        fractureTypeCtValue:snowpackValues.values?.fractureTypeCtValue ? snowpackValues.values?.fractureTypeCtValue : null,
         fractureType1:snowpackValues.values?.fractureTypeCt?.type_1 ? snowpackValues.values?.fractureTypeCt?.type_1 : null,
         fractureType2:snowpackValues.values?.fractureTypeCt?.type_2 ? snowpackValues.values?.fractureTypeCt?.type_2 : null,
         fractureType3:snowpackValues.values?.fractureTypeCt?.type_3 ? snowpackValues.values?.fractureTypeCt?.type_3 : null,
@@ -102,6 +109,7 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue } = us
         fractureDepth:snowpackValues.values?.fractureDepth ? snowpackValues.values?.fractureDepth : null,
         layerHardness:snowpackValues.values?.layerHardness ? snowpackValues.values?.layerHardness : null,
         weakLayerHardness:snowpackValues.values?.weakLayerHardness ? snowpackValues.values?.weakLayerHardness : null,
+        weakLayerHumidity:snowpackValues.values?.weakLayerHumidity ? snowpackValues.values?.weakLayerHumidity : null,
         snowHumidity:snowpackValues.values?.snowHumidity ? snowpackValues.values?.snowHumidity : null, 
         layerSnowType1:snowpackValues.values?.layerSnowType?.type_1 ? snowpackValues.values?.layerSnowType?.type_1 : null,
         layerSnowType2:snowpackValues.values?.layerSnowType?.type_2 ? snowpackValues.values?.layerSnowType?.type_2 : null,
@@ -135,6 +143,13 @@ useEffect(()=>{
     }
 },[errors])
 
+const clearSection = (fields) => {
+    fields.forEach(field => {
+        // For React Hook Form, setting to null or undefined clears the selection
+        setValue(field, null, { shouldValidate: true, shouldDirty: true });
+    });
+};
+
 useEffect(() => {
     Snackbar.dismiss();
 },[])
@@ -162,8 +177,13 @@ const updateData = () => {
     // console.log('------Quick report---------');
     const values = getValues();
     // console.log(values);
-    if( values.compresionTest == 5 && (values.customCompresionTest === null || values.customCompresionTest == "")){
-        setInputError(true);
+    if( (values.compresionTest == 5 && (values.customCompresionTest === null || values.customCompresionTest == "")) ||
+        (values.handTest == 6 && (values.customHandTest === null || values.customHandTest == "")) ||
+        (values.extensionTestResistance == 5 && (values.customExtensionTestResistance === null || values.customExtensionTestResistance == "")) 
+    ){
+        if (values.compresionTest == 5 ) setInputError(true);
+        if (values.handTest == 6 ) setInputError2(true);
+        if (values.extensionTestResistance == 5 ) setInputError3(true);
         Snackbar.show({
             text: t('snackbarErrorMsgCt'),
             duration: Snackbar.LENGTH_SHORT,
@@ -173,6 +193,7 @@ const updateData = () => {
         });
     }else{
         setInputError(false);
+        setInputError2(false);
         let aux = {values: {}}
 
         // aux['values'].observationType= values.observationType;
@@ -234,15 +255,20 @@ const updateData = () => {
         aux['values'].handTest= values.handTest;
         aux['values'].compresionTest= values.compresionTest;
         aux['values'].customCompresionTest = values.customCompresionTest;
+        aux['values'].customHandTest = values.customHandTest;
+        
 
         aux['values'].extensionTest= values.extensionTest;
+        aux['values'].extensionTestResistance= values.extensionTestResistance;
+        aux['values'].customExtensionTestResistance = values.customExtensionTestResistance;
         aux['values'].geoAccuracy= values.geoAccuracy;
         
-        // aux['values'].fractureType= values.fractureType;
+        aux['values'].fractureTypeCtValue= values.fractureTypeCtValue;
         aux['values'].fractureDepth= values.fractureDepth;
         aux['values'].fractureDepthCt= values.fractureDepthCt;
         aux['values'].layerHardness= values.layerHardness;
         aux['values'].weakLayerHardness= values.weakLayerHardness;
+        aux['values'].weakLayerHumidity= values.weakLayerHumidity;
         aux['values'].comments= values.comments;
         
 
@@ -299,6 +325,7 @@ const cmtOptions = [
         {label:  t('moderado')},
         {label:  t('dificil')},
         {label:  t('noConcluyente')},
+        {label:  t('otraOpcion')}
     ];
 
 const  snowTypeOptions= [
@@ -323,13 +350,13 @@ const ectOptions = [
         {label: t('noConcluyente')},
     ];
 
-// const fractureOptions = [
-//         {label: 'Subito/Colapso'},
-//         {label: 'Subita/Planar'},
-//         {label: 'Resistente/Planar'},
-//         {label: 'Progresiva/Colapso'},
-//         {label: 'Irregular'},
-//     ];
+const fractureOptions = [
+        {label: t('colapsoSubito')},
+        {label: t('planarSubito')},
+        {label: t('planarResistente')},
+        {label: t('colapsoProgresivo')},
+        {label: t('roturaBreak')},
+    ];
 
 const hardnessOptions = [
         {label: t('hardnessTest1')},
@@ -389,6 +416,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('geoAccuracy') !== null && watch('geoAccuracy') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['geoAccuracy'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                   
                 </View>
 
@@ -456,21 +491,21 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>Orientación:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
+                    <Text>{t('oriOrientacion')}:</Text>
+                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>  
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
-                                        title="N" 
+                                        title={t('norte')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNE" 
-                                        title="NE"
+                                        title={t('norEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                          <CustomCheckbox name="orientationE" 
-                                        title="E"
+                                        title={t('este')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -478,17 +513,17 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationSE"
-                                        title="SE" 
+                                        title={t('surEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationS" 
-                                        title="S"
+                                        title={t('sur')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                          <CustomCheckbox name="orientationSO" 
-                                        title="SO"
+                                        title={t('surOeste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -496,19 +531,37 @@ return(
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationO"
-                                        title="O" 
+                                        title={t('oeste')}  
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNO" 
-                                        title="NO"
+                                        title={t('norEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
-                        <View style={styles.checkboxGroup}>
-            
+                         <View style={styles.checkboxGroup}>
+                            
                         </View>
+                        
+                       
                     </View> 
+                    {watch([
+                        'orientationN', 'orientationNE', 'orientationE', 
+                        'orientationSE', 'orientationS', 'orientationSO', 
+                        'orientationO', 'orientationNO'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'orientationN', 'orientationNE', 'orientationE', 
+                                'orientationSE', 'orientationS', 'orientationSO', 
+                                'orientationO', 'orientationNO'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -516,14 +569,15 @@ return(
                 </View>*/}
 
                 <View style={styles.formContainer} >
-                <View style={styles.spacer}></View>
-                    <Text>{t('profManti')}:</Text>
-                    <CustomInput
-                        name="depth"
-                        placeholder="(cm)"
-                        control={control}
-                        // rules={{required: 'Title is required'}}
-                    />       
+                    <View style={styles.spacer}></View>
+                        <Text>{t('profManti')}:</Text>
+                        <CustomInput
+                            name="depth"
+                            placeholder="(cm)"
+                            control={control}
+                            // rules={{required: 'Title is required'}}
+                        />       
+                        
                 </View>
 
                 <View style={styles.formContainer} >
@@ -539,6 +593,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('woumpfs') !== null && watch('woumpfs') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['woumpfs'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                
                 </View>
 
@@ -555,6 +617,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('cracks') !== null && watch('cracks') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['cracks'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
             
@@ -608,6 +678,20 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
+                    {watch([
+                        'layerSnowType1', 'layerSnowType2', 'layerSnowType3', 
+                        'layerSnowType4', 'layerSnowType5', 'layerSnowType6'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'layerSnowType1', 'layerSnowType2', 'layerSnowType3', 
+                                'layerSnowType4', 'layerSnowType5', 'layerSnowType6'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -646,6 +730,15 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    <CustomInput
+                            name="customHandTest"
+                            placeholder={t('otroResultado')}
+                            control={control}
+                            customError={inputError2}
+                            customStyles={{width:"100%"}}
+                            // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
+                            // onPress={showDatepicker}
+                            />
                      
                     {/* <Text>Test Cizalla de mano</Text>
                         <RadioButtonRN
@@ -658,12 +751,21 @@ return(
                                 setHandTest(cmtOptions.map(object => object.label).indexOf(e.label)+1);
                             }}
                             /> */}
+                    {watch('handTest') !== null && watch('handTest') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['handTest','customHandTest'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
+                    <Text>{t('cTTest')}:</Text>
                     <CustomRadioButton 
                         name="compresionTest"
-                        title={t('cTTest')}
+                        title={t('ctResistencia')}
                         control={control}
                         data={ctOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -680,22 +782,31 @@ return(
                             // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
                             // onPress={showDatepicker}
                             />
-                    
+                    {watch('compresionTest') !== null && watch('compresionTest') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['compresionTest','customCompresionTest'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.formContainer} >
-                    {/* <CustomRadioButton 
-                        name="fractureType"
-                        title="Tipo de fractura"
+                    
+
+                      {/*<Text>{t('tituloCt')}:</Text>
+                   <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>     */}
+                    <CustomRadioButton 
+                        name="fractureTypeCtValue"
+                        title={t('tipoFracturaCT')}
                         control={control}
                         data={fractureOptions}
                         // rules={{required: 'Campo obligatorio'}}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
-                    /> */}
-                    <Text>{t('tipoFracturaCT')}:</Text>
-                    <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
-                    <View style={styles.formGroup}>
+                    />
+                    {/* <View style={styles.formGroup}>
                         <CustomCheckbox name="fractureType1Ct"
                                         title={t('colapsoSubito')}
                                         control={control}  
@@ -725,10 +836,8 @@ return(
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
-                    </View> 
-                </View>
-                <View style={styles.formContainer} >
-               
+                    </View>  */}
+                
                     <Text>{t('profFractCT')}:</Text>
                     <CustomInput
                         name="fractureDepthCt"
@@ -736,14 +845,56 @@ return(
                         control={control}
                         // rules={{required: 'Title is required'}}
                     />   
+                    {watch('fractureTypeCtValue') !== null && watch('fractureTypeCtValue') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['fractureTypeCtValue','fractureDepthCt'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                   
                 </View>
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
+
+                    <Text>{t('eCTTest')}:</Text>
+                    <CustomRadioButton 
+                        name="extensionTestResistance"
+                        title={t('ectResistencia')}
+                        control={control}
+                        data={ctOptions}
+                        // rules={{required: 'Campo obligatorio'}}
+                        box={false}
+                        textColor={'black'}
+                        circleSize={14}
+                    />
+                    {/* {watch('extensionTestResistance') === 5  && ( */}
+                    <CustomInput
+                            name="customExtensionTestResistance"
+                            placeholder={t('otroResultado')}
+                            control={control}
+                            customError={inputError3}
+                            customStyles={{width:"100%"}}
+                            // rules={getValues('activityType') == 6 ? {required: 'Indica actividad'} : null}
+                            // onPress={showDatepicker}
+                            />
+                    {/* )}*/}
+                    {watch('extensionTestResistance') !== null && watch('extensionTestResistance') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['extensionTestResistance','customExtensionTestResistance'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
+                    
+                </View> 
+                <View style={styles.formContainer} >
                     <CustomRadioButton 
                         name="extensionTest"
-                        title={t('eCTTest')}
+                        title={t('ectPropagation')}
                         control={control}
                         data={ectOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -751,20 +902,17 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-                   
+                    {watch('extensionTest') !== null && watch('extensionTest') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['extensionTest'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
-                <View style={styles.formContainer} >
-                    {/* <CustomRadioButton 
-                        name="fractureType"
-                        title="Tipo de fractura"
-                        control={control}
-                        data={fractureOptions}
-                        // rules={{required: 'Campo obligatorio'}}
-                        box={false}
-                        textColor={'black'}
-                        circleSize={14}
-                    /> */}
+                {/* <View style={styles.formContainer} >
                     <Text>{t('tipoFracturaECT')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
@@ -798,7 +946,7 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                     </View> 
-                </View>
+                </View> */}
 
                 <View style={styles.formContainer} >
               
@@ -824,7 +972,39 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('layerHardness') !== null && watch('layerHardness') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['layerHardness'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
+
+                <View style={styles.formContainer} >
+                    {/* <View style={styles.spacer}/> */}
+                    <CustomRadioButton 
+                        name="snowHumidity"
+                        title={t('humedadCapa')}
+                        control={control}
+                        data={humidityOptions}
+                        // rules={{required: 'Campo obligatorio'}}
+                        box={false}
+                        textColor={'black'}
+                        circleSize={14}
+                    />
+                    {watch('snowHumidity') !== null && watch('snowHumidity') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['snowHumidity'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
+
+
 
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
@@ -838,13 +1018,21 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('weakLayerHardness') !== null && watch('weakLayerHardness') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['weakLayerHardness'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
-                    <View style={styles.spacer}/>
+                    {/* <View style={styles.spacer}/> */}
                     <CustomRadioButton 
-                        name="snowHumidity"
-                        title={t('humedadCapa')}
+                        name="weakLayerHumidity"
+                        title={t('humedadCapaDebil')}
                         control={control}
                         data={humidityOptions}
                         // rules={{required: 'Campo obligatorio'}}
@@ -852,9 +1040,17 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-                   
+                    {watch('weakLayerHumidity') !== null && watch('weakLayerHumidity') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['weakLayerHumidity'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
+              
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
                     <Text>{t('tipoGranoCapaDebil')}:</Text>
@@ -977,7 +1173,19 @@ const styles = StyleSheet.create({
     }, 
     space: {
         height: 200,
-    }
+    },
+    absoluteClear: {
+        position: 'absolute',
+        top: 35,    // Vertical alignment
+        right: 20,  // 20px from the right border
+        zIndex: 10, // Ensures it stays clickable above other elements
+    },
+    clearText: {
+        color: '#B00020',
+        fontSize: 12,
+        fontWeight: '600',
+        //textTransform: 'uppercase', // Optional: makes it look more like a button
+    },
 
 });
 

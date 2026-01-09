@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabs() {
   const {t} = useTranslation();
   return (
-    <Tab.Navigator screenOptions={{unmountOnBlur: true, tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 65}}}>
+    <Tab.Navigator screenOptions={{unmountOnBlur: false, tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 65}}}>
       {bottomMenuData.map((item, idx) => (
         <Tab.Screen 
           key={`tab_item${idx+1}`}

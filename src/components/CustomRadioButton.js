@@ -21,37 +21,72 @@ const CustomRadioButton = ({
       name={name}
       rules={rules}
 
-      render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-        <>
-          <View
-            style={[
-              styles.container,
-              containerStyle,
-              { borderColor: error ? 'red' : containerStyle.borderColor ? containerStyle.borderColor : 'none',
-                borderWidth: error ? 1 : containerStyle.borderWidth ? containerStyle.borderWidth : 0,
-                borderRadius: error ? 5 : containerStyle.borderRadius ? containerStyle.borderRadius : 0,
-                padding: error ? 5 : containerStyle.padding ? containerStyle.padding : 0
-              }
-            ]}
-          >
+      render={({field: {value, onChange}, fieldState: {error}}) => (
+  <View style={styles.outerWrapper}>
+    <View
+      style={[
+        styles.container,
+        containerStyle,
+        { 
+          // Use a transparent border when no error to prevent layout jumps
+          borderColor: error ? 'red' : 'transparent',
+          borderWidth: error ? 1 : 0,
+          borderRadius: 5,
+          padding: error ? 5 : 0
+        }
+      ]}
+    >
+      <Text style={styles.titleStyle}>{title}</Text>
+      <RadioButtonRN
+        textColor={textColor}
+        circleSize={circleSize}
+        data={data}
+        // Force re-render of the radio group when value is cleared
+        initial={value ? value : -1} 
+        box={box}
+        selectedBtn={(e) => {
+          // Find index + 1 to match your logic
+          const idx = data.findIndex(obj => obj.label === e?.label);
+          onChange(idx !== -1 ? idx + 1 : null);
+        }}
+      />
+    </View>
+    {error && (
+      <Text style={styles.errorText}>{error.message || 'Error'}</Text>
+    )}
+  </View>
+)}
+      // render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
+      //   <>
+      //     <View
+      //       style={[
+      //         styles.container,
+      //         containerStyle,
+      //         { borderColor: error ? 'red' : containerStyle.borderColor ? containerStyle.borderColor : 'none',
+      //           borderWidth: error ? 1 : containerStyle.borderWidth ? containerStyle.borderWidth : 0,
+      //           borderRadius: error ? 5 : containerStyle.borderRadius ? containerStyle.borderRadius : 0,
+      //           padding: error ? 5 : containerStyle.padding ? containerStyle.padding : 0
+      //         }
+      //       ]}
+      //     >
 
-          <Text>{title}</Text>
-          <RadioButtonRN
-              textColor={textColor}
-              circleSize={circleSize}
-              data={data}
-              initial={value ? value : null}
-              box={box}
-              selectedBtn={(e) => {
-                  onChange(data.map(object => object.label).indexOf(e?.label)+1);
-              }}
-              />
-          </View>
-          {error && (
-            <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
-          )}
-        </>
-      )}
+      //     <Text>{title}</Text>
+      //     <RadioButtonRN
+      //         textColor={textColor}
+      //         circleSize={circleSize}
+      //         data={data}
+      //         initial={value ? value : null}
+      //         box={box}
+      //         selectedBtn={(e) => {
+      //             onChange(data.map(object => object.label).indexOf(e?.label)+1);
+      //         }}
+      //         />
+      //     </View>
+      //     {error && (
+      //       <Text style={{color: 'red', alignSelf: 'stretch'}}>{error.message || 'Error'}</Text>
+      //     )}
+      //   </>
+      // )}
     />
   );
 };
@@ -68,6 +103,9 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
   },
+  errorText: {
+    color: 'red'
+  }
 });
 
 export default CustomRadioButton;

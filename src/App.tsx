@@ -26,6 +26,7 @@ import { ObservationProvider } from './context/ObservationContext';
 import { LocationProvider } from './context/LocationContext';
 import { NotificationProvider } from './context/NotificationContext';
 
+
 // enableLatestRenderer();
 
 function App(): React.JSX.Element {

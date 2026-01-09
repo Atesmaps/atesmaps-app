@@ -12,7 +12,8 @@ import {
     Button,
     View,
     Text,
-    TextInput
+    TextInput,
+    TouchableOpacity
 } from 'react-native';
 
 import  Snackbar  from "react-native-snackbar";
@@ -31,7 +32,7 @@ const { editingObservation, selectedIndex, updateObservations, setEditingObserva
 const {t} = useTranslation();
 
 const [avalancheValues, setAvalancheValues] = useState(editingObservation.observationTypes?.avalanche ? editingObservation.observationTypes?.avalanche : {status: false, values: {}});
-const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
+const { control, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm({
     //defaultValues: preloadedValues
     defaultValues: {
         date: avalancheValues.values?.date,
@@ -230,10 +231,17 @@ const updateData = () => {
 
 }
 
+const clearSection = (fields) => {
+    fields.forEach(field => {
+        // For React Hook Form, setting to null or undefined clears the selection
+        setValue(field, null, { shouldValidate: true, shouldDirty: true });
+    });
+};
+
 useEffect(()=>{
     let observation = editingObservation.observationTypes;
-    console.log(editingObservation)
-    console.log(observation)
+    // console.log(editingObservation)
+    // console.log(observation)
     // observation['avalanche'] = avalancheValues; 
     setEditingObservation({...editingObservation,observationTypes: observation});
     //updateObservations(obj);
@@ -298,6 +306,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('obsType') !== null && watch('obsType') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['obsType'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
@@ -311,6 +327,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('geoAccuracy') !== null && watch('geoAccuracy') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['geoAccuracy'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 
 
@@ -326,6 +350,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('when') !== null && watch('when') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['when'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -340,6 +372,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('amount') !== null && watch('amount') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['amount'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -395,6 +435,20 @@ return(
                         />
                        
                     </View> 
+                    {watch([
+                        'dangerLevel1', 'dangerLevel2', 'dangerLevel3', 
+                        'dangerLevel4', 'dangerLevel5'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'dangerLevel1', 'dangerLevel2', 'dangerLevel3', 
+                                'dangerLevel4', 'dangerLevel5'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -437,7 +491,7 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="avalancheType4" 
-                                        title={t('puntual')}
+                                        title={t('placaHumeda')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -474,6 +528,22 @@ return(
                         />
                        
                     </View> 
+                    {watch([
+                        'avalancheType1', 'avalancheType2', 'avalancheType3', 
+                        'avalancheType4', 'avalancheType5','avalancheType6',
+                        'avalancheType7', 'avalancheType8', 'avalancheType9'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'avalancheType1', 'avalancheType2', 'avalancheType3', 
+                                'avalancheType4', 'avalancheType5','avalancheType6',
+                                'avalancheType7', 'avalancheType8', 'avalancheType9'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -537,7 +607,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-                     
+                    {watch('trigger') !== null && watch('trigger') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['trigger'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                  </View> 
                  <View style={styles.formContainer} >
                     <View style={styles.spacer}></View>
@@ -572,6 +649,7 @@ return(
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
+                        
                     </View> 
 
                     {/* <View style={styles.formGroup}>
@@ -605,9 +683,21 @@ return(
                     
                        
                     </View> 
+                    {watch([
+                            'heightRange1', 'heightRange2', 'heightRange3'
+                        ]).some(Boolean) && (
+                            <TouchableOpacity 
+                                style={[styles.absoluteClear, { top: 37 }]} 
+                                onPress={() => clearSection([
+                                    'heightRange1', 'heightRange2', 'heightRange3'
+                                ])}
+                            >
+                                <Text style={styles.clearText}>{t('clearAll')}</Text>
+                            </TouchableOpacity>
+                        )}
                 </View>
                 <View style={styles.formContainer} >
-                <Text>Inclinación zona de salida:</Text>
+                <Text>{t('inclinaciónZona')}</Text>
                 <View style={styles.spacer}></View>
                     <View style={styles.inputGroup}>
                     
@@ -635,7 +725,7 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>Orientación:</Text>
+                    <Text>{t('oriOrientacion')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
@@ -691,7 +781,22 @@ return(
                        
                     </View> 
                   
-                  
+                    {watch([
+                        'orientationN', 'orientationNE', 'orientationE', 
+                        'orientationSE', 'orientationS', 'orientationSO', 
+                        'orientationO', 'orientationNO'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'orientationN', 'orientationNE', 'orientationE', 
+                                'orientationSE', 'orientationS', 'orientationSO', 
+                                'orientationO', 'orientationNO'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 {/* {errors.deepPowder && (
                     <Text style={{color: 'red', alignSelf: 'stretch'}}>{errors.deepPowder?.message || 'Error'}</Text>
@@ -725,7 +830,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
-                   
+                   {watch('windExposure') !== null && watch('windExposure') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['windExposure'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -827,7 +939,19 @@ const styles = StyleSheet.create({
     },
     space: {
         height: 20,
-    }
+    },
+    absoluteClear: {
+        position: 'absolute',
+        top: 35,    // Vertical alignment
+        right: 20,  // 20px from the right border
+        zIndex: 10, // Ensures it stays clickable above other elements
+    },
+    clearText: {
+        color: '#B00020',
+        fontSize: 12,
+        fontWeight: '600',
+        //textTransform: 'uppercase', // Optional: makes it look more like a button
+    },
 
 });
 export default AvalancheObservationTypeDetail;

@@ -11,7 +11,8 @@ import {
     View,
     Button,
     Text,
-    TextInput
+    TextInput,
+    TouchableOpacity
 } from 'react-native';
 
 import CustomRadioButton from "../components/CustomRadioButton";
@@ -31,7 +32,7 @@ const {t} = useTranslation();
 const { editingObservation, selectedIndex, setEditingObservation, updateObservations  } = useContext(ObservationContext);
 const [ weatherValues, setWeatherValues ] = useState(editingObservation.observationTypes?.weather ? editingObservation.observationTypes?.weather : {status: false, values: {}});
 
-const { control, handleSubmit, formState: { errors }, getValues, setValue, reset } = useForm({
+const { control, handleSubmit, formState: { errors }, getValues, setValue, reset, watch } = useForm({
     //defaultValues: preloadedValues
     defaultValues: {
         skyCondition: weatherValues.values.skyCondition ? weatherValues.values.skyCondition : null,
@@ -62,27 +63,51 @@ const { control, handleSubmit, formState: { errors }, getValues, setValue, reset
     }
 });
 
-useEffect(()=>{
-    if (errors && Object.keys(errors).length != 0) {
-        let errorsText = t('errorTitle');
-        for (const key in errors) {
-            errorsText += `${key}: ${errors[key]['message']} \n`
-            // console.log(`${key}: ${errors[key]}`);
-        }
+// useEffect(()=>{
+//     if (errors && Object.keys(errors).length != 0) {
+//         let errorsText = t('errorTitle');
+//         for (const key in errors) {
+//             errorsText += `${key}: ${errors[key]['message']} \n`
+//             // console.log(`${key}: ${errors[key]}`);
+//         }
+//         Snackbar.show({
+//             text: errorsText,
+//             duration: Snackbar.LENGTH_INDEFINITE,
+//             numberOfLines: 4,
+//             textColor: "#fff",
+//             backgroundColor: "#B00020",
+//             action: {
+//                 text: t('close'),
+//                 textColor: 'white',
+//                 onPress: () => { /* Do something. */ },
+//             },
+//         });
+//     }
+// },[errors])
+useEffect(() => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+        let errorsText = t('errorTitle') + "\n";
+        errorKeys.forEach((key) => {
+            // Check if message exists to avoid rendering [object Object]
+            const msg = errors[key]?.message;
+            if (msg) errorsText += `• ${msg}\n`;
+        });
+
         Snackbar.show({
             text: errorsText,
-            duration: Snackbar.LENGTH_INDEFINITE,
-            numberOfLines: 4,
+            duration: Snackbar.LENGTH_INDEFINITE, // Change to LONG so it doesn't block the UI forever
+            numberOfLines: 5,
             textColor: "#fff",
             backgroundColor: "#B00020",
             action: {
                 text: t('close'),
                 textColor: 'white',
-                onPress: () => { /* Do something. */ },
+                onPress: () => Snackbar.dismiss(),
             },
         });
     }
-},[errors])
+}, [errors]);
 
 useEffect(() => {
     Snackbar.dismiss();
@@ -246,15 +271,21 @@ const windSpeedOptions = [
 
 const [windSpeed, setWindSpeed] = useState();
 
-
 const windCarryOptions = [
-    {label: t('no')},
-    {label: t('suave')},
-    {label: t('moderado')},
-    {label: t('intensa')},
+    {label: t('sinTransporte')},
+    {label: t('transporteSuave')},
+    {label: t('transporteModerado')},
+    {label: t('transporteIntenso')},
 ]
 
 const [windCarry, setWindCarry] = useState();
+
+const clearSection = (fields) => {
+    fields.forEach(field => {
+        // For React Hook Form, setting to null or undefined clears the selection
+        setValue(field, null, { shouldValidate: true, shouldDirty: true });
+    });
+};
 
 
 return(
@@ -266,20 +297,32 @@ return(
                     <Text style={styles.introSubtext}>{t('campos')}</Text>
                 </View>
 
-                <View style={styles.formContainer} >
-                    <View style={styles.spacer}/>
-                     <CustomRadioButton 
-                        name="skyCondition"
-                        title={`${t('estadoCielo')}*:`}
-                        control={control}
-                        data={skyConditionOptions}
-                        rules={{required: t('requiredField')}}
-                        box={false}
-                        textColor={'black'}
-                        circleSize={14}
-                    />
-                </View>
-                
+
+                    <View style={styles.formContainer} >
+                        <View style={styles.spacer}/>
+                        
+                        <CustomRadioButton 
+                            name="skyCondition"
+                            title={`${t('estadoCielo')}*:`}
+                            control={control}
+                            data={skyConditionOptions}
+                            rules={{required: t('requiredField')}}
+                            box={false}
+                            textColor={'black'}
+                            circleSize={14}
+                        />
+                        {watch('skyCondition') !== null && watch('skyCondition') !== undefined && (
+                        <TouchableOpacity 
+                            style={styles.absoluteClear} 
+                            onPress={() => clearSection(['skyCondition'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                        )}
+                    </View>
+                    
+        
+                  
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
@@ -292,6 +335,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('precipitationType') !== null && watch('precipitationType') !== undefined && (
+                    <TouchableOpacity 
+                        style={styles.absoluteClear} 
+                        onPress={() => clearSection(['precipitationType'])}
+                    >
+                        <Text style={styles.clearText}>{t('clear')}</Text>
+                    </TouchableOpacity>
+                    )}
                 </View>
                   
                 <View style={styles.formContainer} >
@@ -305,6 +356,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('snowIntensity') !== null && watch('snowIntensity') !== undefined && (
+                    <TouchableOpacity 
+                        style={[styles.absoluteClear,{'top':'17'}]} 
+                        onPress={() => clearSection(['snowIntensity'])}
+                    >
+                        <Text style={styles.clearText}>{t('clear')}</Text>
+                    </TouchableOpacity>
+                    )}
                 </View>
                 
                             
@@ -319,6 +378,15 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('rainIntensity') !== null && watch('rainIntensity') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'17'}]}  
+                            onPress={() => clearSection(['rainIntensity'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
+                    
                 </View>
 
                 <View style={styles.formContainer} >
@@ -364,8 +432,8 @@ return(
                             />
                     
                     </View> 
-               
-                    
+               </View>
+                <View style={styles.formContainer} >
 
                     <CustomRadioButton 
                         name="tempChange"
@@ -376,6 +444,15 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+
+                    {watch('tempChange') !== null && watch('tempChange') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'45'}]} 
+                            onPress={() => clearSection(['tempChange'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -434,7 +511,7 @@ return(
                     
                         <CustomInput
                             name="stormDate"
-                            placeholder="dd/mm/yyyy"
+                            placeholder="dd/mm/yyyy - dd/mm/yyyy"
                             control={control}
                             customStyles={{width:"100%"}}
                             //   rules={{required: 'Email is required'}}
@@ -448,14 +525,22 @@ return(
                 <View style={styles.formContainer} >
                     <View style={styles.spacer}/>
                     <CustomRadioButton 
-                        name={t('velViento')}
-                        title="Velocidad del viento:"
+                        name="windSpeed"
+                        title={t('velViento')}
                         control={control}
                         data={windSpeedOptions}
                         box={false}
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('windSpeed') !== null && watch('windSpeed') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['windSpeed'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -470,21 +555,21 @@ return(
                         }
                         ]}
                     > */}
-                    <Text>{t('oriOrientacion')}:</Text>
+                    <Text>{t('vientoOrientacion')}:</Text>
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationN"
-                                        title="N" 
+                                        title={t('norte')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNE" 
-                                        title="NE"
+                                        title={t('norEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                          <CustomCheckbox name="orientationE" 
-                                        title="E"
+                                        title={t('este')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -492,17 +577,17 @@ return(
 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationSE"
-                                        title="SE" 
+                                        title={t('surEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationS" 
-                                        title="S"
+                                        title={t('sur')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                          <CustomCheckbox name="orientationSO" 
-                                        title="SO"
+                                        title={t('surOeste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
@@ -510,23 +595,38 @@ return(
                     </View> 
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="orientationO"
-                                        title="O" 
+                                        title={t('oeste')}  
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNO" 
-                                        title="NO"
+                                        title={t('norEste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                          <View style={styles.checkboxGroup}>
                             
-                            </View>
+                        </View>
                         
                        
                     </View> 
                   
-                  
+                    {watch([
+                        'orientationN', 'orientationNE', 'orientationE', 
+                        'orientationSE', 'orientationS', 'orientationSO', 
+                        'orientationO', 'orientationNO'
+                    ]).some(Boolean) && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear, { top: 37 }]} 
+                            onPress={() => clearSection([
+                                'orientationN', 'orientationNE', 'orientationE', 
+                                'orientationSE', 'orientationS', 'orientationSO', 
+                                'orientationO', 'orientationNO'
+                            ])}
+                        >
+                            <Text style={styles.clearText}>{t('clearAll')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -540,6 +640,14 @@ return(
                         textColor={'black'}
                         circleSize={14}
                     />
+                    {watch('windCarry') !== null && watch('windCarry') !== undefined && (
+                        <TouchableOpacity 
+                            style={[styles.absoluteClear,{'top':'37'}]} 
+                            onPress={() => clearSection(['windCarry'])}
+                        >
+                            <Text style={styles.clearText}>{t('clear')}</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <View style={styles.formContainer} >
@@ -645,7 +753,19 @@ const styles = StyleSheet.create({
     }, 
     space: {
         height: 150,
-    }
+    },
+   absoluteClear: {
+        position: 'absolute',
+        top: 35,    // Vertical alignment
+        right: 20,  // 20px from the right border
+        zIndex: 10, // Ensures it stays clickable above other elements
+    },
+    clearText: {
+        color: '#B00020',
+        fontSize: 12,
+        fontWeight: '600',
+        //textTransform: 'uppercase', // Optional: makes it look more like a button
+    },
 });
 
 export default WeatherObservationTypeDetail;

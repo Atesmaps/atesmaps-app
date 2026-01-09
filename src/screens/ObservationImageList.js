@@ -168,10 +168,10 @@ useLayoutEffect(() => {
 
 const takePhotoFromCamera = () => {
   ImagePicker.openCamera({
-    compressImageMaxWidth: 300,
-    compressImageMaxHeight: 300,
+    compressImageMaxWidth: 1500,
+    compressImageMaxHeight: 2000,
     cropping: true,
-    compressImageQuality: 0.7
+    compressImageQuality:0.8
   }).then(chosenImage => {
     // console.log(chosenImage.filename)
     // console.log(chosenImage.path.split("/").pop())
@@ -190,10 +190,10 @@ const deleteImage = (index) => {
 
 const choosePhotoFromLibrary = async () => {
   ImagePicker.openPicker({
-    width: 300,
-    height: 300,
+    width: 1500,
+    height: 2000,
     cropping: true,
-    compressImageQuality: 0.7
+    compressImageQuality: 0.8
   }).then(chosenImage => {
     // console.log(chosenImage.filename)
     // console.log(chosenImage.path.split("/").pop())
