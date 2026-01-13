@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 export default function BottomTabs() {
   const {t} = useTranslation();
   return (
-    <Tab.Navigator screenOptions={{unmountOnBlur: false, tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 65}}}>
+    <Tab.Navigator screenOptions={{unmountOnBlur: false, tabBarStyle: {height: Platform.OS === 'ios' ? 90 : 90}}}>
       {bottomMenuData.map((item, idx) => (
         <Tab.Screen 
           key={`tab_item${idx+1}`}
@@ -33,7 +33,7 @@ export default function BottomTabs() {
               /> */}
             </View>
           ),
-          tabBarLabel: ({ focused }) => <Text style={{marginBottom: (Platform.OS === 'ios' ? 0 : 5),fontSize: 12, color: focused ? '#307df6' : '#5f5f5f' }}>{t(item.title)}</Text>,
+          tabBarLabel: ({ focused }) => <Text style={{marginBottom: (Platform.OS === 'ios' ? 0 : 0),fontSize: 12, color: focused ? '#307df6' : '#5f5f5f' }}>{t(item.title)}</Text>,
         }}
         />        
       ))}
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#ffffff',
     paddingHorizontal: 10,
-    bottom: Platform.OS === 'ios' ? -5 : 0,
+    bottom: Platform.OS === 'ios' ? -5 : -10,
   },
   tabBarIcon: {
     width: 25,

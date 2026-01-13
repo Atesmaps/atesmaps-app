@@ -407,5 +407,6 @@
   "transporteIntenso": "Intense",
   "clear":"Clear",
   "clearAll":"Clear All",
-"offlineMode":"Offline",
+  "offlineMode":"Offline",
+  "humedadCapaDebil":"Weak layer humidity"
 }
