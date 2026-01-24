@@ -234,7 +234,7 @@
   "planarSubito": "Soudain planaire (SP)",
   "colapsoProgresivo": "Effondrement progressif (PC)",
   "profFractECT": "Profondeur de la fracture (ECT)",
-  "durezaPlaca": "Dureté de la couche (sur la couche fragile)",
+  "durezaPlaca": "Dureté de la plaque (sur la couche fragile)",
   "puño": "Poing",
   "dedos4": "4 doigts",
   "dedo1": "1 doigt",
@@ -242,7 +242,7 @@
   "cuchillo": "Couteau",
   "hielo": "Glace",
   "durezaPlacaDebil": "Dureté de la couche fragile",
-  "humedadCapa": "Humidité de la couche",
+  "humedadCapa": "Humidité de la plaque",
   "secaBola": "Sèche-Boule impossible",
   "humedaBola": "Humide-Boule facile",
   "mojadaGuanteNo": "Mouillée-Gant ne se mouille pas",
@@ -408,5 +408,7 @@
   "clear": "Effacer la sélection",
   "clearAll": "Effacer la sélection",
   "offlineMode":"Offline",
-  "humedadCapaDebil":"Humidité de la couche faible"
+  "humedadCapaDebil":"Humidité de la couche faible",
+  "normal": "Modéré",
+  "terrenoSuave":"Léger"
 }

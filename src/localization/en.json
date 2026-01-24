@@ -408,5 +408,8 @@
   "clear":"Clear",
   "clearAll":"Clear All",
   "offlineMode":"Offline",
-  "humedadCapaDebil":"Weak layer humidity"
+  "humedadCapaDebil":"Weak layer humidity",
+  "normal": "Moderate",
+  "terrenoSuave":"Gentle",
+
 }

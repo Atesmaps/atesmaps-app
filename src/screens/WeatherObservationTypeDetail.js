@@ -600,7 +600,7 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNO" 
-                                        title={t('norEste')} 
+                                        title={t('norOeste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />

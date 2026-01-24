@@ -322,7 +322,7 @@ const windExposureOptions = [
 const cmtOptions = [
         {label:  t('muyFacil')},
         {label:  t('facil')},
-        {label:  t('moderado')},
+        {label:  t('normal')},
         {label:  t('dificil')},
         {label:  t('noConcluyente')},
         {label:  t('otraOpcion')}
@@ -347,7 +347,7 @@ const ctOptions = [
 const ectOptions = [
         {label: t('propagación')},
         {label: t('sinPropagación')},
-        {label: t('noConcluyente')},
+        //{label: t('noConcluyente')},
     ];
 
 const fractureOptions = [
@@ -536,7 +536,7 @@ return(
                                         // rules={{required: 'Campo obligatorio'}}
                         />
                         <CustomCheckbox name="orientationNO" 
-                                        title={t('norEste')} 
+                                        title={t('norOeste')} 
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />

@@ -234,7 +234,7 @@
   "planarSubito": "Planar subito",
   "colapsoProgresivo": "Colapso progresivo",
   "profFractECT": "Profundidad de fractura (ECT)",
-  "durezaPlaca": "Dureza de la capa (sobre la capa débil)",
+  "durezaPlaca": "Dureza de la placa (sobre la capa débil)",
   "puño": "Puño",
   "dedos4": "4 dedos",
   "dedo1": "1 dedo",
@@ -242,7 +242,7 @@
   "cuchillo": "Cuchillo",
   "hielo": "Hielo",
   "durezaPlacaDebil": "Dureza de la capa débil",
-  "humedadCapa": "Humedad de la capa",
+  "humedadCapa": "Humedad de la placa",
   "secaBola": "1-Seca-Bola imposible",
   "humedaBola": "2-Húmeda-Bola fácil",
   "mojadaGuanteNo": "3-Mojada-Guante no se moja",
@@ -413,5 +413,7 @@
   "clear":"Borrar Selección",
   "clearAll":"Borrar Selección",
   "offlineMode":"Offline",
-  "humedadCapaDebil":"Humedad de la capa debil"
+  "humedadCapaDebil":"Humedad de la capa debil",
+  "normal": "Moderado",
+  "terrenoSuave":"Suave",
 }

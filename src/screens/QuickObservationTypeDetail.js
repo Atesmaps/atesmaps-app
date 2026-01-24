@@ -417,7 +417,7 @@ return(
                     <Text style={{fontSize:12, color: 'gray', padding:5}}>{t('multiplesOpciones')}</Text>    
                     <View style={styles.formGroup}>
                         <CustomCheckbox name="rodeMellow"
-                                        title={t('suave')}
+                                        title={t('terrenoSuave')}
                                         control={control}  
                                         // rules={{required: 'Campo obligatorio'}}
                         />

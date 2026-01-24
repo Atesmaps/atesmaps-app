@@ -355,7 +355,7 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
             
-              { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.weather.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norte')}</Text></View>)}
               { item.observationTypes.weather.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
               { item.observationTypes.weather.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
               { item.observationTypes.weather.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
@@ -602,7 +602,7 @@ export default function ShowObservation({ route, navigation }) {
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
-              { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.avalanche.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norte')}</Text></View>)}
               { item.observationTypes.avalanche.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
               { item.observationTypes.avalanche.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
               { item.observationTypes.avalanche.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
@@ -668,7 +668,7 @@ export default function ShowObservation({ route, navigation }) {
             <View style={[styles.linkContainer,{marginTop:5}]}>
               <Text style={styles.link}>{t('oriOrientacion')}:</Text>
             </View>
-              { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('nnorte')}</Text></View>)}
+              { item.observationTypes.snowpack.values.orientation?.N && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norte')}</Text></View>)}
               { item.observationTypes.snowpack.values.orientation?.NE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('norEste')}</Text></View>)}
               { item.observationTypes.snowpack.values.orientation?.E && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('este')}</Text></View>)}
               { item.observationTypes.snowpack.values.orientation?.SE && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={[styles.description, {maxWidth:250}]}>{t('surEste')}</Text></View>)}
@@ -719,7 +719,7 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('testCizalla')}:</Text>
               { item.observationTypes.snowpack.values.handTest === 1 && (<Text style={styles.description}>{t('muyFacil')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 2 && (<Text style={styles.description}>{t('facil')}</Text>)}
-              { item.observationTypes.snowpack.values.handTest === 3 && (<Text style={styles.description}>{t('moderado')}</Text>)}
+              { item.observationTypes.snowpack.values.handTest === 3 && (<Text style={styles.description}>{t('normal')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 4 && (<Text style={styles.description}>{t('dificil')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 5 && (<Text style={styles.description}>{t('noConcluyente')}</Text>)}
               { item.observationTypes.snowpack.values.handTest === 6 && (<Text style={styles.description}>{item.observationTypes.snowpack.values.customHandTest}</Text>)}
@@ -897,7 +897,7 @@ export default function ShowObservation({ route, navigation }) {
               <Text style={styles.link}>{t('tipoTerreno')}:</Text>
             </View>
             
-              { item.observationTypes.quick.values.rodeSlopeTypes?.mellow  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('suave')}</Text></View>)}
+              { item.observationTypes.quick.values.rodeSlopeTypes?.mellow  && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('terrenoSuave')}</Text></View>)}
               { item.observationTypes.quick.values.rodeSlopeTypes?.alpine && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('alpino')}</Text></View>)}
               { item.observationTypes.quick.values.rodeSlopeTypes?.steep && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('empinado')}</Text></View>)}
               { item.observationTypes.quick.values.rodeSlopeTypes?.clear && (<View style={styles.linkContainer}><Text style={styles.link}></Text><Text style={styles.description}>{t('terrenoAbierto')}</Text></View>)}

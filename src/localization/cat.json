@@ -176,7 +176,7 @@
   "placaReciente": "Placa neu recent",
   "debilCapa": "Capa feble persistent",
   "cornisa": "Cornisa",
-  "puntual": "Placa humida",
+  "puntual": "Puntual humida",
   "desli": "Lliscament basal",
   "placaViento": "Placa de vent",
   "placaHumeda": "Placa humida",
@@ -218,6 +218,7 @@
   "testCizalla": "Test de la cisalla de mà",
   "muyFacil": "Molt fàcil",
   "facil": "Fàcil",
+  
   "dificil": "Difícil",
   "noConcluyente": "Sense fractura",
   "cTTest": "Test de la compressió (CT)",
@@ -225,8 +226,8 @@
   "tipoFracturaCT": "Tipus de fractura (CT)",
   "cmSup": "cm des de la superfície",
   "eCTTest": "Test de la columna estesa (ECT)",
-  "propagació": "Propagació",
-  "sinPropagació": "Sense propagació",
+  "propagación": "Propaga fins al final del bloc.",
+  "sinPropagación": "Hi ha fractura però no es propaga fins al final del bloc.",
   "tipoFracturaECT": "Tipus de fractura (ECT)",
   "colapsoSubito": "Col·lapse sobtat",
   "planarResistente": "Planar resistent",
@@ -234,7 +235,7 @@
   "planarSubito": "Planar sobtat",
   "colapsoProgresivo": "Col·lapse progressiu",
   "profFractECT": "Profunditat de fractura (ECT)",
-  "durezaPlaca": "Duresa de la capa (sobre la capa feble)",
+  "durezaPlaca": "Duresa de la placa (sobre la capa feble)",
   "puño": "Puny",
   "dedos4": "4 dits",
   "dedo1": "1 dit",
@@ -242,7 +243,7 @@
   "cuchillo": "Ganivet",
   "hielo": "Gel",
   "durezaPlacaDebil": "Duresa de la capa feble",
-  "humedadCapa": "Humitat de la capa",
+  "humedadCapa": "Humitat de la placa",
   "secaBola": "Seca-Bola impossible",
   "humedaBola": "Humida-Bola fàcil",
   "mojadaGuanteNo": "Molla - bola fàcil i queden gotes d’aigua al guant.",
@@ -386,7 +387,7 @@
 "ra": "exp. en allaus:",
 "ta": "exp. en Terreny d'Allaus:",
 "otraOpcion": "Un altre resultat:",
-"otroResultado": "Resultat alternatiu del Test",
+"otroResultado": "Resultat concret del Test",
 "snackbarErrorMsgCt": "Indica el resultat alternatiu del test",
 
 "ctResistencia": "Resistència",
@@ -409,8 +410,9 @@
 "clearAll":"Esborrar Seleccions",
 
 "offlineMode":"Offline",
-"humedadCapaDebil":"Humitat de la capa feble"
+"humedadCapaDebil":"Humitat de la capa feble",
 
-
+"normal": "Moderat",
+"terrenoSuave": "Feble"
 
 }
