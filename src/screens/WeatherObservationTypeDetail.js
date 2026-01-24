@@ -245,7 +245,7 @@ const [snowIntensity, setSnowIntensity] = useState();
 //Activity type:
 const rainIntensityOptions = [
     {label: t('llovizna')},
-    {label: t('chubasco')},
+    // {label: t('chubasco')},
     {label: t('lluviaConst')},
     {label: t('diluvio')},
 ]
