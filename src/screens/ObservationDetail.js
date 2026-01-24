@@ -600,7 +600,7 @@ export default function ObservationDetail({ route, navigation }) {
             
                   disabled={false} 
                 /> */}
-            <CustomButton text={t('subir')} disabled={!isConnected} bgColor={isConnected ? "#62a256" : "#808080"}  fgColor='white'  onPress={handleSubmit(onSubmit)} />
+            <CustomButton text={t('subir')} disabled={!isConnected} iconName={null} bgColor={isConnected ? "#62a256" : "#808080"}  fgColor='white'  onPress={handleSubmit(onSubmit)} />
           </View>
           <View style={{marginBottom: 30}}>
             <CustomButton text={t('eliminar')}
